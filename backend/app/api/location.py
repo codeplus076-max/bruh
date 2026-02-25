@@ -3,8 +3,11 @@ from typing import Optional, List
 from pydantic import BaseModel
 import requests
 import math
+import os
 
 router = APIRouter(prefix="/hospitals", tags=["hospitals"])
+
+MAPS_API_KEY = os.getenv("MAPS_API_KEY")
 
 class HospitalResponse(BaseModel):
     name: str
@@ -21,12 +24,30 @@ class HospitalsListResponse(BaseModel):
     hospitals: List[HospitalResponse]
 
 def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    R = 6371.0 # Earth radius in kilometers
+    R = 6371.0
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
     a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return round(R * c, 2)
+
+def fetch_place_details(place_id: str) -> dict:
+    """Fetch phone and opening hours from Google Place Details API."""
+    if not MAPS_API_KEY:
+        return {}
+    try:
+        url = "https://maps.googleapis.com/maps/api/place/details/json"
+        params = {
+            "place_id": place_id,
+            "fields": "formatted_phone_number,opening_hours",
+            "key": MAPS_API_KEY
+        }
+        res = requests.get(url, params=params, timeout=5)
+        if res.status_code == 200:
+            return res.json().get("result", {})
+    except Exception:
+        pass
+    return {}
 
 @router.get("/nearby", response_model=HospitalsListResponse)
 async def get_nearby_hospitals(
@@ -34,47 +55,57 @@ async def get_nearby_hospitals(
     lng: float = Query(..., description="User longitude"),
     radius: int = Query(5000, description="Search radius in meters")
 ):
+    if not MAPS_API_KEY:
+        raise HTTPException(status_code=500, detail="MAPS_API_KEY not configured")
+
     try:
-        # Using OpenStreetMap Overpass API for POI (hospitals) around location
-        overpass_url = "http://overpass-api.de/api/interpreter"
-        overpass_query = f"""
-        [out:json];
-        nwr["amenity"="hospital"](around:{radius},{lat},{lng});
-        out center 10;
-        """
-        response = requests.get(overpass_url, params={'data': overpass_query}, timeout=10)
-        
+        # Google Places Nearby Search API
+        url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+        params = {
+            "location": f"{lat},{lng}",
+            "radius": radius,
+            "type": "hospital",
+            "key": MAPS_API_KEY
+        }
+        response = requests.get(url, params=params, timeout=10)
+
         hospitals = []
         if response.status_code == 200:
             data = response.json()
-            for element in data.get("elements", []):
-                # Calculate distance
-                h_lat = element.get("lat") or element.get("center", {}).get("lat")
-                h_lng = element.get("lon") or element.get("center", {}).get("lon")
+            results = data.get("results", [])[:10]  # Limit to 10 results
+
+            for place in results:
+                geometry = place.get("geometry", {}).get("location", {})
+                h_lat = geometry.get("lat")
+                h_lng = geometry.get("lng")
+
+                if h_lat is None or h_lng is None:
+                    continue
+
                 dist = calculate_distance(lat, lng, h_lat, h_lng)
+                name = place.get("name", "Unknown Hospital")
+                address = place.get("vicinity", "Unknown Address")
+                place_id = place.get("place_id", "")
                 
-                tags = element.get("tags", {})
-                name = tags.get("name", "Unknown Hospital")
-                emergency = tags.get("emergency", "no") == "yes"
-                
-                address_parts = [
-                    tags.get("addr:housenumber", ""),
-                    tags.get("addr:street", ""),
-                    tags.get("addr:suburb", ""),
-                    tags.get("addr:city", ""),
-                    tags.get("addr:state", ""),
-                    tags.get("addr:postcode", "")
-                ]
-                address = ", ".join(filter(None, address_parts))
-                if not address:
-                    address = tags.get("addr:full", "Unknown Address")
-                
-                # Try to extract phone and formatting
-                phone = tags.get("contact:phone") or tags.get("phone") or "Unknown Phone"
-                opening_hours = tags.get("opening_hours") or "Unknown Hours"
-                
-                maps_url = f"https://www.openstreetmap.org/?mlat={h_lat}&mlon={h_lng}#map=16/{h_lat}/{h_lng}"
-                
+                # Check for emergency services via types
+                types = place.get("types", [])
+                emergency = "emergency" in types or place.get("permanently_closed") is None
+
+                # Google Maps URL for navigation
+                maps_url = f"https://www.google.com/maps/place/?q=place_id:{place_id}" if place_id else f"https://www.google.com/maps?q={h_lat},{h_lng}"
+
+                # Fetch detailed info (phone, hours) from Place Details
+                details = fetch_place_details(place_id) if place_id else {}
+                phone = details.get("formatted_phone_number")
+                hours_data = details.get("opening_hours", {})
+                if hours_data:
+                    weekday_text = hours_data.get("weekday_text", [])
+                    opening_hours = " | ".join(weekday_text[:2]) if weekday_text else None
+                    if hours_data.get("open_now") is True and not opening_hours:
+                        opening_hours = "Open Now"
+                else:
+                    opening_hours = None
+
                 hospitals.append(HospitalResponse(
                     name=name,
                     address=address,
@@ -86,37 +117,27 @@ async def get_nearby_hospitals(
                     phone=phone,
                     opening_hours=opening_hours
                 ))
-                
+
         # Sort by distance
         hospitals.sort(key=lambda x: x.distance_km)
-        
-        # Fallback mock if API returns nothing (e.g. testing in ocean or rate limited)
+
         if not hospitals:
-            fallback = HospitalResponse(
-                name="Rural General Hospital (Mock Fallback)",
-                address="123 Country Road",
-                distance_km=2.1,
-                lat=lat + 0.018,
-                lng=lng + 0.018,
-                emergency=True,
-                maps_url=f"https://www.openstreetmap.org/?mlat={lat+0.018}&mlon={lng+0.018}#map=16/{lat+0.018}/{lng+0.018}",
-                phone="+1-800-RURAL-MED",
-                opening_hours="24/7"
-            )
-            hospitals.append(fallback)
-            
+            raise ValueError("No hospitals found")
+
         return HospitalsListResponse(hospitals=hospitals)
+
     except Exception as e:
-        # Provide fallback on error
+        # Fallback on error
         fallback = HospitalResponse(
-            name="Rural General Hospital (Mock API Error)",
-            address="123 Country Road",
-            distance_km=2.1,
+            name="Central Hospital (Fallback)",
+            address="Please enable location and try again",
+            distance_km=0.0,
             lat=lat + 0.01,
             lng=lng + 0.01,
             emergency=True,
-            maps_url=f"https://www.openstreetmap.org/?mlat={lat+0.01}&mlon={lng+0.01}#map=16/{lat+0.01}/{lng+0.01}",
-            phone="+1-800-RURAL-MED",
-            opening_hours="24/7"
+            maps_url=f"https://www.google.com/maps/search/hospital/@{lat},{lng},14z",
+            phone=None,
+            opening_hours=None
         )
         return HospitalsListResponse(hospitals=[fallback])
+
