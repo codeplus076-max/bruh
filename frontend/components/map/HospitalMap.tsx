@@ -110,15 +110,15 @@ export function HospitalMap({ t }: { t: Translations }) {
                             </h4>
                             <p className="text-sm text-textMuted mt-1 mb-2">{h.address}</p>
 
-                            {(h.phone || h.opening_hours) && (
+                            {((h.phone && h.phone !== "Unknown Phone") || (h.opening_hours && h.opening_hours !== "Unknown Hours")) && (
                                 <div className="flex flex-col gap-1 mb-3 pt-2 border-t border-borderDark/30">
-                                    {h.phone && (
+                                    {h.phone && h.phone !== "Unknown Phone" && (
                                         <div className="flex items-center gap-1.5 text-xs text-textMuted/80">
                                             <Phone className="w-3 h-3 text-secondary" />
                                             <a href={`tel:${h.phone}`} className="hover:text-secondary hover:underline">{h.phone}</a>
                                         </div>
                                     )}
-                                    {h.opening_hours && (
+                                    {h.opening_hours && h.opening_hours !== "Unknown Hours" && (
                                         <div className="flex items-center gap-1.5 text-xs text-textMuted/80">
                                             <Clock className="w-3 h-3 text-primaryVibrant" />
                                             <span>{h.opening_hours}</span>
