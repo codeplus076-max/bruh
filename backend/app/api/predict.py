@@ -10,9 +10,16 @@ router = APIRouter(prefix="", tags=["predict"])
 
 predictor = DiseasePredictor(model_dir=os.getenv("MODEL_DIR"))
 
-# Initialize OpenAI client securely
+# Initialize OpenAI-compatible client (supports both OpenAI and OpenRouter keys)
 openai_api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=openai_api_key) if openai_api_key else None
+if openai_api_key and openai_api_key.startswith("sk-or-"):
+    # OpenRouter key — use their OpenAI-compatible endpoint
+    client = OpenAI(
+        api_key=openai_api_key,
+        base_url="https://openrouter.ai/api/v1"
+    )
+else:
+    client = OpenAI(api_key=openai_api_key) if openai_api_key else None
 
 class PredictRequest(BaseModel):
     Age: int
