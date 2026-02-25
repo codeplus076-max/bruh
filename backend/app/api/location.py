@@ -17,6 +17,9 @@ class HospitalResponse(BaseModel):
     maps_url: str
     phone: Optional[str] = None
     opening_hours: Optional[str] = None
+    open_now: Optional[bool] = None
+    rating: Optional[float] = None
+    rating_count: Optional[int] = None
 
 class HospitalsListResponse(BaseModel):
     hospitals: List[HospitalResponse]
@@ -29,11 +32,8 @@ def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return round(R * c, 2)
 
-def fetch_place_details(place_id: str) -> dict:
+def fetch_place_details(place_id: str, api_key: str) -> dict:
     """Fetch phone and opening hours from Google Place Details API."""
-    api_key = os.getenv("MAPS_API_KEY")
-    if not api_key:
-        return {}
     try:
         url = "https://maps.googleapis.com/maps/api/place/details/json"
         params = {
@@ -59,12 +59,13 @@ async def get_nearby_hospitals(
         raise HTTPException(status_code=500, detail="MAPS_API_KEY not configured")
 
     try:
-        # Google Places Nearby Search API
+        # Google Places Nearby Search — ranked by prominence
         url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
         params = {
             "location": f"{lat},{lng}",
             "radius": radius,
             "type": "hospital",
+            "rankby": "prominence",
             "key": api_key
         }
         response = requests.get(url, params=params, timeout=10)
@@ -72,7 +73,7 @@ async def get_nearby_hospitals(
         hospitals = []
         if response.status_code == 200:
             data = response.json()
-            results = data.get("results", [])[:10]  # Limit to 10 results
+            results = data.get("results", [])[:12]
 
             for place in results:
                 geometry = place.get("geometry", {}).get("location", {})
@@ -86,25 +87,27 @@ async def get_nearby_hospitals(
                 name = place.get("name", "Unknown Hospital")
                 address = place.get("vicinity", "Unknown Address")
                 place_id = place.get("place_id", "")
-                
-                # Check for emergency services via types
-                types = place.get("types", [])
-                emergency = "emergency" in types or place.get("permanently_closed") is None
+                rating = place.get("rating")
+                rating_count = place.get("user_ratings_total")
 
-                # Google Maps URL for navigation
+                # open_now comes from the Nearby Search result directly
+                opening_hours_brief = place.get("opening_hours", {})
+                open_now = opening_hours_brief.get("open_now") if opening_hours_brief else None
+
+                types = place.get("types", [])
+                emergency = "hospital" in types
+
+                # Google Maps URL using place_id
                 maps_url = f"https://www.google.com/maps/place/?q=place_id:{place_id}" if place_id else f"https://www.google.com/maps?q={h_lat},{h_lng}"
 
-                # Fetch detailed info (phone, hours) from Place Details
-                details = fetch_place_details(place_id) if place_id else {}
+                # Fetch phone from Place Details (separate call)
+                details = fetch_place_details(place_id, api_key) if place_id else {}
                 phone = details.get("formatted_phone_number")
+
+                # Get opening hours text from details if available
                 hours_data = details.get("opening_hours", {})
-                if hours_data:
-                    weekday_text = hours_data.get("weekday_text", [])
-                    opening_hours = " | ".join(weekday_text[:2]) if weekday_text else None
-                    if hours_data.get("open_now") is True and not opening_hours:
-                        opening_hours = "Open Now"
-                else:
-                    opening_hours = None
+                weekday_text = hours_data.get("weekday_text", []) if hours_data else []
+                opening_hours = weekday_text[0] if weekday_text else None  # today's hours
 
                 hospitals.append(HospitalResponse(
                     name=name,
@@ -115,29 +118,33 @@ async def get_nearby_hospitals(
                     emergency=emergency,
                     maps_url=maps_url,
                     phone=phone,
-                    opening_hours=opening_hours
+                    opening_hours=opening_hours,
+                    open_now=open_now,
+                    rating=rating,
+                    rating_count=rating_count
                 ))
 
         # Sort by distance
         hospitals.sort(key=lambda x: x.distance_km)
 
         if not hospitals:
-            raise ValueError("No hospitals found")
+            raise ValueError("No hospitals found in radius")
 
         return HospitalsListResponse(hospitals=hospitals)
 
     except Exception as e:
-        # Fallback on error
         fallback = HospitalResponse(
             name="Central Hospital (Fallback)",
-            address="Please enable location and try again",
+            address="Please enable location access and try again",
             distance_km=0.0,
             lat=lat + 0.01,
             lng=lng + 0.01,
             emergency=True,
             maps_url=f"https://www.google.com/maps/search/hospital/@{lat},{lng},14z",
             phone=None,
-            opening_hours=None
+            opening_hours=None,
+            open_now=None,
+            rating=None,
+            rating_count=None
         )
         return HospitalsListResponse(hospitals=[fallback])
-
