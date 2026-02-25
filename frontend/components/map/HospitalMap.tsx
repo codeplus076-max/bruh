@@ -127,15 +127,29 @@ export function HospitalMap({ t }: { t: Translations }) {
                                 </div>
                             )}
 
-                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-borderDark/50">
+                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-borderDark/50 gap-2">
                                 {h.distance_km > 0
                                     ? <span className="text-xs font-mono text-secondary">{h.distance_km} {t.hospitalDistanceUnit}</span>
                                     : <span className="text-xs font-mono text-primary/60">GPS Origin</span>
                                 }
-
-                                <a href={h.maps_url} target="_blank" rel="noopener noreferrer" className="text-primary text-xs font-medium hover:text-primaryVibrant hover:underline flex items-center gap-1 transition-colors">
-                                    {t.hospitalOpenMaps}
-                                </a>
+                                <div className="flex gap-2">
+                                    <a
+                                        href={`https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs font-medium px-2.5 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-colors"
+                                    >
+                                        🧭 Navigate
+                                    </a>
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.name)}&query_place_id=${h.lat},${h.lng}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs font-medium px-2.5 py-1 rounded-lg bg-surface text-textMuted hover:text-white border border-borderDark hover:border-primary/30 transition-colors"
+                                    >
+                                        📍 View
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
