@@ -17,9 +17,9 @@ const config: Config = {
         background: "#f8fafc", // light gray background
         surface: "#ffffff", // white cards
         surfaceHighlight: "#f1f5f9",
-        primary: "#2563eb", // blue-600
-        primaryVibrant: "#3b82f6", // blue-500
-        primaryMuted: "rgba(37, 99, 235, 0.1)",
+        primary: "#0f83f1", // custom vibrant blue
+        primaryVibrant: "#1b8df7", // custom lighter vibrant blue
+        primaryMuted: "rgba(15, 131, 241, 0.1)",
         secondary: "#10b981", // emerald-500
         danger: "#ef4444", // red-500
         warning: "#f59e0b", // amber-500
