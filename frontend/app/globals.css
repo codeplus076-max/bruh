@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #0a0c10;
+  color: #e2e8f0;
+  font-family: var(--font-outfit), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  /* subtle noise texture + dark grid for atmospheric depth */
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.05), transparent 35%),
+    radial-gradient(circle at 85% 30%, rgba(0, 255, 157, 0.03), transparent 35%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-syne), sans-serif;
+}
+
+/* Glassmorphism primitives */
+.glass-panel {
+  @apply bg-surface/80 backdrop-blur-xl border border-borderDark shadow-glass rounded-2xl;
+}
+
+.glass-pill {
+  @apply bg-surface/50 backdrop-blur-md border border-borderDark px-4 py-2 rounded-full;
+}
+
+/* Custom Scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Markdown prose overrides (if any) */
+.prose {
+  color: #e2e8f0;
+}
+.prose strong {
+  color: #fff;
+  font-weight: 600;
+}
