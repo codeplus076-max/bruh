@@ -12,6 +12,8 @@ type Hospital = {
     lng: number;
     emergency: boolean;
     maps_url: string;
+    phone?: string;
+    opening_hours?: string;
 };
 
 export interface MapProps {
@@ -92,8 +94,10 @@ export default function OSMMap({ userLoc, hospitals }: MapProps) {
                     .addTo(map)
                     .bindPopup(
                         `<strong>${h.name}${h.emergency ? " 🚨" : ""}</strong><br/>
-             ${h.address}<br/>
-             Distance: ${h.distance_km} km<br/>
+             🗺️ ${h.address}<br/>
+             📏 Distance: ${h.distance_km} km<br/>
+             📞 ${h.phone || 'Unknown Phone'}<br/>
+             🕒 ${h.opening_hours || 'Unknown Hours'}<br/>
              <a href="${h.maps_url}" target="_blank" style="color:blue">Open in Maps →</a>`
                     );
             });

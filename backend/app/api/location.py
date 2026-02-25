@@ -39,8 +39,8 @@ async def get_nearby_hospitals(
         overpass_url = "http://overpass-api.de/api/interpreter"
         overpass_query = f"""
         [out:json];
-        node["amenity"="hospital"](around:{radius},{lat},{lng});
-        out body 10;
+        nwr["amenity"="hospital"](around:{radius},{lat},{lng});
+        out center 10;
         """
         response = requests.get(overpass_url, params={'data': overpass_query}, timeout=10)
         
@@ -49,20 +49,29 @@ async def get_nearby_hospitals(
             data = response.json()
             for element in data.get("elements", []):
                 # Calculate distance
-                h_lat = element.get("lat")
-                h_lng = element.get("lon")
+                h_lat = element.get("lat") or element.get("center", {}).get("lat")
+                h_lng = element.get("lon") or element.get("center", {}).get("lon")
                 dist = calculate_distance(lat, lng, h_lat, h_lng)
                 
                 tags = element.get("tags", {})
                 name = tags.get("name", "Unknown Hospital")
                 emergency = tags.get("emergency", "no") == "yes"
-                address = tags.get("addr:street", "Unknown Address")
-                if "addr:city" in tags:
-                    address += f", {tags['addr:city']}"
+                
+                address_parts = [
+                    tags.get("addr:housenumber", ""),
+                    tags.get("addr:street", ""),
+                    tags.get("addr:suburb", ""),
+                    tags.get("addr:city", ""),
+                    tags.get("addr:state", ""),
+                    tags.get("addr:postcode", "")
+                ]
+                address = ", ".join(filter(None, address_parts))
+                if not address:
+                    address = tags.get("addr:full", "Unknown Address")
                 
                 # Try to extract phone and formatting
-                phone = tags.get("contact:phone") or tags.get("phone")
-                opening_hours = tags.get("opening_hours")
+                phone = tags.get("contact:phone") or tags.get("phone") or "Unknown Phone"
+                opening_hours = tags.get("opening_hours") or "Unknown Hours"
                 
                 maps_url = f"https://www.openstreetmap.org/?mlat={h_lat}&mlon={h_lng}#map=16/{h_lat}/{h_lng}"
                 
