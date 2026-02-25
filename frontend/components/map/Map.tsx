@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import type { Map as LeafletMap } from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useState, useCallback } from "react";
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
+
+const MAPS_API_KEY = process.env.NEXT_PUBLIC_MAPS_API_KEY || "";
 
 type Hospital = {
     name: string;
@@ -21,108 +22,152 @@ export interface MapProps {
     hospitals: Hospital[];
 }
 
-export default function OSMMap({ userLoc, hospitals }: MapProps) {
-    const mapRef = useRef<HTMLDivElement>(null);
-    const leafletMapRef = useRef<LeafletMap | null>(null);
+const mapContainerStyle = { width: "100%", height: "400px" };
+const defaultCenter = { lat: 20.5937, lng: 78.9629 }; // Center of India
 
-    useEffect(() => {
-        // Dynamically import leaflet to avoid SSR issues
-        import("leaflet").then((L) => {
-            if (!mapRef.current) return;
+const darkMapStyles = [
+    { elementType: "geometry", stylers: [{ color: "#1a1a2e" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#1a1a2e" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#8892b0" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#0f3460" }] },
+    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#16213e" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#64ffda" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0d1b2a" }] },
+    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#162032" }] },
+    { featureType: "transit", elementType: "geometry", stylers: [{ color: "#162032" }] },
+    { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#1f4068" }] },
+];
 
-            // Destroy existing map instance before re-init
-            if (leafletMapRef.current) {
-                leafletMapRef.current.remove();
-                leafletMapRef.current = null;
-            }
+export default function GoogleMapComponent({ userLoc, hospitals }: MapProps) {
+    const { isLoaded, loadError } = useJsApiLoader({
+        googleMapsApiKey: MAPS_API_KEY,
+    });
 
-            const center: [number, number] = userLoc
-                ? [userLoc.lat, userLoc.lng]
-                : [20.5937, 78.9629]; // Default: center of India
+    const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
 
-            const map = L.map(mapRef.current).setView(center, userLoc ? 13 : 5);
-            leafletMapRef.current = map;
+    const center = userLoc ? { lat: userLoc.lat, lng: userLoc.lng } : defaultCenter;
+    const zoom = userLoc ? 13 : 5;
 
-            L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-                attribution:
-                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            }).addTo(map);
+    const onMapClick = useCallback(() => {
+        setSelectedHospital(null);
+    }, []);
 
-            // Fix default icon URLs
-            const defaultIcon = L.icon({
-                iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-                iconRetinaUrl:
-                    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-                shadowUrl:
-                    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-            });
+    if (loadError) {
+        return (
+            <div className="h-[400px] w-full flex items-center justify-center bg-surface text-textMuted rounded border border-borderDark text-sm">
+                ⚠️ Failed to load Google Maps. Check your API key.
+            </div>
+        );
+    }
 
-            const redIcon = L.icon({
-                iconUrl:
-                    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
-                shadowUrl:
-                    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-            });
-
-            const greenIcon = L.icon({
-                iconUrl:
-                    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-                shadowUrl:
-                    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-            });
-
-            // User location marker
-            if (userLoc) {
-                L.marker([userLoc.lat, userLoc.lng], { icon: greenIcon })
-                    .addTo(map)
-                    .bindPopup("<strong>📍 You are here</strong>");
-            }
-
-            // Hospital markers
-            hospitals.forEach((h) => {
-                const markerIcon = h.emergency ? redIcon : defaultIcon;
-                const phoneStr = h.phone && h.phone !== "Unknown Phone" ? `<br/>📞 ${h.phone}` : "";
-                const hoursStr = h.opening_hours && h.opening_hours !== "Unknown Hours" ? `<br/>🕒 ${h.opening_hours}` : "";
-                const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`;
-
-                L.marker([h.lat, h.lng], { icon: markerIcon })
-                    .addTo(map)
-                    .bindPopup(
-                        `<div style="font-family: inherit; padding-top: 4px;">
-                            <strong>${h.name}${h.emergency ? " 🚨" : ""}</strong><br/>
-                            🗺️ ${h.address}<br/>
-                            📏 Distance: ${h.distance_km} km${phoneStr}${hoursStr}<br/>
-                            <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
-                                <a href="${navUrl}" target="_blank" style="background: #2563eb; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">🧭 Navigate</a>
-                                <a href="${h.maps_url}" target="_blank" style="color: #2563eb; padding: 4px 0; text-decoration: underline; font-size: 12px;">OSM</a>
-                            </div>
-                         </div>`
-                    );
-            });
-        });
-
-        // Cleanup on unmount
-        return () => {
-            if (leafletMapRef.current) {
-                leafletMapRef.current.remove();
-                leafletMapRef.current = null;
-            }
-        };
-    }, [userLoc, hospitals]);
+    if (!isLoaded) {
+        return (
+            <div className="h-[400px] w-full flex items-center justify-center bg-surface text-textMuted rounded border border-borderDark text-sm animate-pulse">
+                Loading Google Maps...
+            </div>
+        );
+    }
 
     return (
-        <div
-            ref={mapRef}
-            className="h-[400px] w-full rounded overflow-hidden border"
-        />
+        <GoogleMap
+            mapContainerStyle={mapContainerStyle}
+            center={center}
+            zoom={zoom}
+            onClick={onMapClick}
+            options={{
+                styles: darkMapStyles,
+                disableDefaultUI: false,
+                zoomControl: true,
+                streetViewControl: false,
+                mapTypeControl: false,
+                fullscreenControl: true,
+            }}
+        >
+            {/* User location marker */}
+            {userLoc && (
+                <Marker
+                    position={{ lat: userLoc.lat, lng: userLoc.lng }}
+                    icon={{
+                        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                        scaledSize: new window.google.maps.Size(40, 40),
+                    }}
+                    title="You are here"
+                />
+            )}
+
+            {/* Hospital markers */}
+            {hospitals.map((h, i) => (
+                <Marker
+                    key={i}
+                    position={{ lat: h.lat, lng: h.lng }}
+                    icon={{
+                        url: h.emergency
+                            ? "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                            : "https://maps.google.com/mapfiles/ms/icons/hospitals.png",
+                        scaledSize: new window.google.maps.Size(36, 36),
+                    }}
+                    onClick={() => setSelectedHospital(h)}
+                    title={h.name}
+                />
+            ))}
+
+            {/* Info window for selected hospital */}
+            {selectedHospital && (
+                <InfoWindow
+                    position={{ lat: selectedHospital.lat, lng: selectedHospital.lng }}
+                    onCloseClick={() => setSelectedHospital(null)}
+                >
+                    <div style={{ fontFamily: "sans-serif", maxWidth: "220px", padding: "4px 0" }}>
+                        <strong style={{ fontSize: "14px" }}>
+                            {selectedHospital.name}{selectedHospital.emergency ? " 🚨" : ""}
+                        </strong>
+                        <p style={{ fontSize: "12px", color: "#555", margin: "4px 0" }}>
+                            🗺️ {selectedHospital.address}
+                        </p>
+                        <p style={{ fontSize: "12px", color: "#555", margin: "2px 0" }}>
+                            📏 {selectedHospital.distance_km} km away
+                        </p>
+                        {selectedHospital.phone && selectedHospital.phone !== "Unknown Phone" && (
+                            <p style={{ fontSize: "12px", margin: "2px 0" }}>
+                                📞 <a href={`tel:${selectedHospital.phone}`} style={{ color: "#2563eb" }}>
+                                    {selectedHospital.phone}
+                                </a>
+                            </p>
+                        )}
+                        {selectedHospital.opening_hours && selectedHospital.opening_hours !== "Unknown Hours" && (
+                            <p style={{ fontSize: "12px", color: "#555", margin: "2px 0" }}>
+                                🕒 {selectedHospital.opening_hours}
+                            </p>
+                        )}
+                        <div style={{ marginTop: "10px", display: "flex", gap: "8px" }}>
+                            <a
+                                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedHospital.lat},${selectedHospital.lng}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    background: "#2563eb",
+                                    color: "white",
+                                    padding: "5px 10px",
+                                    borderRadius: "6px",
+                                    textDecoration: "none",
+                                    fontSize: "12px",
+                                    fontWeight: "600"
+                                }}
+                            >
+                                🧭 Navigate
+                            </a>
+                            <a
+                                href={selectedHospital.maps_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: "#2563eb", fontSize: "12px", alignSelf: "center" }}
+                            >
+                                View on Maps
+                            </a>
+                        </div>
+                    </div>
+                </InfoWindow>
+            )}
+        </GoogleMap>
     );
 }

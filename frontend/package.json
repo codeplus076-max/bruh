@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.8",
     "framer-motion": "^12.34.3",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.575.0",
