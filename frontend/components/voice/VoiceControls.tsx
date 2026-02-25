@@ -81,28 +81,39 @@ export function VoiceControls({ t, onTranscription, currentLang = "en" }: { t: T
   };
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col items-center justify-center p-8">
+      <div className="relative mb-6">
+        {/* Pulsing rings when recording */}
+        {isRecording && (
+          <>
+            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" style={{ animationDuration: '2s' }} />
+            <div className="absolute -inset-4 rounded-full border border-primary/30 animate-pulse" />
+            <div className="absolute -inset-8 rounded-full border border-primary/10 animate-pulse" style={{ animationDelay: '0.5s' }} />
+          </>
+        )}
+
         <button
           onClick={toggleRecording}
-          className={`relative flex items-center justify-center w-12 h-12 rounded-full border transition-all ${isRecording
-            ? "bg-danger/20 border-danger text-danger shadow-[0_0_20px_rgba(255,51,102,0.4)] animate-pulse"
-            : "bg-surfaceHighlight border-borderDark text-primary hover:bg-primary/10 hover:border-primary/50"
+          className={`relative z-10 flex items-center justify-center w-28 h-28 rounded-full shadow-lg transition-transform duration-300 hover:scale-105 ${isRecording
+            ? "bg-danger text-white shadow-[0_0_30px_rgba(239,68,68,0.5)]"
+            : "bg-primary text-white shadow-[0_10px_40px_rgba(37,99,235,0.3)]"
             }`}
         >
           {isRecording ? (
-            <Square className="w-4 h-4 fill-current" />
+            <Square className="w-10 h-10 fill-current" />
           ) : (
-            <Mic className="w-5 h-5" />
+            <Mic className="w-10 h-10" />
           )}
         </button>
+      </div>
 
-        <div className="flex flex-col">
-          <span className="text-white font-medium text-sm tracking-wide">{t.voiceInputTitle}</span>
-          <span className={`text-xs ${errorMsg ? 'text-danger' : isRecording ? 'text-danger animate-pulse' : 'text-textMuted'}`}>
-            {errorMsg ? errorMsg : isRecording ? t.voiceInputListening : t.voiceInputTap}
-          </span>
-        </div>
+      <div className="flex flex-col items-center text-center space-y-2">
+        <h3 className="text-xl font-bold text-slate-800 tracking-tight">
+          {errorMsg ? "Error" : isRecording ? "Listening..." : "Tap to Speak"}
+        </h3>
+        <p className={`text-base px-6 ${errorMsg ? 'text-danger' : isRecording ? 'text-primary animate-pulse' : 'text-slate-500'}`}>
+          {errorMsg ? errorMsg : isRecording ? "Speak now..." : "Describe your symptoms clearly"}
+        </p>
       </div>
     </div>
   );

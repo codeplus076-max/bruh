@@ -13,18 +13,14 @@ export function LanguageSwitcher({
     onChange: (l: Language) => void;
 }) {
     return (
-        <div className="inline-flex items-center gap-1 p-1 bg-surface/80 backdrop-blur-md rounded-full border border-borderDark shadow-glass">
-            <div className="pl-3 pr-2 py-1 text-primary/70 flex items-center">
-                <Globe className="w-4 h-4" />
-            </div>
-            <div className="w-px h-5 bg-borderDark/80 mx-1" />
+        <div className="flex items-center gap-2 p-1 bg-white rounded-full border border-slate-100 shadow-sm overflow-x-auto no-scrollbar w-full max-w-sm">
             {(["en", "hi", "mr"] as Language[]).map((lang) => (
                 <button
                     key={lang}
                     onClick={() => onChange(lang)}
-                    className={`relative px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-widest transition-all ${current === lang
-                            ? "text-background bg-primary shadow-neon"
-                            : "text-textMuted hover:text-white"
+                    className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all flex-1 ${current === lang
+                        ? "bg-primary text-white shadow-md"
+                        : "text-slate-500 hover:text-slate-800"
                         }`}
                 >
                     {labels[lang]}
