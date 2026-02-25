@@ -1,1 +1,13 @@
+# ML model files (too large for GitHub)
 backend/app/ml/*.joblib
+
+# Environment files — NEVER commit secrets
+.env
+**/.env
+**/.env.local
+**/.env.production
+**/.env.development
+
+# Python virtual environment
+backend/venv/
+venv/
