@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Translations } from "@/lib/translations";
-import { MapPin, AlertCircle, Crosshair, Phone, Clock, Star } from "lucide-react";
+import { MapPin, AlertCircle, Crosshair, Globe, Navigation } from "lucide-react";
 import { motion } from "framer-motion";
 
 type Hospital = {
@@ -16,12 +16,47 @@ type Hospital = {
     maps_url: string;
     phone?: string;
     opening_hours?: string;
-    open_now?: boolean;
     rating?: number;
-    rating_count?: number;
+    user_ratings_total?: number;
+    website?: string;
+    wheelchair_accessible?: boolean;
+    open_now?: boolean;
+    specialty?: string;
 };
 
 const MapComponent = dynamic(() => import("./Map"), { ssr: false });
+
+function StarRating({ rating }: { rating: number }) {
+    const full = Math.floor(rating);
+    const half = rating - full >= 0.5;
+    return (
+        <span className="flex items-center gap-0.5">
+            {Array.from({ length: 5 }).map((_, i) => {
+                const filled = i < full;
+                const isHalf = !filled && half && i === full;
+                return (
+                    <svg key={i} className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+                        {filled ? (
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#f59e0b" />
+                        ) : isHalf ? (
+                            <>
+                                <defs>
+                                    <linearGradient id={`half-${i}`}>
+                                        <stop offset="50%" stopColor="#f59e0b" />
+                                        <stop offset="50%" stopColor="#374151" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill={`url(#half-${i})`} />
+                            </>
+                        ) : (
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#374151" />
+                        )}
+                    </svg>
+                );
+            })}
+        </span>
+    );
+}
 
 export function HospitalMap({ t }: { t: Translations }) {
     const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -56,8 +91,8 @@ export function HospitalMap({ t }: { t: Translations }) {
                         lng: longitude + 0.01,
                         emergency: true,
                         maps_url: `https://www.google.com/maps/search/hospital/@${latitude},${longitude},14z`,
-                        phone: undefined,
-                        opening_hours: undefined,
+                        phone: "+1-800-RURAL-MED",
+                        opening_hours: "24/7"
                     }]);
                 }
                 setLoading(false);
@@ -65,24 +100,7 @@ export function HospitalMap({ t }: { t: Translations }) {
             () => {
                 setError(t.hospitalNoAccess);
                 setLoading(false);
-            },
-            // High accuracy GPS — get exact position
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
-    };
-
-    const renderStars = (rating: number) => {
-        const full = Math.floor(rating);
-        const half = rating % 1 >= 0.5;
-        return (
-            <span className="flex items-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                        key={i}
-                        className={`w-3 h-3 ${i < full ? "text-yellow-400 fill-yellow-400" : half && i === full ? "text-yellow-400 fill-yellow-400/50" : "text-textMuted/30"}`}
-                    />
-                ))}
-            </span>
+            }
         );
     };
 
@@ -112,101 +130,114 @@ export function HospitalMap({ t }: { t: Translations }) {
                 <MapComponent userLoc={userLoc} hospitals={hospitals} />
             </div>
 
-            <div className="p-4 space-y-3 max-h-[380px] overflow-y-auto custom-scrollbar">
+            {/* Hospital cards */}
+            <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
                 {hospitals.map((h, i) => (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                         key={i}
-                        className={`p-4 rounded-xl border relative overflow-hidden transition-all hover:shadow-glass ${h.emergency
-                            ? "bg-danger/5 border-danger/20 hover:border-danger/40"
-                            : "bg-surfaceHighlight/50 border-borderDark hover:border-primary/30"
-                            }`}
+                        className="bg-white/5 border border-borderDark rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-glass transition-all"
                     >
-                        {h.emergency && <div className="absolute top-0 right-0 w-16 h-16 bg-danger/10 blur-2xl rounded-full" />}
+                        {/* Card body */}
+                        <div className="p-4 flex gap-3">
+                            {/* Left: info */}
+                            <div className="flex-1 min-w-0">
+                                {/* Name + emergency badge */}
+                                <div className="flex items-start gap-2 flex-wrap">
+                                    <h4 className="font-bold text-white text-[15px] leading-snug">
+                                        {h.name}
+                                    </h4>
+                                    {h.emergency && (
+                                        <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-danger/20 text-danger border border-danger/20">
+                                            {t.hospitalEmergency}
+                                        </span>
+                                    )}
+                                </div>
 
-                        <div className="relative z-10">
-                            {/* Name + Emergency badge */}
-                            <div className="flex items-start justify-between gap-2 mb-1">
-                                <h4 className="font-bold text-white tracking-wide text-[15px] leading-snug">
-                                    {h.name}
-                                </h4>
-                                {h.emergency && (
-                                    <span className="shrink-0 px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-danger/20 text-danger border border-danger/20">
-                                        {t.hospitalEmergency}
-                                    </span>
-                                )}
-                            </div>
-
-                            {/* Address */}
-                            <p className="text-sm text-textMuted mb-2">{h.address}</p>
-
-                            {/* Rating + Open/Closed */}
-                            <div className="flex items-center gap-3 mb-3">
-                                {h.rating !== undefined && h.rating !== null && (
-                                    <div className="flex items-center gap-1.5">
-                                        {renderStars(h.rating)}
-                                        <span className="text-xs text-yellow-400 font-semibold">{h.rating.toFixed(1)}</span>
-                                        {h.rating_count && (
-                                            <span className="text-xs text-textMuted/60">({h.rating_count.toLocaleString()})</span>
+                                {/* Rating row */}
+                                {h.rating != null && (
+                                    <div className="flex items-center gap-1.5 mt-1.5">
+                                        <span className="text-sm font-bold text-amber-400">{h.rating.toFixed(1)}</span>
+                                        <StarRating rating={h.rating} />
+                                        {h.user_ratings_total != null && (
+                                            <span className="text-xs text-textMuted">({h.user_ratings_total.toLocaleString()})</span>
                                         )}
                                     </div>
                                 )}
-                                {h.open_now !== undefined && h.open_now !== null && (
-                                    <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${h.open_now ? "text-emerald-400 bg-emerald-400/10" : "text-red-400 bg-red-400/10"}`}>
-                                        {h.open_now ? "Open Now" : "Closed"}
-                                    </span>
+
+                                {/* Specialty · wheelchair · address */}
+                                <p className="text-xs text-textMuted mt-1.5 leading-relaxed">
+                                    {h.specialty && <span>{h.specialty}</span>}
+                                    {h.wheelchair_accessible && <span> · ♿</span>}
+                                    {h.address && h.address !== "Unknown Address" && (
+                                        <span className={h.specialty ? " · " : ""}>{h.address}</span>
+                                    )}
+                                </p>
+
+                                {/* Open/Closed + hours + phone */}
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5">
+                                    {h.open_now != null && (
+                                        <span className={`text-xs font-semibold ${h.open_now ? "text-emerald-400" : "text-danger"}`}>
+                                            {h.open_now ? "Open" : "Closed"}
+                                        </span>
+                                    )}
+                                    {h.opening_hours && h.opening_hours !== "Unknown Hours" && (
+                                        <span className="text-xs text-textMuted">{h.opening_hours}</span>
+                                    )}
+                                    {h.phone && h.phone !== "Unknown Phone" && (
+                                        <>
+                                            <span className="text-xs text-textMuted/40">·</span>
+                                            <a
+                                                href={`tel:${h.phone}`}
+                                                className="text-xs text-textMuted hover:text-secondary transition-colors"
+                                            >
+                                                {h.phone}
+                                            </a>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Distance badge */}
+                                {h.distance_km > 0 && (
+                                    <p className="text-xs font-mono text-secondary/70 mt-1.5">
+                                        📍 {h.distance_km} km away
+                                    </p>
                                 )}
                             </div>
 
-                            {/* Phone + Hours */}
-                            {(h.phone || h.opening_hours) && (
-                                <div className="flex flex-col gap-1 mb-3 pt-2 border-t border-borderDark/30">
-                                    {h.phone && (
-                                        <div className="flex items-center gap-1.5 text-xs text-textMuted/80">
-                                            <Phone className="w-3 h-3 text-secondary" />
-                                            <a href={`tel:${h.phone}`} className="hover:text-secondary hover:underline">{h.phone}</a>
-                                        </div>
-                                    )}
-                                    {h.opening_hours && (
-                                        <div className="flex items-center gap-1.5 text-xs text-textMuted/80">
-                                            <Clock className="w-3 h-3 text-primaryVibrant" />
-                                            <span>{h.opening_hours}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Distance + Buttons */}
-                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-borderDark/50 gap-2">
-                                {h.distance_km > 0
-                                    ? <span className="text-xs font-mono text-secondary">{h.distance_km} {t.hospitalDistanceUnit}</span>
-                                    : <span className="text-xs font-mono text-primary/60">GPS Origin</span>
-                                }
-                                <div className="flex gap-2">
+                            {/* Right: Website + Directions icon buttons */}
+                            <div className="flex flex-col gap-2 items-center shrink-0 pt-0.5">
+                                {h.website && (
                                     <a
-                                        href={userLoc
-                                            ? `https://www.google.com/maps/dir/?api=1&origin=${userLoc.lat},${userLoc.lng}&destination=${h.lat},${h.lng}&travelmode=driving`
-                                            : `https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`
-                                        }
+                                        href={h.website}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-xs font-medium px-2.5 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-colors"
+                                        className="flex flex-col items-center gap-1 group"
+                                        title="Visit website"
                                     >
-                                        🧭 Navigate
+                                        <span className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                            <Globe className="w-4 h-4 text-primary" />
+                                        </span>
+                                        <span className="text-[10px] text-textMuted group-hover:text-primary transition-colors">Website</span>
                                     </a>
-                                    <a
-                                        href={h.maps_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs font-medium px-2.5 py-1 rounded-lg bg-surface text-textMuted hover:text-white border border-borderDark hover:border-primary/30 transition-colors"
-                                    >
-                                        📍 View
-                                    </a>
-                                </div>
+                                )}
+                                <a
+                                    href={`https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex flex-col items-center gap-1 group"
+                                    title="Get directions"
+                                >
+                                    <span className="w-10 h-10 rounded-full bg-secondary/10 border border-secondary/20 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+                                        <Navigation className="w-4 h-4 text-secondary" />
+                                    </span>
+                                    <span className="text-[10px] text-textMuted group-hover:text-secondary transition-colors">Directions</span>
+                                </a>
                             </div>
                         </div>
                     </motion.div>
                 ))}
+
                 {hospitals.length === 0 && !loading && userLoc && (
                     <div className="py-8 px-4 text-center border border-dashed border-borderDark rounded-xl">
                         <p className="text-sm text-textMuted/60 font-mono">{t.hospitalNone}</p>
