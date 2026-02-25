@@ -90,15 +90,22 @@ export default function OSMMap({ userLoc, hospitals }: MapProps) {
             // Hospital markers
             hospitals.forEach((h) => {
                 const markerIcon = h.emergency ? redIcon : defaultIcon;
+                const phoneStr = h.phone && h.phone !== "Unknown Phone" ? `<br/>📞 ${h.phone}` : "";
+                const hoursStr = h.opening_hours && h.opening_hours !== "Unknown Hours" ? `<br/>🕒 ${h.opening_hours}` : "";
+                const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`;
+
                 L.marker([h.lat, h.lng], { icon: markerIcon })
                     .addTo(map)
                     .bindPopup(
-                        `<strong>${h.name}${h.emergency ? " 🚨" : ""}</strong><br/>
-             🗺️ ${h.address}<br/>
-             📏 Distance: ${h.distance_km} km<br/>
-             📞 ${h.phone || 'Unknown Phone'}<br/>
-             🕒 ${h.opening_hours || 'Unknown Hours'}<br/>
-             <a href="${h.maps_url}" target="_blank" style="color:blue">Open in Maps →</a>`
+                        `<div style="font-family: inherit; padding-top: 4px;">
+                            <strong>${h.name}${h.emergency ? " 🚨" : ""}</strong><br/>
+                            🗺️ ${h.address}<br/>
+                            📏 Distance: ${h.distance_km} km${phoneStr}${hoursStr}<br/>
+                            <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+                                <a href="${navUrl}" target="_blank" style="background: #2563eb; color: white; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500;">🧭 Navigate</a>
+                                <a href="${h.maps_url}" target="_blank" style="color: #2563eb; padding: 4px 0; text-decoration: underline; font-size: 12px;">OSM</a>
+                            </div>
+                         </div>`
                     );
             });
         });

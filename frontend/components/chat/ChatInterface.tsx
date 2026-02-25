@@ -5,16 +5,14 @@ import { Translations } from "@/lib/translations";
 import { Send, ActivitySquare, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Message = { role: "assistant" | "user"; text: string };
-type Step = "symptoms" | "age" | "duration" | "result";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Message = { role: "assistant" | "user"; content: string; diagnosis?: any };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function ChatInterface({ t, lang, input, setInput }: { t: Translations, lang: string, input: string, setInput: (v: string) => void }) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(false);
-    const [step, setStep] = useState<Step>("symptoms");
-    const [collected, setCollected] = useState({ symptoms: "", age: 0, duration: 0 });
     const [isMuted, setIsMuted] = useState(false);
     const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -30,7 +28,11 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
     const speak = useCallback((content: string) => {
         if (isMuted || typeof window === "undefined" || !window.speechSynthesis) return;
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(content);
+
+        // Strip emojis to prevent reading them aloud
+        const cleanContent = content.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+
+        const utterance = new SpeechSynthesisUtterance(cleanContent);
 
         // Explicitly set language based on frontend state
         const preferredLang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
@@ -50,109 +52,60 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
         window.speechSynthesis.speak(utterance);
     }, [isMuted, lang, voices]);
 
+    // Initialize chat session on mount
     useEffect(() => {
-        setMessages([{ role: "assistant", text: t.chatGreeting }]);
-        setStep("symptoms");
-        setCollected({ symptoms: "", age: 0, duration: 0 });
-        setInput("");
-        // Initially speak the greeting on lang change if not muted
+        setMessages([{ role: "assistant", content: t.chatGreeting }]);
         speak(t.chatGreeting);
-    }, [t, lang, setInput, speak]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount
 
-    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
     useEffect(() => {
         // Cleanup speech on unmount
         return () => window.speechSynthesis?.cancel();
     }, []);
 
-    const addMsg = (role: "assistant" | "user", text: string) => {
-        setMessages((prev) => [...prev, { role, text }]);
-        if (role === "assistant") {
-            // Remove common emojis manually to avoid TS 'es6' regex flag errors
-            const textToSpeak = text
-                .replace(/👋/g, "")
-                .replace(/🙏/g, "")
-                .replace(/📋/g, "")
-                .replace(/🔍/g, "")
-                .replace(/😊/g, "")
-                .replace(/🤒/g, "")
-                .replace(/📊/g, "")
-                .replace(/🔴/g, "")
-                .replace(/🟡/g, "")
-                .replace(/🟢/g, "")
-                .replace(/💊/g, "")
-                .replace(/⚠️/g, "")
-                .replace(/🌿/g, "");
-            speak(textToSpeak);
-        } else {
-            window.speechSynthesis?.cancel();
-        }
-    };
-
-    const delay = (fn: () => void, ms: number) => setTimeout(fn, ms);
-
     const handleSend = async () => {
         const text = input.trim();
         if (!text || loading) return;
+
         setInput("");
-        addMsg("user", text);
+        window.speechSynthesis?.cancel();
 
-        if (step === "symptoms") {
-            setCollected((c) => ({ ...c, symptoms: text }));
-            setStep("age");
-            delay(() => addMsg("assistant", t.chatAskAge), 600);
+        // Add user message to UI immediately
+        const userMsg: Message = { role: "user", content: text };
+        const newMessagesContext = [...messages, userMsg];
+        setMessages(newMessagesContext);
+        setLoading(true);
 
-        } else if (step === "age") {
-            const age = parseInt(text);
-            if (isNaN(age) || age < 1 || age > 120) {
-                delay(() => addMsg("assistant", t.chatInvalidAge), 400);
-                return;
-            }
-            setCollected((c) => ({ ...c, age }));
-            setStep("duration");
-            delay(() => addMsg("assistant", t.chatAskDuration), 600);
+        try {
+            const res = await fetch(`${API_URL}/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    // Cleanse diagnosis obj from payload sent to backend to match strict pydantic type
+                    messages: newMessagesContext.map(m => ({ role: m.role, content: m.content })),
+                    language: lang
+                }),
+            });
 
-        } else if (step === "duration") {
-            const duration = parseFloat(text);
-            if (isNaN(duration) || duration < 0) {
-                delay(() => addMsg("assistant", t.chatInvalidDuration), 400);
-                return;
-            }
-            const finalData = { ...collected, duration };
-            setStep("result");
-            setLoading(true);
-            delay(() => addMsg("assistant", t.chatAnalysing), 500);
+            if (!res.ok) throw new Error("API Error");
 
-            try {
-                const severity = duration > 5 ? 3 : duration > 2 ? 2 : 1;
-                const res = await fetch(`${API_URL}/predict`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ Age: finalData.age, Gender: 1, Severity: severity, Duration_Min_Days: finalData.duration }),
-                });
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                const msg = t.chatResultLabel(finalData.symptoms, data.disease, data.risk_level, data.triage_guidance, data.risk_level === "High");
-                delay(() => addMsg("assistant", msg), 1500);
-            } catch {
-                delay(() => addMsg("assistant", t.chatError), 1500);
-            } finally {
-                setLoading(false);
-            }
+            const data = await res.json();
 
-        } else {
-            setStep("symptoms");
-            setCollected({ symptoms: "", age: 0, duration: 0 });
-            delay(() => addMsg("assistant", t.chatRestart), 500);
+            const aiMsg: Message = { role: "assistant", content: data.content, diagnosis: data.diagnosis };
+            setMessages(prev => [...prev, aiMsg]);
+
+            speak(data.content);
+        } catch {
+            const errorMsg: Message = { role: "assistant", content: t.chatError };
+            setMessages(prev => [...prev, errorMsg]);
+            speak(t.chatError);
+        } finally {
+            setLoading(false);
         }
     };
-
-    const placeholder =
-        step === "symptoms" ? t.chatPlaceholderSymptoms
-            : step === "age" ? t.chatPlaceholderAge
-                : step === "duration" ? t.chatPlaceholderDuration
-                    : t.chatPlaceholderRestart;
 
     return (
         <div className="flex flex-col h-[560px] glass-panel overflow-hidden relative">
@@ -191,17 +144,16 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
                                 ? "bg-primary/10 text-primary border border-primary/30 rounded-2xl rounded-tr-sm"
                                 : "bg-surface text-textMain border border-borderDark rounded-2xl rounded-tl-sm ring-1 ring-white/5"
                                 }`}>
-                                {m.text.includes("🔴") || m.text.includes("🟡") || m.text.includes("🟢") ? (
-                                    // Style the markdown-ish result specifically
-                                    <div className="space-y-3">
-                                        {m.text.split('\n\n').map((block, idx) => (
-                                            <p key={idx} className={block.includes("⚠️") ? "text-warning font-medium p-3 bg-warning/10 rounded-lg border border-warning/20" : ""}>
-                                                {block}
-                                            </p>
-                                        ))}
+                                {m.content}
+
+                                {m.diagnosis && (
+                                    <div className={`mt-3 p-4 rounded-xl border ${m.diagnosis.is_high_risk ? 'bg-warning/10 border-warning/30' : 'bg-primary/5 border-primary/20'}`}>
+                                        <div className="space-y-2">
+                                            <p><span className="font-semibold text-white">📊 Condition:</span> {m.diagnosis.disease}</p>
+                                            <p><span className="font-semibold text-white">⚠️ Risk Level:</span> <span className={m.diagnosis.is_high_risk ? 'text-warning font-bold' : 'text-primary'}>{m.diagnosis.risk_level}</span></p>
+                                            <p className="pt-2 border-t border-borderDark text-textMuted"><span className="text-white">💊 Advice:</span> {m.diagnosis.triage_guidance}</p>
+                                        </div>
                                     </div>
-                                ) : (
-                                    m.text
                                 )}
                             </div>
                         </motion.div>
@@ -230,7 +182,7 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder={placeholder}
+                        placeholder="Type to chat..."
                         className="flex-1 bg-surface border border-borderDark rounded-full px-5 py-3.5 text-sm text-textMain outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-textMuted/60"
                         onKeyDown={(e) => e.key === "Enter" && handleSend()}
                         disabled={loading}
