@@ -38,7 +38,7 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
 
         // Find and bind real voice payload
         if (voices.length > 0) {
-            let targetLangCode = lang === "hi" ? "hi" : lang === "mr" ? "mr" : "en";
+            const targetLangCode = lang === "hi" ? "hi" : lang === "mr" ? "mr" : "en";
             const matchedVoice = voices.find(v => v.lang.toLowerCase().includes(targetLangCode));
             if (matchedVoice) {
                 utterance.voice = matchedVoice;
