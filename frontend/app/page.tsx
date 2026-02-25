@@ -7,7 +7,7 @@ import { VoiceControls } from "@/components/voice/VoiceControls";
 import { HospitalMap } from "@/components/map/HospitalMap";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Language, translations } from "@/lib/translations";
-import { BriefcaseMedical, Moon, User, Activity } from "lucide-react";
+import { Activity, ShieldAlert, Cpu } from "lucide-react";
 
 const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -17,107 +17,105 @@ const containerVariants: Variants = {
     }
 };
 
+const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: { type: "spring" as const, stiffness: 80, damping: 15 }
+    }
+};
+
 export default function Home() {
     const [lang, setLang] = useState<Language>("en");
     const [chatInput, setChatInput] = useState("");
-    const [isAnalyzed, setIsAnalyzed] = useState(false);
     const t = translations[lang];
 
     return (
-        <main className="min-h-screen bg-slate-100 text-slate-900 pb-12 font-sans selection:bg-primary/30 flex justify-center w-full">
-            <div className="w-full max-w-md bg-slate-50 min-h-screen shadow-2xl relative overflow-hidden flex flex-col pt-6 pb-20 sm:rounded-[40px] sm:my-8 sm:min-h-[850px] border-4 border-slate-200">
+        <main className="relative min-h-screen text-textMain selection:bg-primary/30 selection:text-primaryVibrant overflow-hidden pb-12">
 
-                <motion.div
-                    className="relative z-10 w-full flex flex-col space-y-8"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="show"
+            {/* Background Atmosphere */}
+            <div className="absolute inset-x-0 top-0 h-[600px] bg-hero-glow pointer-events-none opacity-40 mix-blend-screen" />
+
+            <motion.div
+                className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-16 space-y-12"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+            >
+                {/* Header Section */}
+                <motion.header
+                    variants={itemVariants}
+                    className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-borderDark"
                 >
-                    {/* Header */}
-                    <div className="px-6 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-white shadow-md">
-                                <BriefcaseMedical className="w-5 h-5" />
-                            </div>
-                            <div className="flex flex-col">
-                                <h1 className="text-xl font-bold text-slate-800 leading-none mb-1 tracking-tight">TriageAI</h1>
-                                <p className="text-xs text-slate-500 font-medium tracking-wide">Rural Health Assistant</p>
-                            </div>
+                    <div className="space-y-4 max-w-2xl">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-primary/20 text-primary text-xs font-mono tracking-widest uppercase">
+                            <Cpu className="w-3.5 h-3.5" />
+                            <span>Bio-Triage Online</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button className="w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500">
-                                <Moon className="w-4 h-4" />
-                            </button>
-                            <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center overflow-hidden border border-orange-200">
-                                <User className="w-5 h-5 text-orange-400 mt-1" />
-                            </div>
-                        </div>
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white tracking-tight leading-tight mix-blend-plus-lighter">
+                            {t.appTitle}
+                        </h1>
+                        <p className="text-lg text-textMuted font-light max-w-xl leading-relaxed">
+                            {t.appSubtitle}
+                        </p>
                     </div>
 
-                    {/* Language Switcher */}
-                    <div className="px-6 flex justify-center">
+                    <div className="flex flex-col items-start lg:items-end gap-3 shrink-0 pt-4 lg:pt-0">
                         <LanguageSwitcher current={lang} onChange={setLang} />
                     </div>
+                </motion.header>
 
-                    {/* Main Content Area */}
-                    <div className="flex-1 px-4 space-y-6 flex flex-col">
+                {/* Disclaimer Bar */}
+                <motion.section variants={itemVariants} className="relative overflow-hidden rounded-xl bg-danger/10 border border-danger/20 p-4 shadow-glass">
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-danger shadow-[0_0_15px_rgba(255,51,102,0.8)]" />
+                    <div className="flex items-start gap-4">
+                        <ShieldAlert className="w-5 h-5 text-danger shrink-0 mt-0.5" />
+                        <p className="text-sm text-textMain/90 leading-relaxed font-light">
+                            {t.disclaimer}
+                        </p>
+                    </div>
+                </motion.section>
 
-                        {/* Voice Node */}
-                        <div className="w-full relative z-10 flex flex-col items-center">
+                {/* Main Grid Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+
+                    {/* Chat Side */}
+                    <motion.div variants={itemVariants} className="lg:col-span-7 flex flex-col gap-6">
+                        <div className="flex items-center gap-3 mb-2">
+                            <Activity className="w-5 h-5 text-secondary" />
+                            <h2 className="text-xl font-heading text-white">{t.diagnosticChat}</h2>
+                        </div>
+
+                        <div className="relative z-20 shadow-glass rounded-2xl">
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-[18px] blur opacity-30" />
+                            <ChatInterface t={t} lang={lang} input={chatInput} setInput={setChatInput} />
+                        </div>
+
+                        {/* Voice Control Node */}
+                        <div className="glass-panel p-4">
                             <VoiceControls
                                 t={t}
                                 currentLang={lang}
-                                onTranscription={(text) => {
-                                    setChatInput((prev) => prev ? prev + " " + text : text);
-                                    setIsAnalyzed(false);
-                                }}
+                                onTranscription={(text) => setChatInput((prev) => prev ? prev + " " + text : text)}
                             />
                         </div>
+                    </motion.div>
 
-                        {/* Live Transcript Card */}
-                        {chatInput && !isAnalyzed && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                className="w-full bg-white rounded-3xl p-6 shadow-card border border-slate-100 mx-auto max-w-[95%]"
-                            >
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">Live Transcript</span>
-                                    <span className="w-2 h-2 rounded-full bg-danger animate-pulse"></span>
-                                </div>
-                                <p className="text-lg text-slate-800 leading-relaxed font-medium mb-6">
-                                    &quot;{chatInput}&quot;
-                                </p>
-                                <button
-                                    onClick={() => setIsAnalyzed(true)}
-                                    className="w-full py-4 bg-primary hover:bg-primaryVibrant text-white rounded-2xl font-bold text-[15px] shadow-md transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Activity className="w-5 h-5" />
-                                    Analyze Symptoms
-                                </button>
-                            </motion.div>
-                        )}
-
-                        {/* Interactive Chat and Map Section (Revealed automatically or manually) */}
-                        <div className={`w-full transition-opacity duration-500 ${isAnalyzed ? 'opacity-100' : 'opacity-40 pointer-events-none hidden'}`}>
-                            <div className="space-y-6 px-2">
-                                <div className="glass-panel overflow-hidden border-0">
-                                    <ChatInterface t={t} lang={lang} input={chatInput} setInput={setChatInput} />
-                                </div>
-
-                                <div className="glass-panel p-4 pb-0 bg-white">
-                                    <p className="font-bold text-slate-700 mb-3 px-2 flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-primary" />
-                                        {t.locationServices}
-                                    </p>
-                                    <HospitalMap t={t} />
-                                </div>
-                            </div>
+                    {/* Map Side */}
+                    <motion.div variants={itemVariants} className="lg:col-span-5 flex flex-col gap-6 sticky top-8">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-2 h-2 rounded-full bg-primary shadow-neon" />
+                            <h2 className="text-xl font-heading text-white">{t.locationServices}</h2>
                         </div>
 
-                    </div>
-                </motion.div>
-            </div>
+                        <div className="relative shadow-glass rounded-2xl">
+                            <HospitalMap t={t} />
+                        </div>
+                    </motion.div>
+
+                </div>
+            </motion.div>
         </main>
     );
 }
