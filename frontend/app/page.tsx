@@ -95,6 +95,7 @@ export default function Home() {
                         {/* Voice Control Node */}
                         <div className="glass-panel p-4">
                             <VoiceControls
+                                t={t}
                                 currentLang={lang}
                                 onTranscription={(text) => setChatInput((prev) => prev ? prev + " " + text : text)}
                             />

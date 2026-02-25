@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Mic, Square } from "lucide-react";
+import { Translations } from "@/lib/translations";
 
-export function VoiceControls({ onTranscription, currentLang = "en" }: { onTranscription: (text: string) => void, currentLang?: string }) {
+export function VoiceControls({ t, onTranscription, currentLang = "en" }: { t: Translations, onTranscription: (text: string) => void, currentLang?: string }) {
   const [isRecording, setIsRecording] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,7 +34,7 @@ export function VoiceControls({ onTranscription, currentLang = "en" }: { onTrans
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
       if (!SpeechRecognition) {
-        setErrorMsg("Voice not supported in this browser");
+        setErrorMsg(t.voiceInputErrorNotSupported);
         return;
       }
 
@@ -61,7 +62,7 @@ export function VoiceControls({ onTranscription, currentLang = "en" }: { onTrans
       recognition.onerror = (event: any) => {
         console.error("Speech recognition error", event.error);
         if (event.error !== "no-speech") {
-          setErrorMsg("Microphone error");
+          setErrorMsg(t.voiceInputErrorMicrophone);
         }
         setIsRecording(false);
       };
@@ -97,9 +98,9 @@ export function VoiceControls({ onTranscription, currentLang = "en" }: { onTrans
         </button>
 
         <div className="flex flex-col">
-          <span className="text-white font-medium text-sm tracking-wide">Voice Input</span>
+          <span className="text-white font-medium text-sm tracking-wide">{t.voiceInputTitle}</span>
           <span className={`text-xs ${errorMsg ? 'text-danger' : isRecording ? 'text-danger animate-pulse' : 'text-textMuted'}`}>
-            {errorMsg ? errorMsg : isRecording ? "Listening now..." : "Tap to speak your symptoms"}
+            {errorMsg ? errorMsg : isRecording ? t.voiceInputListening : t.voiceInputTap}
           </span>
         </div>
       </div>

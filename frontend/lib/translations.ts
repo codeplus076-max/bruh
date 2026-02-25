@@ -37,6 +37,13 @@ export const translations = {
         hospitalEmergency: "Emergency",
         hospitalOpenMaps: "Open in Maps →",
         hospitalDistanceUnit: "km away",
+
+        // Voice
+        voiceInputTitle: "Voice Input",
+        voiceInputTap: "Tap to speak your symptoms",
+        voiceInputListening: "Listening now...",
+        voiceInputErrorNotSupported: "Voice not supported in this browser",
+        voiceInputErrorMicrophone: "Microphone error",
     },
 
     hi: {
@@ -72,6 +79,13 @@ export const translations = {
         hospitalEmergency: "आपातकाल",
         hospitalOpenMaps: "मानचित्र में खोलें →",
         hospitalDistanceUnit: "किमी दूर",
+
+        // Voice
+        voiceInputTitle: "वॉयस इनपुट",
+        voiceInputTap: "अपने लक्षण बोलने के लिए टैप करें",
+        voiceInputListening: "अब सुन रहा हूँ...",
+        voiceInputErrorNotSupported: "इस ब्राउज़र में वॉयस इनपुट समर्थित नहीं है",
+        voiceInputErrorMicrophone: "माइक्रोफ़ोन त्रुटि",
     },
 
     mr: {
@@ -107,6 +121,13 @@ export const translations = {
         hospitalEmergency: "आपत्काल",
         hospitalOpenMaps: "नकाशात उघडा →",
         hospitalDistanceUnit: "किमी दूर",
+
+        // Voice
+        voiceInputTitle: "व्हॉइस इनपुट",
+        voiceInputTap: "तुमची लक्षणे बोलण्यासाठी टॅप करा",
+        voiceInputListening: "आता ऐकत आहे...",
+        voiceInputErrorNotSupported: "या ब्राउझरमध्ये व्हॉइस इनपुट समर्थित नाही",
+        voiceInputErrorMicrophone: "मायक्रोफोन त्रुटी",
     },
 };
 

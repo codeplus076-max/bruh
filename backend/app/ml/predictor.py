@@ -4,7 +4,9 @@ import pandas as pd
 import numpy as np
 
 class DiseasePredictor:
-    def __init__(self, model_dir: str = "app/ml"):
+    def __init__(self, model_dir: str = None):
+        if model_dir is None:
+            model_dir = os.path.dirname(os.path.abspath(__file__))
         self.model_path = os.path.join(model_dir, "triage_model.joblib")
         self.meta_path = os.path.join(model_dir, "model_meta.joblib")
         self._model = None

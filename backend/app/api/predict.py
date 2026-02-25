@@ -5,7 +5,7 @@ from app.ml.predictor import DiseasePredictor
 
 router = APIRouter(prefix="", tags=["predict"])
 
-predictor = DiseasePredictor(model_dir=os.getenv("MODEL_DIR", "app/ml"))
+predictor = DiseasePredictor(model_dir=os.getenv("MODEL_DIR"))
 
 class PredictRequest(BaseModel):
     Age: int
