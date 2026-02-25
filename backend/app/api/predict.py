@@ -8,7 +8,8 @@ from app.ml.predictor import DiseasePredictor
 
 router = APIRouter(prefix="", tags=["predict"])
 
-predictor = DiseasePredictor(model_dir=os.getenv("MODEL_DIR"))
+# Always load from the ml/ directory relative to this file's location — works on Render and locally
+predictor = DiseasePredictor()
 
 # Initialize OpenAI-compatible client (supports both OpenAI and OpenRouter keys)
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -165,6 +166,22 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/debug-model")
+def debug_model():
+    """Debug endpoint to check model loading status on the server."""
+    import os as _os
+    from app.ml.predictor import DiseasePredictor as _DP
+    ml_dir = _os.path.dirname(_os.path.abspath(_DP.__init__.__code__.co_filename))
+    model_path = _os.path.join(ml_dir, "triage_model.joblib")
+    meta_path = _os.path.join(ml_dir, "model_meta.joblib")
+    return {
+        "ml_dir": ml_dir,
+        "model_exists": _os.path.exists(model_path),
+        "meta_exists": _os.path.exists(meta_path),
+        "model_loaded": predictor._model is not None,
+        "cwd": _os.getcwd()
+    }
 
 @router.post("/predict", response_model=PredictResponse)
 async def predict_disease(request: PredictRequest):
