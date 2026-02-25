@@ -28,6 +28,7 @@ const itemVariants = {
 
 export default function Home() {
     const [lang, setLang] = useState<Language>("en");
+    const [chatInput, setChatInput] = useState("");
     const t = translations[lang];
 
     return (
@@ -60,7 +61,7 @@ export default function Home() {
                         </p>
                     </div>
 
-                    <div className="flex flex-col items-start lg:items-end gap-3 Shrink-0 pt-4 lg:pt-0">
+                    <div className="flex flex-col items-start lg:items-end gap-3 shrink-0 pt-4 lg:pt-0">
                         <LanguageSwitcher current={lang} onChange={setLang} />
                     </div>
                 </motion.header>
@@ -88,12 +89,15 @@ export default function Home() {
 
                         <div className="relative z-20 shadow-glass rounded-2xl">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-[18px] blur opacity-30" />
-                            <ChatInterface t={t} />
+                            <ChatInterface t={t} lang={lang} input={chatInput} setInput={setChatInput} />
                         </div>
 
                         {/* Voice Control Node */}
                         <div className="glass-panel p-4">
-                            <VoiceControls onTranscription={(text) => console.log("Voice:", text)} />
+                            <VoiceControls
+                                currentLang={lang}
+                                onTranscription={(text) => setChatInput((prev) => prev ? prev + " " + text : text)}
+                            />
                         </div>
                     </motion.div>
 

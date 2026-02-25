@@ -10,9 +10,8 @@ type Step = "symptoms" | "age" | "duration" | "result";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export function ChatInterface({ t }: { t: Translations }) {
+export function ChatInterface({ t, lang, input, setInput }: { t: Translations, lang: string, input: string, setInput: (v: string) => void }) {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState<Step>("symptoms");
     const [collected, setCollected] = useState({ symptoms: "", age: 0, duration: 0 });
@@ -22,11 +21,11 @@ export function ChatInterface({ t }: { t: Translations }) {
     const speak = (content: string) => {
         if (isMuted || typeof window === "undefined" || !window.speechSynthesis) return;
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(content);
+        let utterance = new SpeechSynthesisUtterance(content);
 
-        // Try to match voice lang to selected lang roughly
-        if (content.includes("क्या") || content.includes("नमस्ते")) utterance.lang = "hi-IN";
-        else if (content.includes("नमस्कार")) utterance.lang = "mr-IN";
+        // Explicitly set language based on frontend state
+        if (lang === "hi") utterance.lang = "hi-IN";
+        else if (lang === "mr") utterance.lang = "mr-IN";
         else utterance.lang = "en-US";
 
         utterance.rate = 1.0;
@@ -41,7 +40,7 @@ export function ChatInterface({ t }: { t: Translations }) {
         setInput("");
         // Initially speak the greeting on lang change if not muted
         speak(t.chatGreeting);
-    }, [t]);
+    }, [t, lang]);
 
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
