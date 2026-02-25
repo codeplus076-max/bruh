@@ -17,15 +17,6 @@ const containerVariants: Variants = {
     }
 };
 
-const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    show: {
-        opacity: 1,
-        y: 0,
-        transition: { type: "spring" as const, stiffness: 80, damping: 15 }
-    }
-};
-
 export default function Home() {
     const [lang, setLang] = useState<Language>("en");
     const [chatInput, setChatInput] = useState("");
@@ -95,7 +86,7 @@ export default function Home() {
                                     <span className="w-2 h-2 rounded-full bg-danger animate-pulse"></span>
                                 </div>
                                 <p className="text-lg text-slate-800 leading-relaxed font-medium mb-6">
-                                    "{chatInput}"
+                                    &quot;{chatInput}&quot;
                                 </p>
                                 <button
                                     onClick={() => setIsAnalyzed(true)}

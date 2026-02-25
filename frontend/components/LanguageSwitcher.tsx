@@ -1,7 +1,6 @@
 "use client";
 
 import { Language } from "@/lib/translations";
-import { Globe } from "lucide-react";
 
 const labels: Record<Language, string> = { en: "EN", hi: "HI", mr: "MR" };
 
