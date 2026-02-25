@@ -7,8 +7,6 @@ import os
 
 router = APIRouter(prefix="/hospitals", tags=["hospitals"])
 
-MAPS_API_KEY = os.getenv("MAPS_API_KEY")
-
 class HospitalResponse(BaseModel):
     name: str
     address: str
@@ -33,14 +31,15 @@ def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
 
 def fetch_place_details(place_id: str) -> dict:
     """Fetch phone and opening hours from Google Place Details API."""
-    if not MAPS_API_KEY:
+    api_key = os.getenv("MAPS_API_KEY")
+    if not api_key:
         return {}
     try:
         url = "https://maps.googleapis.com/maps/api/place/details/json"
         params = {
             "place_id": place_id,
             "fields": "formatted_phone_number,opening_hours",
-            "key": MAPS_API_KEY
+            "key": api_key
         }
         res = requests.get(url, params=params, timeout=5)
         if res.status_code == 200:
@@ -55,7 +54,8 @@ async def get_nearby_hospitals(
     lng: float = Query(..., description="User longitude"),
     radius: int = Query(5000, description="Search radius in meters")
 ):
-    if not MAPS_API_KEY:
+    api_key = os.getenv("MAPS_API_KEY")
+    if not api_key:
         raise HTTPException(status_code=500, detail="MAPS_API_KEY not configured")
 
     try:
@@ -65,7 +65,7 @@ async def get_nearby_hospitals(
             "location": f"{lat},{lng}",
             "radius": radius,
             "type": "hospital",
-            "key": MAPS_API_KEY
+            "key": api_key
         }
         response = requests.get(url, params=params, timeout=10)
 
