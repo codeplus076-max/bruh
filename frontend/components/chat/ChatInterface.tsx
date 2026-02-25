@@ -16,7 +16,16 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
     const [step, setStep] = useState<Step>("symptoms");
     const [collected, setCollected] = useState({ symptoms: "", age: 0, duration: 0 });
     const [isMuted, setIsMuted] = useState(false);
+    const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
     const bottomRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            const loadVoices = () => setVoices(window.speechSynthesis.getVoices());
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+    }, []);
 
     const speak = (content: string) => {
         if (isMuted || typeof window === "undefined" || !window.speechSynthesis) return;
@@ -24,9 +33,17 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
         let utterance = new SpeechSynthesisUtterance(content);
 
         // Explicitly set language based on frontend state
-        if (lang === "hi") utterance.lang = "hi-IN";
-        else if (lang === "mr") utterance.lang = "mr-IN";
-        else utterance.lang = "en-US";
+        let preferredLang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
+        utterance.lang = preferredLang;
+
+        // Find and bind real voice payload
+        if (voices.length > 0) {
+            let targetLangCode = lang === "hi" ? "hi" : lang === "mr" ? "mr" : "en";
+            const matchedVoice = voices.find(v => v.lang.toLowerCase().includes(targetLangCode));
+            if (matchedVoice) {
+                utterance.voice = matchedVoice;
+            }
+        }
 
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
