@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 import { VoiceControls } from "@/components/voice/VoiceControls";
 import { HospitalMap } from "@/components/map/HospitalMap";
@@ -9,7 +9,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Language, translations } from "@/lib/translations";
 import { Activity, ShieldAlert, Cpu } from "lucide-react";
 
-const containerVariants = {
+const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: {
         opacity: 1,
@@ -17,7 +17,7 @@ const containerVariants = {
     }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     show: {
         opacity: 1,

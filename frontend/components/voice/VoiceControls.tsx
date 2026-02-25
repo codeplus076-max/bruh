@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Mic, Square, Loader2, Volume2 } from "lucide-react";
+import { Mic, Square } from "lucide-react";
 
 export function VoiceControls({ onTranscription, currentLang = "en" }: { onTranscription: (text: string) => void, currentLang?: string }) {
   const [isRecording, setIsRecording] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function VoiceControls({ onTranscription, currentLang = "en" }: { onTrans
       // Start recording
       setErrorMsg("");
 
-      // @ts-ignore
+      // @ts-expect-error - SpeechRecognition is not standard in Window yet
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
       if (!SpeechRecognition) {
@@ -50,11 +51,13 @@ export function VoiceControls({ onTranscription, currentLang = "en" }: { onTrans
         setIsRecording(true);
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         onTranscription(transcript);
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onerror = (event: any) => {
         console.error("Speech recognition error", event.error);
         if (event.error !== "no-speech") {

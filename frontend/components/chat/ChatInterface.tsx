@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Translations } from "@/lib/translations";
 import { Send, ActivitySquare, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,13 +27,13 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
         }
     }, []);
 
-    const speak = (content: string) => {
+    const speak = useCallback((content: string) => {
         if (isMuted || typeof window === "undefined" || !window.speechSynthesis) return;
         window.speechSynthesis.cancel();
-        let utterance = new SpeechSynthesisUtterance(content);
+        const utterance = new SpeechSynthesisUtterance(content);
 
         // Explicitly set language based on frontend state
-        let preferredLang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
+        const preferredLang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
         utterance.lang = preferredLang;
 
         // Find and bind real voice payload
@@ -48,7 +48,7 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
         window.speechSynthesis.speak(utterance);
-    };
+    }, [isMuted, lang, voices]);
 
     useEffect(() => {
         setMessages([{ role: "assistant", text: t.chatGreeting }]);
@@ -57,7 +57,7 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
         setInput("");
         // Initially speak the greeting on lang change if not muted
         speak(t.chatGreeting);
-    }, [t, lang]);
+    }, [t, lang, setInput, speak]);
 
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 

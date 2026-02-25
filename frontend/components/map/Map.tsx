@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { Map as LeafletMap } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 type Hospital = {
@@ -20,7 +21,7 @@ export interface MapProps {
 
 export default function OSMMap({ userLoc, hospitals }: MapProps) {
     const mapRef = useRef<HTMLDivElement>(null);
-    const leafletMapRef = useRef<any>(null);
+    const leafletMapRef = useRef<LeafletMap | null>(null);
 
     useEffect(() => {
         // Dynamically import leaflet to avoid SSR issues
