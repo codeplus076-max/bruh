@@ -17,68 +17,64 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
     const bottomRef = useRef<HTMLDivElement>(null);
 
     const speak = useCallback((content: string) => {
-        if (isMuted || typeof window === "undefined" || !window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
+        if (isMuted || typeof window === "undefined") return;
 
-        // Strip emojis and special symbols to prevent mis-reading
+        // Stop existing speech
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        const oldAudio = document.getElementById("tts-audio") as HTMLAudioElement;
+        if (oldAudio) {
+            oldAudio.pause();
+            oldAudio.remove();
+        }
+
+        // Clean text (remove emojis and markdown asterisks)
         const cleanContent = content
             .replace(/[\u2700-\u27BF\uE000-\uF8FF\u2011-\u26FF]/g, '')
             .replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, '')
+            .replace(/[*#_`~]/g, '')
             .trim();
         if (!cleanContent) return;
 
-        const preferredLang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
-        const langPrefix = preferredLang.split("-")[0]; // "hi", "mr", "en"
-
-        const doSpeak = (availableVoices: SpeechSynthesisVoice[]) => {
+        // For English, native browser TTS is 100% reliable
+        if (lang === "en") {
             const utterance = new SpeechSynthesisUtterance(cleanContent);
-            utterance.rate = lang === "en" ? 1.0 : 0.9;  // slightly slower for Indic scripts
-            utterance.pitch = 1.0;
-
-            if (availableVoices.length > 0) {
-                // If Marathi is requested but not installed, fallback to Hindi since both use Devanagari.
-                // An English voice reading Devanagari will just be silent.
-                const targetLangs = lang === "mr" ? [preferredLang, "mr", "hi-IN", "hi"] : [preferredLang, langPrefix];
-
-                const voice =
-                    availableVoices.find(v => targetLangs.some(l => v.lang.toLowerCase().replace('_', '-').startsWith(l.toLowerCase()))) ||
-                    availableVoices.find(v => targetLangs.some(l => v.name.toLowerCase().includes(l.toLowerCase())));
-
-                if (voice) {
-                    utterance.voice = voice;
-                    utterance.lang = voice.lang; // Important: match utterance lang to voice lang exactly
-                    console.log(`[TTS] Selected voice: ${voice.name} (${voice.lang}) for requested lang: ${lang}`);
-                } else {
-                    utterance.lang = preferredLang;
-                    console.warn(`[TTS] No suitable voice found for ${lang}, falling back to browser default`);
-                }
-            } else {
-                utterance.lang = preferredLang;
-            }
-
-            // Chrome bug workaround: keep utterance in memory
-            (window as any)._speechUtterance = utterance;
-            window.speechSynthesis.speak(utterance);
-        };
-
-        // Read voices directly — avoids stale-state timing issues
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length > 0) {
-            doSpeak(voices);
-        } else {
-            // Some browsers load voices asynchronously; wait for the event then speak once
-            const onLoaded = () => {
-                window.speechSynthesis.onvoiceschanged = null;
-                doSpeak(window.speechSynthesis.getVoices());
-            };
-            window.speechSynthesis.onvoiceschanged = onLoaded;
+            utterance.lang = "en-US";
+            utterance.rate = 1.0;
+            if (window.speechSynthesis) window.speechSynthesis.speak(utterance);
+            return;
         }
+
+        // For Hindi (hi) and Marathi (mr), Windows often lacks native voice packs.
+        // We use Google Translate Web TTS via HTML5 Audio to guarantee pronunciation.
+        const tl = lang === "mr" ? "mr" : "hi";
+        // Substring to 200 chars to respect the free web API limit
+        const safeText = encodeURIComponent(cleanContent.substring(0, 200));
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${tl}&client=tw-ob&q=${safeText}`;
+
+        const audio = new Audio(audioUrl);
+        audio.id = "tts-audio";
+
+        audio.play().catch(err => {
+            console.warn("[TTS] Web audio failed (likely autoplay blocked), falling back to native TTS", err);
+            if (window.speechSynthesis) {
+                const utterance = new SpeechSynthesisUtterance(cleanContent);
+                utterance.lang = "hi-IN"; // Force Hindi voice even for Marathi text to read Devanagari
+                utterance.rate = 0.9;
+
+                const voices = window.speechSynthesis.getVoices();
+                const voice = voices.find(v => v.lang.includes('hi') || v.lang.includes('mr'));
+                if (voice) utterance.voice = voice;
+
+                window.speechSynthesis.speak(utterance);
+            }
+        });
     }, [isMuted, lang]);
 
     // Initialize chat session on mount
     useEffect(() => {
         setMessages([{ role: "assistant", content: t.chatGreeting }]);
-        speak(t.chatGreeting);
+        // Delay initial greeting slightly to avoid instant autoplay block
+        setTimeout(() => speak(t.chatGreeting), 300);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Only run once on mount
 
