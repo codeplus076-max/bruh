@@ -1,5 +1,3 @@
-# ML model files (too large for GitHub)
-backend/app/ml/*.joblib
 
 # Environment files — NEVER commit secrets
 .env
