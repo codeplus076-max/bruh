@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Outfit, Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { AuthProvider } from "@/context/AuthContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 // Primary body font - Technical, super clean
 const outfit = Outfit({

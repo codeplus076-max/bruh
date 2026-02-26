@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Mic, Square } from "lucide-react";
-import { Translations } from "@/lib/translations";
+import { useLanguage } from "@/context/LanguageContext";
 
-export function VoiceControls({ t, onTranscription, currentLang = "en" }: { t: Translations, onTranscription: (text: string) => void, currentLang?: string }) {
+export function VoiceControls({ onTranscription }: { onTranscription: (text: string) => void }) {
+  const { lang, t } = useLanguage();
   const [isRecording, setIsRecording] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,8 +45,8 @@ export function VoiceControls({ t, onTranscription, currentLang = "en" }: { t: T
       recognition.continuous = false;
       recognition.interimResults = false;
 
-      if (currentLang === "hi") recognition.lang = "hi-IN";
-      else if (currentLang === "mr") recognition.lang = "mr-IN";
+      if (lang === "hi") recognition.lang = "hi-IN";
+      else if (lang === "mr") recognition.lang = "mr-IN";
       else recognition.lang = "en-US";
 
       recognition.onstart = () => {

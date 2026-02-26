@@ -37,6 +37,7 @@ export const translations = {
         hospitalEmergency: "Emergency",
         hospitalOpenMaps: "Open in Maps →",
         hospitalDistanceUnit: "km away",
+        hospitalSubtitle: "Geolocation-aware health facility finder",
 
         // Voice
         voiceInputTitle: "Voice Input",
@@ -79,6 +80,7 @@ export const translations = {
         hospitalEmergency: "आपातकाल",
         hospitalOpenMaps: "मानचित्र में खोलें →",
         hospitalDistanceUnit: "किमी दूर",
+        hospitalSubtitle: "भू-स्थान जागरूक स्वास्थ्य सुविधा खोजक",
 
         // Voice
         voiceInputTitle: "वॉयस इनपुट",
@@ -121,6 +123,7 @@ export const translations = {
         hospitalEmergency: "आपत्काल",
         hospitalOpenMaps: "नकाशात उघडा →",
         hospitalDistanceUnit: "किमी दूर",
+        hospitalSubtitle: "भू-स्थान जागरूक आरोग्य सुविधा शोधक",
 
         // Voice
         voiceInputTitle: "व्हॉइस इनपुट",

@@ -2,15 +2,21 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Translations } from "@/lib/translations";
-import { Send, ActivitySquare, Volume2, VolumeX } from "lucide-react";
+import { Send, ActivitySquare, Volume2, VolumeX, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
+import { useLanguage } from "@/context/LanguageContext";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Message = { role: "assistant" | "user"; content: string; diagnosis?: any };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export function ChatInterface({ t, lang, input, setInput }: { t: Translations, lang: string, input: string, setInput: (v: string) => void }) {
+export function ChatInterface({ input, setInput }: { input: string, setInput: (v: string) => void }) {
+    const { lang, t } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
@@ -114,10 +120,36 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
             const data = await res.json();
 
             const aiMsg: Message = { role: "assistant", content: data.content, diagnosis: data.diagnosis };
-            setMessages(prev => [...prev, aiMsg]);
 
+            // Sync to Firestore if it's a diagnosis message
+            if (data.diagnosis) {
+                try {
+                    const docRef = await addDoc(collection(db, "sessions"), {
+                        symptoms: newMessagesContext.filter(m => m.role === "user").map(m => m.content).join(", "),
+                        predictions: data.diagnosis,
+                        risk_level: data.diagnosis.risk_level || "Unknown",
+                        guidance: {
+                            first_aid: data.diagnosis.first_aid || [],
+                            home_remedies: data.diagnosis.home_remedies || [],
+                            routine: data.diagnosis.routine || [],
+                            medicines: data.diagnosis.medicines || [],
+                            warnings: data.diagnosis.warnings || [],
+                        },
+                        timestamp: new Date().toISOString(),
+                        createdAt: serverTimestamp(),
+                        language: lang,
+                        userId: "anonymous" // In a full implementation, use auth.currentUser.uid
+                    });
+                    aiMsg.diagnosis.sessionId = docRef.id;
+                } catch (dbErr) {
+                    console.error("Firestore sync failed", dbErr);
+                }
+            }
+
+            setMessages(prev => [...prev, aiMsg]);
             speak(data.content);
-        } catch {
+        } catch (err) {
+            console.error("Chat error:", err);
             const errorMsg: Message = { role: "assistant", content: t.chatError };
             setMessages(prev => [...prev, errorMsg]);
             speak(t.chatError);
@@ -252,6 +284,21 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
                                                             </li>
                                                         ))}
                                                     </ul>
+                                                </div>
+                                            )}
+
+                                            {m.diagnosis.sessionId && (
+                                                <div className="mt-4 pt-4 border-t border-borderDark flex flex-col gap-3">
+                                                    <Link
+                                                        href={`/report?id=${m.diagnosis.sessionId}`}
+                                                        className="w-full py-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-neon"
+                                                    >
+                                                        <FileText className="w-4 h-4" /> View Full Medical Report (PDF)
+                                                    </Link>
+
+                                                    <p className="text-[10px] text-textMuted text-center italic">
+                                                        Securely saved to Upchaar Cloud Diagnostics
+                                                    </p>
                                                 </div>
                                             )}
                                         </div>
