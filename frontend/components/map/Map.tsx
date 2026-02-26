@@ -5,6 +5,9 @@ import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-map
 
 const MAPS_API_KEY = process.env.NEXT_PUBLIC_MAPS_API_KEY || "";
 
+// Must be defined OUTSIDE the component — a stable reference prevents infinite re-renders
+const LIBRARIES: ("places" | "geometry")[] = ["places", "geometry"];
+
 type Hospital = {
     name: string;
     address: string;
@@ -41,6 +44,7 @@ const darkMapStyles = [
 export default function GoogleMapComponent({ userLoc, hospitals }: MapProps) {
     const { isLoaded, loadError } = useJsApiLoader({
         googleMapsApiKey: MAPS_API_KEY,
+        libraries: LIBRARIES,
     });
 
     const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
@@ -51,6 +55,15 @@ export default function GoogleMapComponent({ userLoc, hospitals }: MapProps) {
     const onMapClick = useCallback(() => {
         setSelectedHospital(null);
     }, []);
+
+    // Bug #5 guard: show a clear message if the API key is missing
+    if (!MAPS_API_KEY) {
+        return (
+            <div className="h-[400px] w-full flex items-center justify-center bg-surface text-textMuted rounded border border-borderDark text-sm px-4 text-center">
+                ⚠️ Google Maps API key is not configured.<br />Set <code>NEXT_PUBLIC_MAPS_API_KEY</code> in your <code>.env</code> file.
+            </div>
+        );
+    }
 
     if (loadError) {
         return (

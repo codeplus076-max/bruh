@@ -130,109 +130,115 @@ export function HospitalMap({ t }: { t: Translations }) {
                 <MapComponent userLoc={userLoc} hospitals={hospitals} />
             </div>
 
-            {/* Hospital cards */}
-            <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+            {/* Hospital cards — Google Maps style */}
+            <div className="p-4 space-y-3 max-h-[420px] overflow-y-auto custom-scrollbar">
                 {hospitals.map((h, i) => (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                         key={i}
-                        className="bg-white/5 border border-borderDark rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-glass transition-all"
+                        className="bg-white/[0.04] border border-borderDark rounded-2xl overflow-hidden hover:border-primary/30 hover:bg-white/[0.07] transition-all shadow-sm"
                     >
-                        {/* Card body */}
-                        <div className="p-4 flex gap-3">
-                            {/* Left: info */}
-                            <div className="flex-1 min-w-0">
-                                {/* Name + emergency badge */}
-                                <div className="flex items-start gap-2 flex-wrap">
-                                    <h4 className="font-bold text-white text-[15px] leading-snug">
-                                        {h.name}
-                                    </h4>
-                                    {h.emergency && (
-                                        <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-danger/20 text-danger border border-danger/20">
-                                            {t.hospitalEmergency}
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Rating row */}
-                                {h.rating != null && (
-                                    <div className="flex items-center gap-1.5 mt-1.5">
-                                        <span className="text-sm font-bold text-amber-400">{h.rating.toFixed(1)}</span>
-                                        <StarRating rating={h.rating} />
-                                        {h.user_ratings_total != null && (
-                                            <span className="text-xs text-textMuted">({h.user_ratings_total.toLocaleString()})</span>
+                        <div className="p-4">
+                            {/* Row 1: Name + emergency badge + action buttons */}
+                            <div className="flex items-start justify-between gap-3">
+                                {/* Left: all text info */}
+                                <div className="flex-1 min-w-0">
+                                    {/* Name + badge */}
+                                    <div className="flex items-start gap-2 flex-wrap">
+                                        <h4 className="font-bold text-white text-[15px] leading-snug">
+                                            {h.name}
+                                        </h4>
+                                        {h.emergency && (
+                                            <span className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-danger/20 text-danger border border-danger/20">
+                                                Emergency
+                                            </span>
                                         )}
                                     </div>
-                                )}
 
-                                {/* Specialty · wheelchair · address */}
-                                <p className="text-xs text-textMuted mt-1.5 leading-relaxed">
-                                    {h.specialty && <span>{h.specialty}</span>}
-                                    {h.wheelchair_accessible && <span> · ♿</span>}
-                                    {h.address && h.address !== "Unknown Address" && (
-                                        <span className={h.specialty ? " · " : ""}>{h.address}</span>
+                                    {/* Star rating row */}
+                                    {h.rating != null && (
+                                        <div className="flex items-center gap-1.5 mt-1">
+                                            <span className="text-sm font-bold text-amber-400">{h.rating.toFixed(1)}</span>
+                                            <StarRating rating={h.rating} />
+                                            {h.user_ratings_total != null && (
+                                                <span className="text-xs text-textMuted">({h.user_ratings_total.toLocaleString()})</span>
+                                            )}
+                                        </div>
                                     )}
-                                </p>
 
-                                {/* Open/Closed + hours + phone */}
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5">
-                                    {h.open_now != null && (
-                                        <span className={`text-xs font-semibold ${h.open_now ? "text-emerald-400" : "text-danger"}`}>
-                                            {h.open_now ? "Open" : "Closed"}
-                                        </span>
-                                    )}
-                                    {h.opening_hours && h.opening_hours !== "Unknown Hours" && (
-                                        <span className="text-xs text-textMuted">{h.opening_hours}</span>
-                                    )}
-                                    {h.phone && h.phone !== "Unknown Phone" && (
-                                        <>
-                                            <span className="text-xs text-textMuted/40">·</span>
-                                            <a
-                                                href={`tel:${h.phone}`}
-                                                className="text-xs text-textMuted hover:text-secondary transition-colors"
-                                            >
-                                                {h.phone}
-                                            </a>
-                                        </>
+                                    {/* Specialty · wheelchair · address */}
+                                    <p className="text-xs text-textMuted mt-1 leading-relaxed">
+                                        {[
+                                            h.specialty,
+                                            h.wheelchair_accessible ? "♿ Accessible" : null,
+                                            h.address && h.address !== "Unknown Address" ? h.address : null,
+                                        ].filter(Boolean).join(" · ")}
+                                    </p>
+
+                                    {/* Open/Closed + hours + phone */}
+                                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-1">
+                                        {h.open_now != null && (
+                                            <span className={`text-xs font-semibold ${h.open_now ? "text-emerald-400" : "text-danger"}`}>
+                                                {h.open_now ? "Open" : "Closed"}
+                                            </span>
+                                        )}
+                                        {h.opening_hours && h.opening_hours !== "Unknown Hours" && (
+                                            <>
+                                                <span className="text-textMuted/40 text-xs">·</span>
+                                                <span className="text-xs text-textMuted">{h.opening_hours}</span>
+                                            </>
+                                        )}
+                                        {h.phone && h.phone !== "Unknown Phone" && (
+                                            <>
+                                                <span className="text-textMuted/40 text-xs">·</span>
+                                                <a
+                                                    href={`tel:${h.phone}`}
+                                                    className="text-xs text-textMuted hover:text-secondary transition-colors"
+                                                >
+                                                    {h.phone}
+                                                </a>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {/* Distance */}
+                                    {h.distance_km > 0 && (
+                                        <p className="text-xs font-mono text-secondary/60 mt-1">
+                                            📍 {h.distance_km} km away
+                                        </p>
                                     )}
                                 </div>
 
-                                {/* Distance badge */}
-                                {h.distance_km > 0 && (
-                                    <p className="text-xs font-mono text-secondary/70 mt-1.5">
-                                        📍 {h.distance_km} km away
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Right: Website + Directions icon buttons */}
-                            <div className="flex flex-col gap-2 items-center shrink-0 pt-0.5">
-                                {h.website && (
+                                {/* Right: Website + Directions icon buttons (Google Maps style) */}
+                                <div className="flex flex-col gap-2 items-center shrink-0">
+                                    {h.website && (
+                                        <a
+                                            href={h.website}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex flex-col items-center gap-1 group"
+                                            title="Visit website"
+                                        >
+                                            <span className="w-11 h-11 rounded-full bg-[#e8f0fe] flex items-center justify-center group-hover:bg-[#d2e3fc] transition-colors">
+                                                <Globe className="w-5 h-5 text-[#1a73e8]" />
+                                            </span>
+                                            <span className="text-[10px] text-textMuted group-hover:text-[#1a73e8] transition-colors font-medium">Website</span>
+                                        </a>
+                                    )}
+                                    {/* Directions — links to Google Maps turn-by-turn */}
                                     <a
-                                        href={h.website}
+                                        href={`https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&destination_place_id=${encodeURIComponent(h.maps_url.split("place_id:")[1] ?? "")}&travelmode=driving`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex flex-col items-center gap-1 group"
-                                        title="Visit website"
+                                        title="Get directions"
                                     >
-                                        <span className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                            <Globe className="w-4 h-4 text-primary" />
+                                        <span className="w-11 h-11 rounded-full bg-[#e8f0fe] flex items-center justify-center group-hover:bg-[#d2e3fc] transition-colors">
+                                            <Navigation className="w-5 h-5 text-[#1a73e8]" />
                                         </span>
-                                        <span className="text-[10px] text-textMuted group-hover:text-primary transition-colors">Website</span>
+                                        <span className="text-[10px] text-textMuted group-hover:text-[#1a73e8] transition-colors font-medium">Directions</span>
                                     </a>
-                                )}
-                                <a
-                                    href={`https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex flex-col items-center gap-1 group"
-                                    title="Get directions"
-                                >
-                                    <span className="w-10 h-10 rounded-full bg-secondary/10 border border-secondary/20 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                                        <Navigation className="w-4 h-4 text-secondary" />
-                                    </span>
-                                    <span className="text-[10px] text-textMuted group-hover:text-secondary transition-colors">Directions</span>
-                                </a>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
@@ -253,3 +259,4 @@ export function HospitalMap({ t }: { t: Translations }) {
         </div>
     );
 }
+

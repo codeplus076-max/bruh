@@ -46,6 +46,28 @@ class ChatResponse(BaseModel):
     content: str
     diagnosis: Optional[Dict[str, Any]] = None
 
+# Module-level tools list — can be imported by tests and reused without rebuilding each request
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "analyze_symptoms",
+            "description": "Trigger the medical ML model to get a diagnosis once age, gender, severity, and duration are known.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "age": {"type": "integer"},
+                    "gender": {"type": "integer", "description": "1 for Male, 0 for Female"},
+                    "severity": {"type": "integer", "description": "1 (mild), 2 (moderate), or 3 (severe)"},
+                    "duration_days": {"type": "integer"}
+                },
+                "required": ["age", "gender", "severity", "duration_days"]
+            }
+        }
+    }
+]
+
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     if not client:
@@ -68,29 +90,10 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
     for msg in request.messages:
         messages.append({"role": msg.role, "content": msg.content})
         
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "analyze_symptoms",
-                "description": "Trigger the medical ML model to get a diagnosis once age, gender, severity, and duration are known.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "age": {"type": "integer"},
-                        "gender": {"type": "integer", "description": "1 for Male, 0 for Female"},
-                        "severity": {"type": "integer", "description": "1 (mild), 2 (moderate), or 3 (severe)"},
-                        "duration_days": {"type": "integer"}
-                    },
-                    "required": ["age", "gender", "severity", "duration_days"]
-                }
-            }
-        }
-    ]
     
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="openai/gpt-3.5-turbo",
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -148,7 +151,7 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
                 })
                 
                 final_response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
+                    model="openai/gpt-3.5-turbo",
                     messages=messages
                 )
                 

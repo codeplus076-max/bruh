@@ -90,8 +90,8 @@ class DiseasePredictor:
                 
             df = pd.DataFrame([row])
             
-            # Predict returns an encoded integer
-            pred_idx = self._model.predict(df)[0]
+            # Predict returns an encoded integer — cast to plain Python int for safe indexing
+            pred_idx = int(self._model.predict(df)[0])
             
             # Decode the integer back to a string disease label
             classes = self._meta.get('classes', [])
