@@ -11,3 +11,4 @@ backend/app/ml/*.joblib
 # Python virtual environment
 backend/venv/
 venv/
+__pycache__/
