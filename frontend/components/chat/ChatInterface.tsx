@@ -136,7 +136,7 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
                         <ActivitySquare className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <h2 className="text-white font-heading font-medium tracking-wide">{t.chatTitle}</h2>
+                        <h2 className="text-textMain font-heading font-medium tracking-wide">{t.chatTitle}</h2>
                         <p className="text-primaryVibrant/70 text-xs tracking-wider uppercase mt-0.5">{t.chatSubtitle}</p>
                     </div>
                 </div>
@@ -168,9 +168,9 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
                                 {m.diagnosis && (
                                     <div className={`mt-3 p-4 rounded-xl border ${m.diagnosis.is_high_risk ? 'bg-warning/10 border-warning/30' : 'bg-primary/5 border-primary/20'}`}>
                                         <div className="space-y-2">
-                                            <p><span className="font-semibold text-white">📊 Condition:</span> {m.diagnosis.disease}</p>
-                                            <p><span className="font-semibold text-white">⚠️ Risk Level:</span> <span className={m.diagnosis.is_high_risk ? 'text-warning font-bold' : 'text-primary'}>{m.diagnosis.risk_level}</span></p>
-                                            <p className="pt-2 border-t border-borderDark text-textMuted"><span className="text-white">💊 Advice:</span> {m.diagnosis.triage_guidance}</p>
+                                            <p><span className="font-semibold text-textMain">📊 Condition:</span> {m.diagnosis.disease}</p>
+                                            <p><span className="font-semibold text-textMain">⚠️ Risk Level:</span> <span className={m.diagnosis.is_high_risk ? 'text-danger font-bold' : 'text-primary'}>{m.diagnosis.risk_level}</span></p>
+                                            <p className="pt-2 border-t border-borderDark text-textMuted"><span className="text-textMain">💊 Advice:</span> {m.diagnosis.triage_guidance}</p>
                                         </div>
                                     </div>
                                 )}

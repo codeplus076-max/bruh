@@ -24,7 +24,7 @@ export function LanguageSwitcher({
                     onClick={() => onChange(lang)}
                     className={`relative px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-widest transition-all ${current === lang
                         ? "text-background bg-primary shadow-neon"
-                        : "text-textMuted hover:text-white"
+                        : "text-textMuted hover:text-textMain"
                         }`}
                 >
                     {labels[lang]}

@@ -6,6 +6,7 @@ import { ChatInterface } from "@/components/chat/ChatInterface";
 import { VoiceControls } from "@/components/voice/VoiceControls";
 import { HospitalMap } from "@/components/map/HospitalMap";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Language, translations } from "@/lib/translations";
 import { Activity, ShieldAlert, Cpu } from "lucide-react";
 
@@ -53,7 +54,7 @@ export default function Home() {
                             <Cpu className="w-3.5 h-3.5" />
                             <span>Bio-Triage Online</span>
                         </div>
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white tracking-tight leading-tight mix-blend-plus-lighter">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-textMain tracking-tight leading-tight dark:mix-blend-plus-lighter">
                             {t.appTitle}
                         </h1>
                         <p className="text-lg text-textMuted font-light max-w-xl leading-relaxed">
@@ -62,7 +63,10 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-col items-start lg:items-end gap-3 shrink-0 pt-4 lg:pt-0">
-                        <LanguageSwitcher current={lang} onChange={setLang} />
+                        <div className="flex items-center gap-3">
+                            <ThemeToggle />
+                            <LanguageSwitcher current={lang} onChange={setLang} />
+                        </div>
                     </div>
                 </motion.header>
 
@@ -84,7 +88,7 @@ export default function Home() {
                     <motion.div variants={itemVariants} className="lg:col-span-7 flex flex-col gap-6">
                         <div className="flex items-center gap-3 mb-2">
                             <Activity className="w-5 h-5 text-secondary" />
-                            <h2 className="text-xl font-heading text-white">{t.diagnosticChat}</h2>
+                            <h2 className="text-xl font-heading text-textMain">{t.diagnosticChat}</h2>
                         </div>
 
                         <div className="relative z-20 shadow-glass rounded-2xl">
@@ -106,7 +110,7 @@ export default function Home() {
                     <motion.div variants={itemVariants} className="lg:col-span-5 flex flex-col gap-6 sticky top-8">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="w-2 h-2 rounded-full bg-primary shadow-neon" />
-                            <h2 className="text-xl font-heading text-white">{t.locationServices}</h2>
+                            <h2 className="text-xl font-heading text-textMain">{t.locationServices}</h2>
                         </div>
 
                         <div className="relative shadow-glass rounded-2xl">

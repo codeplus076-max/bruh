@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,18 +15,18 @@ const config: Config = {
         mono: ["var(--font-geist-mono)", "monospace"],
       },
       colors: {
-        background: "#0a0c10", // Ultra dark deep blue/black
-        surface: "#11151c", // Elevated panel color
-        surfaceHighlight: "#181d26", // Hover panel color
-        primary: "#00f0ff", // Surgical Neon Cyan
-        primaryVibrant: "#00d5ff",
-        primaryMuted: "rgba(0, 240, 255, 0.15)",
-        secondary: "#00ff9d", // Bioluminescent Green (for moderate/good states)
-        danger: "#ff3366", // Neon Crimson (for high risk)
-        warning: "#ffd166",
-        textMain: "#e2e8f0",
-        textMuted: "#94a3b8",
-        borderDark: "rgba(255,255,255,0.08)",
+        background: "rgb(var(--background) / <alpha-value>)",
+        surface: "rgb(var(--surface) / <alpha-value>)",
+        surfaceHighlight: "rgb(var(--surface-highlight) / <alpha-value>)",
+        primary: "rgb(var(--primary) / <alpha-value>)",
+        primaryVibrant: "rgb(var(--primary-vibrant) / <alpha-value>)",
+        primaryMuted: "rgb(var(--primary) / 0.15)",
+        secondary: "rgb(var(--secondary) / <alpha-value>)",
+        danger: "rgb(var(--danger) / <alpha-value>)",
+        warning: "rgb(var(--warning) / <alpha-value>)",
+        textMain: "rgb(var(--text-main) / <alpha-value>)",
+        textMuted: "rgb(var(--text-muted) / <alpha-value>)",
+        borderDark: "rgb(var(--border-dark) / var(--border-opacity))",
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

@@ -115,7 +115,7 @@ export function HospitalMap({ t }: { t: Translations }) {
                 <button
                     onClick={findHospitals}
                     disabled={loading}
-                    className="relative w-full overflow-hidden group bg-surfaceHighlight hover:bg-surface border border-borderDark rounded-xl px-4 py-3 text-sm text-textMain hover:text-white transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="relative w-full overflow-hidden group bg-surfaceHighlight hover:bg-surface border border-borderDark rounded-xl px-4 py-3 text-sm text-textMain hover:text-primaryVibrant transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                     <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                     <Crosshair className={`w-4 h-4 ${loading ? 'animate-spin text-primary' : 'text-primary'}`} />
@@ -136,7 +136,7 @@ export function HospitalMap({ t }: { t: Translations }) {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                         key={i}
-                        className="bg-white/[0.04] border border-borderDark rounded-2xl overflow-hidden hover:border-primary/30 hover:bg-white/[0.07] transition-all shadow-sm"
+                        className="bg-surfaceHighlight/50 border border-borderDark rounded-2xl overflow-hidden hover:border-primary/30 hover:bg-surfaceHighlight transition-all shadow-sm"
                     >
                         <div className="p-4">
                             {/* Row 1: Name + emergency badge + action buttons */}
@@ -145,7 +145,7 @@ export function HospitalMap({ t }: { t: Translations }) {
                                 <div className="flex-1 min-w-0">
                                     {/* Name + badge */}
                                     <div className="flex items-start gap-2 flex-wrap">
-                                        <h4 className="font-bold text-white text-[15px] leading-snug">
+                                        <h4 className="font-bold text-textMain text-[15px] leading-snug">
                                             {h.name}
                                         </h4>
                                         {h.emergency && (
