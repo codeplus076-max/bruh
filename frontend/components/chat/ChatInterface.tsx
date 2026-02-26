@@ -32,18 +32,32 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
 
         const doSpeak = (availableVoices: SpeechSynthesisVoice[]) => {
             const utterance = new SpeechSynthesisUtterance(cleanContent);
-            utterance.lang = preferredLang;
             utterance.rate = lang === "en" ? 1.0 : 0.9;  // slightly slower for Indic scripts
             utterance.pitch = 1.0;
 
             if (availableVoices.length > 0) {
-                // 1) exact match e.g. "hi-IN"  2) prefix match e.g. "hi"  3) speak anyway (browser decides)
+                // If Marathi is requested but not installed, fallback to Hindi since both use Devanagari.
+                // An English voice reading Devanagari will just be silent.
+                const targetLangs = lang === "mr" ? [preferredLang, "mr", "hi-IN", "hi"] : [preferredLang, langPrefix];
+
                 const voice =
-                    availableVoices.find(v => v.lang === preferredLang) ||
-                    availableVoices.find(v => v.lang.toLowerCase().startsWith(langPrefix));
-                if (voice) utterance.voice = voice;
+                    availableVoices.find(v => targetLangs.some(l => v.lang.toLowerCase().replace('_', '-').startsWith(l.toLowerCase()))) ||
+                    availableVoices.find(v => targetLangs.some(l => v.name.toLowerCase().includes(l.toLowerCase())));
+
+                if (voice) {
+                    utterance.voice = voice;
+                    utterance.lang = voice.lang; // Important: match utterance lang to voice lang exactly
+                    console.log(`[TTS] Selected voice: ${voice.name} (${voice.lang}) for requested lang: ${lang}`);
+                } else {
+                    utterance.lang = preferredLang;
+                    console.warn(`[TTS] No suitable voice found for ${lang}, falling back to browser default`);
+                }
+            } else {
+                utterance.lang = preferredLang;
             }
 
+            // Chrome bug workaround: keep utterance in memory
+            (window as any)._speechUtterance = utterance;
             window.speechSynthesis.speak(utterance);
         };
 
