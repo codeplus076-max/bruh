@@ -180,15 +180,74 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
 
                                             <div className="space-y-1">
                                                 <p className="text-sm font-medium text-textMain">🏥 Urgency: <span className="text-textMuted font-normal">{m.diagnosis.urgency}</span></p>
-                                                <p className="text-sm font-medium text-textMain">💊 First Aid: <span className="text-textMuted font-normal">{m.diagnosis.triage_guidance}</span></p>
                                             </div>
 
+                                            {m.diagnosis.first_aid && m.diagnosis.first_aid.length > 0 && (
+                                                <div className="mt-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                                                    <p className="text-sm font-bold text-emerald-400 mb-1.5 flex items-center gap-1.5">🩹 Immediate First Aid</p>
+                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                        {m.diagnosis.first_aid.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {m.diagnosis.home_remedies && m.diagnosis.home_remedies.length > 0 && (
+                                                <div className="mt-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                                                    <p className="text-sm font-bold text-amber-500 mb-1.5 flex items-center gap-1.5">☕ Supportive Home Care</p>
+                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                        {m.diagnosis.home_remedies.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {m.diagnosis.medicines && m.diagnosis.medicines.length > 0 && (
+                                                <div className="mt-2 p-3 bg-teal-500/10 border border-teal-500/20 rounded-xl">
+                                                    <p className="text-sm font-bold text-teal-400 mb-2 flex items-center gap-1.5">💊 Safe OTC Medicines</p>
+                                                    <div className="space-y-2.5">
+                                                        {m.diagnosis.medicines.map((med: any, idx: number) => (
+                                                            <div key={idx} className="bg-surface/50 p-2 rounded-lg border border-borderDark text-xs">
+                                                                <p className="font-bold text-teal-300">{med.name} <span className="text-textMuted font-normal">— {med.purpose}</span></p>
+                                                                <p className="text-textMain/80 mt-1 leading-relaxed">🔹 {med.guidance}</p>
+                                                                {med.warning && <p className="text-danger mt-1 italic">⚠️ {med.warning}</p>}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {m.diagnosis.routine && m.diagnosis.routine.length > 0 && (
+                                                <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                                                    <p className="text-sm font-bold text-blue-400 mb-1.5 flex items-center gap-1.5">📅 Daily Routine</p>
+                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                        {m.diagnosis.routine.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {m.diagnosis.when_to_seek_care && m.diagnosis.when_to_seek_care.length > 0 && (
+                                                <div className="mt-2 p-3 bg-pink-500/10 border border-pink-500/20 rounded-xl">
+                                                    <p className="text-sm font-bold text-pink-400 mb-1.5 flex items-center gap-1.5">🏥 When to Seek Care</p>
+                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                        {m.diagnosis.when_to_seek_care.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {m.diagnosis.warnings && m.diagnosis.warnings.length > 0 && (
+                                                <div className="mt-2 p-3 bg-danger/20 border border-danger/40 rounded-xl">
+                                                    <p className="text-sm font-bold text-danger mb-1.5 flex items-center gap-1.5">🚫 Critical Warnings</p>
+                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                        {m.diagnosis.warnings.map((item: string, idx: number) => <li key={idx} className="font-semibold leading-relaxed">{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+
                                             {m.diagnosis.explanation && m.diagnosis.explanation.length > 0 && (
-                                                <div className="pt-2 border-t border-borderDark mt-2">
-                                                    <p className="text-xs font-semibold text-textMain mb-1">Medical Reasoning:</p>
-                                                    <ul className="list-disc list-inside text-xs text-textMuted space-y-0.5 bg-surfaceHighlight/30 p-2 rounded-md">
+                                                <div className="pt-3 border-t border-borderDark mt-3">
+                                                    <p className="text-xs font-semibold text-textMain mb-1.5">Medical Reasoning:</p>
+                                                    <ul className="list-disc list-inside text-xs text-textMuted space-y-1 bg-surfaceHighlight/30 p-2.5 rounded-md">
                                                         {m.diagnosis.explanation.map((exp: string, idx: number) => (
-                                                            <li key={idx} className={exp.includes("EMERGENCY") ? "text-danger font-medium" : ""}>
+                                                            <li key={idx} className={exp.includes("EMERGENCY") ? "text-danger font-medium leading-relaxed" : "leading-relaxed"}>
                                                                 {exp}
                                                             </li>
                                                         ))}

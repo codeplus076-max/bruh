@@ -34,6 +34,11 @@ class PredictResponse(BaseModel):
     urgency: str
     confidence: str
     first_aid: List[str]
+    home_remedies: List[str]
+    routine: List[str]
+    medicines: List[Dict[str, str]]
+    warnings: List[str]
+    when_to_seek_care: List[str]
     explanation: List[str]
     emergency: bool
 
@@ -124,6 +129,7 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
                 
                 # Analyze risk with the new clinical engine
                 from app.triage.risk_engine import evaluate_patient_risk
+                from app.guidance.guidance_engine import generate_guidance
                 
                 risk_assessment = evaluate_patient_risk(
                     age=args.get("age", 30),
@@ -131,16 +137,34 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
                     symptoms=args,
                     ml_disease=disease
                 )
+                
+                # Extract symptoms for guidance logic
+                symptoms_list = [str(k) for k, v in args.items() if isinstance(v, bool) and v] + [disease]
+                    
+                guidance = generate_guidance(
+                    symptoms=symptoms_list,
+                    disease=disease,
+                    age=args.get("age", 30),
+                    severity_score=args.get("severity", 1),
+                    risk_level=risk_assessment["risk_level"],
+                    urgency=risk_assessment["urgency"]
+                )
                     
                 diagnosis_data = {
                     "disease": disease,
                     "risk_level": risk_assessment["risk_level"],
                     "urgency": risk_assessment["urgency"],
                     "confidence": risk_assessment["confidence"],
-                    "triage_guidance": " -> ".join(risk_assessment.get("first_aid", [])) or "Please follow up with a doctor.",
+                    "first_aid": guidance["first_aid"],
+                    "home_remedies": guidance["home_remedies"],
+                    "routine": guidance["routine"],
+                    "medicines": guidance["medicines"],
+                    "warnings": guidance["warnings"],
+                    "when_to_seek_care": guidance["when_to_seek_care"],
                     "is_high_risk": risk_assessment["risk_level"] in ["High", "Emergency"],
                     "extracted_symptoms": args,
-                    "explanation": risk_assessment["explanation"]
+                    "explanation": risk_assessment["explanation"],
+                    "emergency": risk_assessment["emergency"]
                 }
                 
                 # Send the function result back to OpenAI to generate a final empathetic response
@@ -229,13 +253,29 @@ async def predict_disease(request: PredictRequest):
             symptoms=symptoms,
             ml_disease=disease
         )
+        
+        from app.guidance.guidance_engine import generate_guidance
+        
+        guidance = generate_guidance(
+            symptoms=[disease],
+            disease=disease,
+            age=request.Age,
+            severity_score=request.Severity,
+            risk_level=risk_assessment["risk_level"],
+            urgency=risk_assessment["urgency"]
+        )
             
         return PredictResponse(
             predictions=[{"disease": disease, "probability": 0.85}], # Simulated prob since we only get top prediction
             risk_level=risk_assessment["risk_level"],
             urgency=risk_assessment["urgency"],
             confidence=risk_assessment["confidence"],
-            first_aid=risk_assessment.get("first_aid", ["Rest and monitor symptoms."]),
+            first_aid=guidance["first_aid"],
+            home_remedies=guidance["home_remedies"],
+            routine=guidance["routine"],
+            medicines=guidance["medicines"],
+            warnings=guidance["warnings"],
+            when_to_seek_care=guidance["when_to_seek_care"],
             explanation=risk_assessment["explanation"],
             emergency=risk_assessment["emergency"]
         )
