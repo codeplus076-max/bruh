@@ -3,6 +3,10 @@ fastapi>=0.111.0
 uvicorn>=0.30.0
 pydantic>=2.7.0
 python-dotenv>=1.0.1
+python-multipart>=0.0.9
+
+# Caching & Utilities
+cachetools>=5.3.0
 
 # General HTTP Client
 requests>=2.32.0
