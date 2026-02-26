@@ -167,10 +167,34 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
 
                                 {m.diagnosis && (
                                     <div className={`mt-3 p-4 rounded-xl border ${m.diagnosis.is_high_risk ? 'bg-warning/10 border-warning/30' : 'bg-primary/5 border-primary/20'}`}>
-                                        <div className="space-y-2">
-                                            <p><span className="font-semibold text-textMain">📊 Condition:</span> {m.diagnosis.disease}</p>
-                                            <p><span className="font-semibold text-textMain">⚠️ Risk Level:</span> <span className={m.diagnosis.is_high_risk ? 'text-danger font-bold' : 'text-primary'}>{m.diagnosis.risk_level}</span></p>
-                                            <p className="pt-2 border-t border-borderDark text-textMuted"><span className="text-textMain">💊 Advice:</span> {m.diagnosis.triage_guidance}</p>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-start gap-2 border-b border-borderDark pb-2">
+                                                <div>
+                                                    <p className="font-semibold text-textMain text-base">📊 {m.diagnosis.disease}</p>
+                                                    <p className="text-xs text-textMuted mt-0.5">Confidence: {m.diagnosis.confidence}</p>
+                                                </div>
+                                                <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${m.diagnosis.is_high_risk ? 'bg-danger/20 text-danger border border-danger/30' : 'bg-primary/20 text-primary border border-primary/30'}`}>
+                                                    {m.diagnosis.risk_level} Risk
+                                                </span>
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-medium text-textMain">🏥 Urgency: <span className="text-textMuted font-normal">{m.diagnosis.urgency}</span></p>
+                                                <p className="text-sm font-medium text-textMain">💊 First Aid: <span className="text-textMuted font-normal">{m.diagnosis.triage_guidance}</span></p>
+                                            </div>
+
+                                            {m.diagnosis.explanation && m.diagnosis.explanation.length > 0 && (
+                                                <div className="pt-2 border-t border-borderDark mt-2">
+                                                    <p className="text-xs font-semibold text-textMain mb-1">Medical Reasoning:</p>
+                                                    <ul className="list-disc list-inside text-xs text-textMuted space-y-0.5 bg-surfaceHighlight/30 p-2 rounded-md">
+                                                        {m.diagnosis.explanation.map((exp: string, idx: number) => (
+                                                            <li key={idx} className={exp.includes("EMERGENCY") ? "text-danger font-medium" : ""}>
+                                                                {exp}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}

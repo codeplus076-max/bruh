@@ -3,7 +3,7 @@ export type Language = "en" | "hi" | "mr";
 export const translations = {
     en: {
         // Page
-        appTitle: "AI Rural Health Triage",
+        appTitle: "UPCHAAR - AI Rural Health Triage",
         appSubtitle: "Multilingual Assistant for Symptom Check & Nearest Hospital Finder",
         disclaimer: "Medical Disclaimer: This tool is powered by AI and is intended for informational triage only. It is not a substitute for professional medical advice. In an emergency, call your local emergency services immediately.",
         diagnosticChat: "Diagnostic Chat",

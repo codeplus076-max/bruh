@@ -1,10 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { motion, Variants } from "framer-motion";
-import { ChatInterface } from "@/components/chat/ChatInterface";
 import { VoiceControls } from "@/components/voice/VoiceControls";
-import { HospitalMap } from "@/components/map/HospitalMap";
+
+// Lazy load heavy components
+const ChatInterface = dynamic(() => import("@/components/chat/ChatInterface").then(mod => mod.ChatInterface), {
+    loading: () => <div className="p-8 text-center text-primary animate-pulse">Initializing Neural Interface...</div>,
+    ssr: false
+});
+
+const HospitalMap = dynamic(() => import("@/components/map/HospitalMap").then(mod => mod.HospitalMap), {
+    loading: () => <div className="p-8 text-center text-primary animate-pulse">Loading GIS Topology...</div>,
+    ssr: false
+});
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Language, translations } from "@/lib/translations";
@@ -93,7 +103,9 @@ export default function Home() {
 
                         <div className="relative z-20 shadow-glass rounded-2xl">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-[18px] blur opacity-30" />
-                            <ChatInterface t={t} lang={lang} input={chatInput} setInput={setChatInput} />
+                            <Suspense fallback={<div className="h-[400px] bg-surface rounded-2xl animate-pulse" />}>
+                                <ChatInterface t={t} lang={lang} input={chatInput} setInput={setChatInput} />
+                            </Suspense>
                         </div>
 
                         {/* Voice Control Node */}
@@ -114,7 +126,9 @@ export default function Home() {
                         </div>
 
                         <div className="relative shadow-glass rounded-2xl">
-                            <HospitalMap t={t} />
+                            <Suspense fallback={<div className="h-[400px] bg-surface rounded-2xl animate-pulse" />}>
+                                <HospitalMap t={t} />
+                            </Suspense>
                         </div>
                     </motion.div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Syne } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ui/ThemeProvider";
 
 // Primary body font - Technical, super clean
 const outfit = Outfit({
@@ -17,7 +18,7 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "AI Rural Health Triage",
+  title: "UPCHAAR - AI Rural Health Triage",
   description: "Multilingual Symptom Checker & Triage",
 };
 
@@ -27,9 +28,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${outfit.variable} ${syne.variable} font-sans antialiased`}>
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
