@@ -14,43 +14,52 @@ export function ChatInterface({ t, lang, input, setInput }: { t: Translations, l
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
-    const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
     const bottomRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (typeof window !== "undefined" && window.speechSynthesis) {
-            const loadVoices = () => setVoices(window.speechSynthesis.getVoices());
-            loadVoices();
-            window.speechSynthesis.onvoiceschanged = loadVoices;
-        }
-    }, []);
 
     const speak = useCallback((content: string) => {
         if (isMuted || typeof window === "undefined" || !window.speechSynthesis) return;
         window.speechSynthesis.cancel();
 
-        // Strip emojis to prevent reading them aloud
-        const cleanContent = content.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+        // Strip emojis and special symbols to prevent mis-reading
+        const cleanContent = content
+            .replace(/[\u2700-\u27BF\uE000-\uF8FF\u2011-\u26FF]/g, '')
+            .replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, '')
+            .trim();
+        if (!cleanContent) return;
 
-        const utterance = new SpeechSynthesisUtterance(cleanContent);
-
-        // Explicitly set language based on frontend state
         const preferredLang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
-        utterance.lang = preferredLang;
+        const langPrefix = preferredLang.split("-")[0]; // "hi", "mr", "en"
 
-        // Find and bind real voice payload
-        if (voices.length > 0) {
-            const targetLangCode = lang === "hi" ? "hi" : lang === "mr" ? "mr" : "en";
-            const matchedVoice = voices.find(v => v.lang.toLowerCase().includes(targetLangCode));
-            if (matchedVoice) {
-                utterance.voice = matchedVoice;
+        const doSpeak = (availableVoices: SpeechSynthesisVoice[]) => {
+            const utterance = new SpeechSynthesisUtterance(cleanContent);
+            utterance.lang = preferredLang;
+            utterance.rate = lang === "en" ? 1.0 : 0.9;  // slightly slower for Indic scripts
+            utterance.pitch = 1.0;
+
+            if (availableVoices.length > 0) {
+                // 1) exact match e.g. "hi-IN"  2) prefix match e.g. "hi"  3) speak anyway (browser decides)
+                const voice =
+                    availableVoices.find(v => v.lang === preferredLang) ||
+                    availableVoices.find(v => v.lang.toLowerCase().startsWith(langPrefix));
+                if (voice) utterance.voice = voice;
             }
-        }
 
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        window.speechSynthesis.speak(utterance);
-    }, [isMuted, lang, voices]);
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // Read voices directly — avoids stale-state timing issues
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            doSpeak(voices);
+        } else {
+            // Some browsers load voices asynchronously; wait for the event then speak once
+            const onLoaded = () => {
+                window.speechSynthesis.onvoiceschanged = null;
+                doSpeak(window.speechSynthesis.getVoices());
+            };
+            window.speechSynthesis.onvoiceschanged = onLoaded;
+        }
+    }, [isMuted, lang]);
 
     // Initialize chat session on mount
     useEffect(() => {
