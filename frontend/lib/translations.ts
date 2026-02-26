@@ -29,7 +29,7 @@ export const translations = {
             `Okay, based on what you've shared:\n\n🤒 Symptoms: ${symptoms}\n📊 Possible Condition: ${disease}\n${risk === "High" ? "🔴" : risk === "Moderate" ? "🟡" : "🟢"} Risk Level: ${risk}\n\n💊 Guidance: ${guidance}\n\n${isHigh ? "⚠️ Please seek medical attention as soon as possible. Use the hospital finder below!" : "🌿 Keep monitoring your symptoms. If they worsen, consult a doctor."}`,
 
         // Hospital
-        hospitalTitle: "Nearby Facilities & Hospitals (OpenStreetMap)",
+        hospitalTitle: "Nearby Facilities & Hospitals",
         hospitalFind: "📍 Find Nearest Hospital",
         hospitalLocating: "Locating...",
         hospitalNoAccess: "Location access denied or unavailable.",
@@ -71,7 +71,7 @@ export const translations = {
         chatResultLabel: (symptoms: string, disease: string, risk: string, guidance: string, isHigh: boolean) =>
             `आपकी जानकारी के आधार पर:\n\n🤒 लक्षण: ${symptoms}\n📊 संभावित स्थिति: ${disease}\n${risk === "High" ? "🔴" : risk === "Moderate" ? "🟡" : "🟢"} जोखिम स्तर: ${risk}\n\n💊 सलाह: ${guidance}\n\n${isHigh ? "⚠️ कृपया जल्द से जल्द चिकित्सा सहायता लें। नीचे अस्पताल खोजक का उपयोग करें!" : "🌿 अपने लक्षणों की निगरानी करते रहें। अगर वे बिगड़ें, तो डॉक्टर से मिलें।"}`,
 
-        hospitalTitle: "नजदीकी सुविधाएँ और अस्पताल (OpenStreetMap)",
+        hospitalTitle: "नजदीकी सुविधाएँ और अस्पताल",
         hospitalFind: "📍 नजदीकी अस्पताल खोजें",
         hospitalLocating: "खोज रहे हैं...",
         hospitalNoAccess: "स्थान की अनुमति अस्वीकृत या अनुपलब्ध।",
@@ -113,7 +113,7 @@ export const translations = {
         chatResultLabel: (symptoms: string, disease: string, risk: string, guidance: string, isHigh: boolean) =>
             `तुम्ही सांगितलेल्या माहितीच्या आधारे:\n\n🤒 लक्षणे: ${symptoms}\n📊 संभाव्य स्थिती: ${disease}\n${risk === "High" ? "🔴" : risk === "Moderate" ? "🟡" : "🟢"} धोका पातळी: ${risk}\n\n💊 सल्ला: ${guidance}\n\n${isHigh ? "⚠️ शक्य तितक्या लवकर वैद्यकीय मदत घ्या. खाली रुग्णालय शोधक वापरा!" : "🌿 तुमच्या लक्षणांवर लक्ष ठेवा. जर ते बिघडले तर डॉक्टरांना भेटा."}`,
 
-        hospitalTitle: "जवळचे सुविधा आणि रुग्णालये (OpenStreetMap)",
+        hospitalTitle: "जवळचे सुविधा आणि रुग्णालये",
         hospitalFind: "📍 जवळचे रुग्णालय शोधा",
         hospitalLocating: "शोधत आहे...",
         hospitalNoAccess: "स्थान प्रवेश नाकारला किंवा अनुपलब्ध.",
