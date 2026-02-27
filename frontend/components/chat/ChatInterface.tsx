@@ -319,12 +319,12 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
 
 
     return (
-        <div className="flex flex-col h-[600px] glass-panel overflow-hidden relative">
+        <div className="flex flex-col h-[80vh] min-h-[500px] md:h-[650px] w-full glass-panel overflow-hidden relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10 mix-blend-screen transform translate-x-1/2 -translate-y-1/2" />
 
             {/* Inworld Voice Controls Header */}
-            <div className="bg-surfaceHighlight/50 backdrop-blur-md px-6 py-3 border-b border-borderDark flex items-center justify-between z-20">
-                <div className="flex items-center gap-3">
+            <div className="bg-surfaceHighlight/50 backdrop-blur-md px-4 sm:px-6 py-3 border-b border-borderDark flex flex-col sm:flex-row items-center justify-between z-20 gap-3 sm:gap-0">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 w-full sm:w-auto">
                     <button
                         onClick={() => resetChat(t.chatGreeting)}
                         className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider bg-surface border border-borderDark text-textMuted hover:text-primary hover:border-primary/50 transition-all shadow-sm group"
@@ -366,7 +366,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                     </button>
                 </div>
 
-                <div className="flex items-center gap-2 text-[9px] text-textMuted uppercase tracking-[0.2em] font-black opacity-60">
+                <div className="hidden md:flex items-center gap-2 text-[9px] text-textMuted uppercase tracking-[0.2em] font-black opacity-60 w-full sm:w-auto justify-center sm:justify-end">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                     Inworld AI Powered
                 </div>
@@ -386,19 +386,19 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                 </AnimatePresence>
             </div>
 
-            <div className="bg-surface/30 backdrop-blur-sm px-6 py-4 border-b border-borderDark flex items-center justify-between">
+            <div className="bg-surface/30 backdrop-blur-sm px-4 sm:px-6 py-3 sm:py-4 border-b border-borderDark flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg border border-primary/20 shadow-neon">
+                    <div className="p-2 bg-primary/10 rounded-lg border border-primary/20 shadow-neon shrink-0">
                         <ActivitySquare className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <h2 className="text-textMain font-heading font-medium tracking-wide">{t.chatTitle}</h2>
-                        <p className="text-primaryVibrant/70 text-xs tracking-wider uppercase mt-0.5">{t.chatSubtitle}</p>
+                        <h2 className="text-textMain font-heading font-medium tracking-wide text-base sm:text-lg">{t.chatTitle}</h2>
+                        <p className="text-primaryVibrant/70 text-[10px] sm:text-xs tracking-wider uppercase mt-0.5 line-clamp-1">{t.chatSubtitle}</p>
                     </div>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar z-10">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 custom-scrollbar z-10">
                 <AnimatePresence initial={false}>
                     {messages.map((m: Message, i: number) => (
                         <motion.div
@@ -408,7 +408,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                             transition={{ type: "spring", stiffness: 200, damping: 20 }}
                             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                         >
-                            <div className={`max-w-[85%] px-5 py-3.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg relative group ${m.role === "user"
+                            <div className={`max-w-[95%] sm:max-w-[85%] md:max-w-[80%] px-4 py-3 sm:px-5 sm:py-3.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg relative group ${m.role === "user"
                                 ? "bg-primary/10 text-primary border border-primary/30 rounded-2xl rounded-tr-sm"
                                 : "bg-surface text-textMain border border-borderDark rounded-2xl rounded-tl-sm ring-1 ring-white/5"
                                 }`}>
@@ -584,33 +584,33 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                 <div ref={bottomRef} className="h-1" />
             </div>
 
-            <div className="p-4 bg-surfaceHighlight/40 backdrop-blur-lg border-t border-borderDark z-10">
-                <div className="flex items-center gap-3 relative max-w-4xl mx-auto">
+            <div className="p-3 sm:p-4 bg-surfaceHighlight/40 backdrop-blur-lg border-t border-borderDark z-10">
+                <div className="flex items-center gap-2 sm:gap-3 relative max-w-4xl mx-auto">
                     <div className="flex-1 relative group">
                         <input
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             placeholder={t.chatPlaceholderSymptoms || "Type to chat..."}
-                            className="w-full bg-surface border border-borderDark rounded-full py-4 pl-6 pr-28 text-sm text-textMain outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-textMuted/60 shadow-inner"
+                            className="w-full bg-surface border border-borderDark rounded-full py-3.5 sm:py-4 pl-4 sm:pl-6 pr-24 sm:pr-28 text-sm text-textMain outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-textMuted/60 shadow-inner"
                             onKeyDown={(e) => e.key === "Enter" && handleSend()}
                             disabled={loading}
                         />
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                        <div className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 sm:gap-1.5">
                             <button
                                 onClick={toggleSTT}
-                                className={`p-2.5 rounded-full transition-all ${isListening ? "bg-danger text-white animate-pulse" : "bg-primary/5 text-primary hover:bg-primary/10"
+                                className={`p-2 sm:p-2.5 rounded-full transition-all min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center ${isListening ? "bg-danger text-white animate-pulse" : "bg-primary/5 text-primary hover:bg-primary/10"
                                     }`}
                                 title="Voice Input"
                             >
-                                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5 shadow-sm" />}
+                                {isListening ? <MicOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Mic className="w-4 h-4 sm:w-5 sm:h-5 shadow-sm" />}
                             </button>
                             <button
                                 onClick={() => handleSend()}
                                 disabled={loading || !input.trim()}
-                                className="p-2.5 bg-primary text-white rounded-full hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20"
+                                className="p-2 sm:p-2.5 bg-primary text-white rounded-full hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center"
                             >
-                                <Send className="w-5 h-5" />
+                                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                             </button>
                         </div>
                     </div>

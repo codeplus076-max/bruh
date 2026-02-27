@@ -249,16 +249,20 @@ export default function ReportPage() {
         <main className="min-h-screen bg-hero-glow p-4 md:p-8">
             <div className="max-w-4xl mx-auto space-y-8">
                 {/* Navbar */}
-                <nav className="flex items-center justify-between bg-surface/40 backdrop-blur-xl border border-borderDark rounded-2xl px-6 py-3 shadow-glass">
-                    <div className="flex items-center gap-3">
+                <nav className="flex flex-col sm:flex-row items-center justify-between bg-surface/40 backdrop-blur-xl border border-borderDark rounded-2xl px-4 sm:px-6 py-4 sm:py-3 shadow-glass gap-4 sm:gap-0">
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                         <button
                             onClick={() => router.push("/chat")}
                             className="p-3 hover:bg-primary/10 text-textMuted hover:text-primary rounded-xl transition-all flex items-center justify-center min-w-[44px] min-h-[44px]"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
+                        <div className="sm:hidden flex items-center gap-4">
+                            <ThemeToggle />
+                            <LanguageSwitcher />
+                        </div>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 w-full sm:w-auto justify-center sm:justify-end">
                         <div className="w-px h-6 bg-borderDark hidden sm:block" />
                         <a
                             href="/logout"
@@ -267,16 +271,18 @@ export default function ReportPage() {
                         >
                             <LogOut className="w-5 h-5" />
                         </a>
-                        <ThemeToggle />
-                        <LanguageSwitcher />
+                        <div className="hidden sm:flex items-center gap-4">
+                            <ThemeToggle />
+                            <LanguageSwitcher />
+                        </div>
                     </div>
                 </nav>
 
                 {data ? (
                     <div className="glass-panel p-8 space-y-8">
-                        <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-borderDark pb-8">
-                            <div className="flex items-center gap-6">
-                                <div className="w-16 h-16 relative rounded-full overflow-hidden bg-primary/5 border border-primary/10 shadow-sm">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-borderDark pb-8">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                                <div className="w-16 h-16 relative rounded-full overflow-hidden bg-primary/5 border border-primary/10 shadow-sm shrink-0">
                                     <Image src="/logo.png" alt="Logo" fill className="object-cover" />
                                 </div>
                                 <div>
@@ -287,16 +293,16 @@ export default function ReportPage() {
                                     <p className="text-textMuted font-mono text-[10px] uppercase mt-3 tracking-tighter">Medical Triage Record • Ref: {sessionId?.substring(0, 8)}</p>
                                 </div>
                             </div>
-                            <div className="flex gap-3">
+                            <div className="flex flex-wrap sm:flex-nowrap gap-3 w-full md:w-auto">
                                 <button
                                     onClick={generatePDF}
-                                    className="px-6 py-3 bg-primary text-background rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-all shadow-neon"
+                                    className="flex-1 md:flex-none px-4 sm:px-6 py-3 bg-primary text-background rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-neon whitespace-nowrap"
                                 >
                                     <Download className="w-4 h-4" /> Download PDF
                                 </button>
                                 <button
                                     onClick={() => window.print()}
-                                    className="px-6 py-3 bg-surface border border-borderDark hover:border-primary/50 text-textMain rounded-xl font-bold flex items-center gap-2 transition-all"
+                                    className="flex-1 md:flex-none px-4 sm:px-6 py-3 bg-surface border border-borderDark hover:border-primary/50 text-textMain rounded-xl font-bold flex items-center justify-center gap-2 transition-all whitespace-nowrap"
                                 >
                                     <Printer className="w-4 h-4" /> Print
                                 </button>

@@ -60,8 +60,8 @@ export default function HospitalsPage() {
                 animate="show"
             >
                 {/* Navbar */}
-                <motion.nav variants={itemVariants} className="flex items-center justify-between bg-surface/40 backdrop-blur-xl border border-borderDark rounded-2xl px-6 py-3 shadow-glass">
-                    <div className="flex items-center gap-4">
+                <motion.nav variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-between bg-surface/40 backdrop-blur-xl border border-borderDark rounded-2xl px-4 sm:px-6 py-4 sm:py-3 shadow-glass gap-4 sm:gap-0">
+                    <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
                         <button
                             onClick={() => router.push("/chat")}
                             className="p-3 hover:bg-primary/10 text-textMuted hover:text-primary rounded-xl transition-all mr-2 flex items-center justify-center min-w-[44px] min-h-[44px]"
