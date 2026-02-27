@@ -1,11 +1,8 @@
 "use client";
 
-declare global {
-    interface Window {
-        SpeechRecognition?: any;
-        webkitSpeechRecognition?: any;
-    }
-}
+import type { ISpeechRecognition, ISpeechRecognitionEvent } from "@/types/speech";
+
+
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, PhoneOff, Volume2, ActivitySquare } from "lucide-react";
@@ -22,13 +19,12 @@ interface LiveCallOverlayProps {
 export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, lastAiResponse }: LiveCallOverlayProps) {
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
-    const recognitionRef = useRef<any>(null);
+    const recognitionRef = useRef<ISpeechRecognition | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     const playResponse = useCallback(async (text: string) => {
         setIsSpeaking(true);
         const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-        console.log(`LiveCall: Stream fetch from ${API_URL}/voice/stream`);
 
         const fallbackToSpeechSynth = () => {
             console.warn("LiveCall: Falling back to Browser Speech Synthesis.");
@@ -99,7 +95,7 @@ export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, la
                     recognitionRef.current.continuous = false;
                     recognitionRef.current.interimResults = false;
 
-                    recognitionRef.current.onresult = (event: any) => {
+                    recognitionRef.current.onresult = (event: ISpeechRecognitionEvent) => {
                         const transcript = event.results[0][0].transcript;
                         onTranscription(transcript);
                         setIsListening(false);

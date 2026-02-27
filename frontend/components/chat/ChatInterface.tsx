@@ -1,18 +1,8 @@
 "use client";
 
-declare global {
-    interface Window {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        SpeechRecognition?: any;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        webkitSpeechRecognition?: any;
-    }
+import type { ISpeechRecognition, ISpeechRecognitionEvent, ISpeechRecognitionErrorEvent, ISpeechRecognitionResult, SpeechRecognitionResultAlternative } from "@/types/speech";
 
-    interface SpeechRecognitionErrorEvent extends Event {
-        error: string;
-        message: string;
-    }
-}
+
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, ActivitySquare, Volume2, VolumeX, FileText, Mic, MicOff, Phone, Play, Pause, Plus } from "lucide-react";
@@ -57,8 +47,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     const [voiceError, setVoiceError] = useState<string | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recognitionRef = useRef<any>(null);
+    const recognitionRef = useRef<ISpeechRecognition | null>(null);
 
     const playAudio = useCallback(async (text: string, index: number) => {
         if (playingMessageId === index) {
@@ -68,7 +57,6 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         }
 
         setVoiceError(null);
-        console.log(`[Voice] Starting playback for message ${index}. Text length: ${text.length}`);
         setPlayingMessageId(index);
 
         // Native Browser Fallback Function
@@ -104,10 +92,8 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                 body: JSON.stringify({ text, language: lang })
             });
 
-            console.log(`[Voice] API Status: ${response.status} | Content-Type: ${response.headers.get("Content-Type")}`);
             if (response.ok) {
                 const blob = await response.blob();
-                console.log(`[Voice] Blob Size: ${(blob.size / 1024).toFixed(2)} KB | Type: ${blob.type}`);
                 if (blob.size < 100) {
                     const errorText = await blob.text();
                     console.error("[Voice] Small blob text content:", errorText.substring(0, 100));
@@ -233,13 +219,10 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                     recognitionRef.current.continuous = false;
                     recognitionRef.current.interimResults = true;
 
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    recognitionRef.current.onresult = (e: any) => {
-                        const transcript = Array.from(e.results)
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            .map((result: any) => result[0])
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            .map((result: any) => result.transcript)
+                    recognitionRef.current.onresult = (e: ISpeechRecognitionEvent) => {
+                        const transcript = Array.from<ISpeechRecognitionResult>(e.results as unknown as Iterable<ISpeechRecognitionResult> | ArrayLike<ISpeechRecognitionResult>)
+                            .map((result: ISpeechRecognitionResult) => result[0])
+                            .map((alt: SpeechRecognitionResultAlternative) => alt.transcript)
                             .join("");
 
                         setInput(transcript);
@@ -250,7 +233,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                         }
                     };
                     recognitionRef.current.onend = () => setIsListening(false);
-                    recognitionRef.current.onerror = (err: SpeechRecognitionErrorEvent) => {
+                    recognitionRef.current.onerror = (err: ISpeechRecognitionErrorEvent) => {
                         console.error("STT Error:", err);
                         setIsListening(false);
                     };
