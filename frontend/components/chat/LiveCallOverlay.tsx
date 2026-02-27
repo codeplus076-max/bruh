@@ -2,35 +2,8 @@
 
 declare global {
     interface Window {
-        SpeechRecognition: typeof SpeechRecognition;
-        webkitSpeechRecognition: typeof SpeechRecognition;
-    }
-
-    // Define minimum needed for SpeechRecognition
-    interface SpeechRecognition extends EventTarget {
-        continuous: boolean;
-        interimResults: boolean;
-        lang: string;
-        onresult: (event: SpeechRecognitionEvent) => void;
-        onerror: (event: SpeechRecognitionErrorEvent) => void;
-        onend: () => void;
-        start(): void;
-        stop(): void;
-        abort(): void;
-    }
-
-    interface SpeechRecognitionEvent extends Event {
-        results: SpeechRecognitionResultList;
-        resultIndex: number;
-    }
-
-    interface SpeechRecognitionClass {
-        new(): SpeechRecognition;
-    }
-
-    interface Window {
-        SpeechRecognition: SpeechRecognitionClass;
-        webkitSpeechRecognition: SpeechRecognitionClass;
+        SpeechRecognition?: any;
+        webkitSpeechRecognition?: any;
     }
 }
 

@@ -2,30 +2,8 @@
 
 declare global {
     interface Window {
-        SpeechRecognition: SpeechRecognitionClass;
-        webkitSpeechRecognition: SpeechRecognitionClass;
-    }
-
-    // Define minimum needed for SpeechRecognition
-    interface SpeechRecognition extends EventTarget {
-        continuous: boolean;
-        interimResults: boolean;
-        lang: string;
-        onresult: (event: SpeechRecognitionEvent) => void;
-        onerror: (event: SpeechRecognitionErrorEvent) => void;
-        onend: () => void;
-        start(): void;
-        stop(): void;
-        abort(): void;
-    }
-
-    interface SpeechRecognitionEvent extends Event {
-        results: SpeechRecognitionResultList;
-        resultIndex: number;
-    }
-
-    interface SpeechRecognitionClass {
-        new(): SpeechRecognition;
+        SpeechRecognition?: any;
+        webkitSpeechRecognition?: any;
     }
 
     interface SpeechRecognitionErrorEvent extends Event {
@@ -241,7 +219,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         } finally {
             setLoading(false);
         }
-    }, [input, loading, sessionId, messages, setMessages, lang, userProfile, user, loadSession, autoSpeak, playAudio, t]);
+    }, [input, setInput, loading, sessionId, messages, setMessages, lang, userProfile, user, loadSession, autoSpeak, playAudio, t]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
