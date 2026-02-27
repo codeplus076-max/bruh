@@ -55,7 +55,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     const [voiceError, setVoiceError] = useState<string | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
+    const recognitionRef = useRef<any>(null);
 
     const playAudio = useCallback(async (text: string, index: number) => {
         if (playingMessageId === index) {

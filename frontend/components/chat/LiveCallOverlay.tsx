@@ -22,7 +22,7 @@ interface LiveCallOverlayProps {
 export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, lastAiResponse }: LiveCallOverlayProps) {
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
+    const recognitionRef = useRef<any>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     const playResponse = useCallback(async (text: string) => {
@@ -99,7 +99,7 @@ export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, la
                     recognitionRef.current.continuous = false;
                     recognitionRef.current.interimResults = false;
 
-                    recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+                    recognitionRef.current.onresult = (event: any) => {
                         const transcript = event.results[0][0].transcript;
                         onTranscription(transcript);
                         setIsListening(false);
