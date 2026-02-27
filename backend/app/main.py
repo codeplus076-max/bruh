@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
 load_dotenv() # Load at very top
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 import os
@@ -26,6 +27,21 @@ app.add_middleware(
 
 # Add GZip compression for large JSON payloads (like Hospital Lists)
 app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    # Log the exact error securely to the console for Render logs
+    print(f"Global Error caught on {request.url.path}: {str(exc)}")
+    
+    # Return a structured error response that the frontend can parse smoothly
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Server Error",
+            "message": "An unexpected error occurred while processing your request. Our team has been notified.",
+            "path": request.url.path
+        },
+    )
 
 @app.get("/health")
 def health_check():

@@ -14,7 +14,8 @@ import {
     ArrowLeft,
     Printer,
     CheckCircle2,
-    AlertCircle
+    AlertCircle,
+    LogOut
 } from "lucide-react";
 import jsPDF from "jspdf";
 import Image from "next/image";
@@ -252,12 +253,20 @@ export default function ReportPage() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => router.push("/chat")}
-                            className="p-2 hover:bg-primary/10 text-textMuted hover:text-primary rounded-xl transition-all"
+                            className="p-3 hover:bg-primary/10 text-textMuted hover:text-primary rounded-xl transition-all flex items-center justify-center min-w-[44px] min-h-[44px]"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                     </div>
                     <div className="flex items-center gap-4">
+                        <div className="w-px h-6 bg-borderDark hidden sm:block" />
+                        <a
+                            href="/logout"
+                            className="p-3 hover:bg-danger/10 text-textMuted hover:text-danger rounded-xl transition-all flex items-center justify-center min-w-[44px] min-h-[44px]"
+                            title="Sign Out"
+                        >
+                            <LogOut className="w-5 h-5" />
+                        </a>
                         <ThemeToggle />
                         <LanguageSwitcher />
                     </div>

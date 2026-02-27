@@ -15,6 +15,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatStateContext";
 import { LiveCallOverlay } from "./LiveCallOverlay";
 
+const audioCache = new Map<string, string>();
+
 interface Diagnosis {
     disease?: string;
     confidence?: string;
@@ -40,6 +42,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     const { user, userProfile } = useAuth();
     const { messages, sessionId, setMessages, resetChat, loadSession } = useChat();
     const [loading, setLoading] = useState(false);
+    const [loadingStatus, setLoadingStatus] = useState("Analyzing symptoms...");
     const [autoSpeak, setAutoSpeak] = useState(false);
     const [showCall, setShowCall] = useState(false);
     const [isListening, setIsListening] = useState(false);
@@ -85,6 +88,20 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             setTimeout(() => setVoiceError(null), 5000);
         };
 
+        const cacheKey = `${lang}_${text.substring(0, 100)}`;
+        if (audioCache.has(cacheKey)) {
+            const url = audioCache.get(cacheKey)!;
+            if (audioRef.current) {
+                audioRef.current.src = url;
+                const playPromise = audioRef.current.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => fallbackToSpeechSynthesis());
+                }
+                audioRef.current.onended = () => setPlayingMessageId(null);
+            }
+            return;
+        }
+
         try {
             const response = await fetch(`${API_URL}/voice/tts`, {
                 method: "POST",
@@ -101,6 +118,8 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                 }
 
                 const url = URL.createObjectURL(blob);
+                audioCache.set(cacheKey, url);
+
                 if (audioRef.current) {
                     audioRef.current.src = url;
 
@@ -117,7 +136,6 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
 
                     audioRef.current.onended = () => {
                         setPlayingMessageId(null);
-                        URL.revokeObjectURL(url);
                     };
                 }
             } else {
@@ -150,7 +168,12 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         const userMsg: Message = { role: "user", content: text };
         const newMessagesContext = [...messages, userMsg];
         setMessages(newMessagesContext);
+        setLoadingStatus("Analyzing symptoms...");
         setLoading(true);
+
+        const statusTimer = setTimeout(() => {
+            setLoadingStatus("Generating medical guidance...");
+        }, 3000);
 
         try {
             const res = await fetch(`${API_URL}/chat`, {
@@ -206,6 +229,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             setMessages((prev: Message[]) => [...prev, errorMsg]);
             if (autoSpeak) playAudio(t.chatError, newMessagesContext.length);
         } finally {
+            clearTimeout(statusTimer);
             setLoading(false);
         }
     }, [input, setInput, loading, sessionId, messages, setMessages, lang, userProfile, user, loadSession, autoSpeak, playAudio, t]);
@@ -417,54 +441,79 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                                             </div>
 
                                             {m.diagnosis.first_aid && m.diagnosis.first_aid.length > 0 && (
-                                                <div className="mt-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                                                    <p className="text-sm font-bold text-emerald-400 mb-1.5 flex items-center gap-1.5">🩹 Immediate First Aid</p>
-                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
-                                                        {m.diagnosis.first_aid.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
-                                                    </ul>
-                                                </div>
+                                                <details className="mt-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl overflow-hidden group">
+                                                    <summary className="p-3 text-sm font-bold text-emerald-400 cursor-pointer flex items-center justify-between outline-none">
+                                                        <span className="flex items-center gap-1.5">🩹 Immediate First Aid</span>
+                                                        <span className="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+                                                    </summary>
+                                                    <div className="px-3 pb-3">
+                                                        <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                            {m.diagnosis.first_aid.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                </details>
                                             )}
 
                                             {m.diagnosis.home_remedies && m.diagnosis.home_remedies.length > 0 && (
-                                                <div className="mt-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                                                    <p className="text-sm font-bold text-amber-500 mb-1.5 flex items-center gap-1.5">☕ Supportive Home Care</p>
-                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
-                                                        {m.diagnosis.home_remedies.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
-                                                    </ul>
-                                                </div>
+                                                <details className="mt-2 bg-amber-500/10 border border-amber-500/20 rounded-xl overflow-hidden group">
+                                                    <summary className="p-3 text-sm font-bold text-amber-500 cursor-pointer flex items-center justify-between outline-none">
+                                                        <span className="flex items-center gap-1.5">☕ Supportive Home Care</span>
+                                                        <span className="text-amber-500 group-open:rotate-180 transition-transform">▼</span>
+                                                    </summary>
+                                                    <div className="px-3 pb-3">
+                                                        <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                            {m.diagnosis.home_remedies.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                </details>
                                             )}
 
                                             {m.diagnosis.medicines && m.diagnosis.medicines.length > 0 && (
-                                                <div className="mt-2 p-3 bg-teal-500/10 border border-teal-500/20 rounded-xl">
-                                                    <p className="text-sm font-bold text-teal-400 mb-2 flex items-center gap-1.5">💊 Safe OTC Medicines</p>
-                                                    <div className="space-y-2.5">
-                                                        {m.diagnosis.medicines.map((med: { name: string; purpose: string; guidance: string; warning?: string }, idx: number) => (
-                                                            <div key={idx} className="bg-surface/50 p-2 rounded-lg border border-borderDark text-xs">
-                                                                <p className="font-bold text-teal-300">{med.name} <span className="text-textMuted font-normal">— {med.purpose}</span></p>
-                                                                <p className="text-textMain/80 mt-1 leading-relaxed">🔹 {med.guidance}</p>
-                                                                {med.warning && <p className="text-danger mt-1 italic">⚠️ {med.warning}</p>}
-                                                            </div>
-                                                        ))}
+                                                <details className="mt-2 bg-teal-500/10 border border-teal-500/20 rounded-xl overflow-hidden group">
+                                                    <summary className="p-3 text-sm font-bold text-teal-400 cursor-pointer flex items-center justify-between outline-none">
+                                                        <span className="flex items-center gap-1.5">💊 Safe OTC Medicines</span>
+                                                        <span className="text-teal-400 group-open:rotate-180 transition-transform">▼</span>
+                                                    </summary>
+                                                    <div className="px-3 pb-3">
+                                                        <div className="space-y-2.5">
+                                                            {m.diagnosis.medicines.map((med: { name: string; purpose: string; guidance: string; warning?: string }, idx: number) => (
+                                                                <div key={idx} className="bg-surface/50 p-2 rounded-lg border border-borderDark text-xs">
+                                                                    <p className="font-bold text-teal-300">{med.name} <span className="text-textMuted font-normal">— {med.purpose}</span></p>
+                                                                    <p className="text-textMain/80 mt-1 leading-relaxed">🔹 {med.guidance}</p>
+                                                                    {med.warning && <p className="text-danger mt-1 italic">⚠️ {med.warning}</p>}
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </details>
                                             )}
 
                                             {m.diagnosis.routine && m.diagnosis.routine.length > 0 && (
-                                                <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-                                                    <p className="text-sm font-bold text-blue-400 mb-1.5 flex items-center gap-1.5">📅 Daily Routine</p>
-                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
-                                                        {m.diagnosis.routine.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
-                                                    </ul>
-                                                </div>
+                                                <details className="mt-2 bg-blue-500/10 border border-blue-500/20 rounded-xl overflow-hidden group">
+                                                    <summary className="p-3 text-sm font-bold text-blue-400 cursor-pointer flex items-center justify-between outline-none">
+                                                        <span className="flex items-center gap-1.5">📅 Daily Routine</span>
+                                                        <span className="text-blue-400 group-open:rotate-180 transition-transform">▼</span>
+                                                    </summary>
+                                                    <div className="px-3 pb-3">
+                                                        <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                            {m.diagnosis.routine.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                </details>
                                             )}
 
                                             {m.diagnosis.when_to_seek_care && m.diagnosis.when_to_seek_care.length > 0 && (
-                                                <div className="mt-2 p-3 bg-pink-500/10 border border-pink-500/20 rounded-xl">
-                                                    <p className="text-sm font-bold text-pink-400 mb-1.5 flex items-center gap-1.5">🏥 When to Seek Care</p>
-                                                    <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
-                                                        {m.diagnosis.when_to_seek_care.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
-                                                    </ul>
-                                                </div>
+                                                <details className="mt-2 bg-pink-500/10 border border-pink-500/20 rounded-xl overflow-hidden group">
+                                                    <summary className="p-3 text-sm font-bold text-pink-400 cursor-pointer flex items-center justify-between outline-none">
+                                                        <span className="flex items-center gap-1.5">🏥 When to Seek Care</span>
+                                                        <span className="text-pink-400 group-open:rotate-180 transition-transform">▼</span>
+                                                    </summary>
+                                                    <div className="px-3 pb-3">
+                                                        <ul className="list-disc list-inside text-xs text-textMain/90 space-y-1">
+                                                            {m.diagnosis.when_to_seek_care.map((item: string, idx: number) => <li key={idx} className="leading-relaxed">{item}</li>)}
+                                                        </ul>
+                                                    </div>
+                                                </details>
                                             )}
 
                                             {m.diagnosis.warnings && m.diagnosis.warnings.length > 0 && (
@@ -477,16 +526,21 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                                             )}
 
                                             {m.diagnosis.explanation && m.diagnosis.explanation.length > 0 && (
-                                                <div className="pt-3 border-t border-borderDark mt-3">
-                                                    <p className="text-xs font-semibold text-textMain mb-1.5">Medical Reasoning:</p>
-                                                    <ul className="list-disc list-inside text-xs text-textMuted space-y-1 bg-surfaceHighlight/30 p-2.5 rounded-md">
-                                                        {m.diagnosis.explanation.map((exp: string, idx: number) => (
-                                                            <li key={idx} className={exp.includes("EMERGENCY") ? "text-danger font-medium leading-relaxed" : "leading-relaxed"}>
-                                                                {exp}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
+                                                <details className="mt-3 bg-surfaceHighlight/30 border border-borderDark rounded-xl overflow-hidden group">
+                                                    <summary className="p-3 text-xs font-semibold text-textMain cursor-pointer flex items-center justify-between outline-none">
+                                                        <span className="flex items-center gap-1.5">Medical Reasoning</span>
+                                                        <span className="text-textMuted group-open:rotate-180 transition-transform">▼</span>
+                                                    </summary>
+                                                    <div className="px-3 pb-3">
+                                                        <ul className="list-disc list-inside text-xs text-textMuted space-y-1">
+                                                            {m.diagnosis.explanation.map((exp: string, idx: number) => (
+                                                                <li key={idx} className={exp.includes("EMERGENCY") ? "text-danger font-medium leading-relaxed" : "leading-relaxed"}>
+                                                                    {exp}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                </details>
                                             )}
 
                                             {m.diagnosis.sessionId && (
@@ -514,12 +568,15 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                             className="flex justify-start"
                         >
-                            <div className="bg-surface border border-borderDark rounded-2xl rounded-tl-sm px-5 py-4 shadow-glass">
-                                <span className="flex gap-1.5 items-center">
-                                    {[0, 150, 300].map((d) => (
-                                        <span key={d} className="w-2 h-2 bg-primary/60 rounded-full animate-pulse" style={{ animationDelay: `${d}ms` }} />
-                                    ))}
-                                </span>
+                            <div className="bg-surface border border-borderDark rounded-2xl rounded-tl-sm px-5 py-4 shadow-glass max-w-[85%]">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-1.5">
+                                        {[0, 150, 300].map((d) => (
+                                            <span key={d} className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse" style={{ animationDelay: `${d}ms` }} />
+                                        ))}
+                                    </div>
+                                    <span className="text-sm text-textMuted animate-pulse">{loadingStatus}</span>
+                                </div>
                             </div>
                         </motion.div>
                     )}

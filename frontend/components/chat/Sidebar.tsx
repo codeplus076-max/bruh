@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Plus, MessageSquare, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, MessageSquare, Clock, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { useChat } from "@/context/ChatStateContext";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -122,9 +122,9 @@ export function Sidebar() {
                 )}
             </div>
 
-            {/* User Info / Logout Placeholder */}
+            {/* User Info / Logout Action */}
             {user && isOpen && (
-                <div className="p-4 border-t border-borderDark bg-surfaceHighlight/30">
+                <div className="p-4 border-t border-borderDark bg-surfaceHighlight/30 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
                             {user.displayName?.[0] || "U"}
@@ -134,6 +134,13 @@ export function Sidebar() {
                             <p className="text-[10px] text-textMuted truncate">{user.email}</p>
                         </div>
                     </div>
+                    <a
+                        href="/logout"
+                        className="p-2 text-textMuted hover:text-danger hover:bg-danger/10 rounded-lg transition-all"
+                        title="Log Out"
+                    >
+                        <LogOut size={16} />
+                    </a>
                 </div>
             )}
         </motion.div>

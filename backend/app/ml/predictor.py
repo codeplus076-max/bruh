@@ -3,6 +3,7 @@ import joblib
 import pandas as pd
 import numpy as np
 from .symptom_mapper import SymptomMapper
+from .risk_engine import calculate_risk
 
 class DiseasePredictor:
     """
@@ -18,11 +19,11 @@ class DiseasePredictor:
             cls._instance = super(DiseasePredictor, cls).__new__(cls)
             cls._instance.model_path = os.path.join(
                 model_dir or os.path.dirname(os.path.abspath(__file__)), 
-                "triage_model.joblib"
+                "triage_model_v2.joblib"
             )
             cls._instance.meta_path = os.path.join(
                 model_dir or os.path.dirname(os.path.abspath(__file__)), 
-                "model_meta.joblib"
+                "model_meta_v2.joblib"
             )
             cls._instance.load_model()
         return cls._instance
@@ -36,26 +37,24 @@ class DiseasePredictor:
         if os.path.exists(self.model_path) and os.path.exists(self.meta_path):
             self.__class__._model = joblib.load(self.model_path)
             self.__class__._meta = joblib.load(self.meta_path)
-            print("Successfully loaded custom Random Forest model and metadata.")
+            print("Successfully loaded custom XGBoost model and metadata.")
         else:
             print(f"Warning: Model or meta not found in {self.model_path}. Using mock predictions.")
             self.__class__._model = None
+            self.__class__._meta = None
 
-    def predict(self, age: int, gender: int, severity: int, duration: float, clinical_symptoms: str = "") -> str:
-        """Legacy wrapper for backward compatibility."""
-        res = self.predict_with_metadata(age, gender, severity, duration, clinical_symptoms)
-        return res["disease"]
-
-    def predict_with_metadata(self, age: int, gender: int, severity: int, duration: float, clinical_symptoms: str) -> dict:
+    def predict(self, age: int, gender: int, severity: int, duration: float, clinical_symptoms: str = "") -> dict:
         """
-        Predicts disease with medical confidence scoring and symptom mapping.
+        Predicts disease with medical confidence scoring, risk engine integration,
+        and precise standardized JSON-like output schemas.
         """
         if not self._model or not self._meta:
             return {
-                "disease": "Mock Disease (Model Not Loaded)",
-                "confidence": "Low",
-                "confidence_score": 0.0,
-                "matched_symptoms": []
+                "condition": "Mock Disease (Model Not Loaded)",
+                "confidence": 0.0,
+                "risk_level": "Low",
+                "risk_score": 0,
+                "important_features": []
             }
 
         # 1. Map text symptoms to feature flags
@@ -97,32 +96,46 @@ class DiseasePredictor:
             print(f"Prediction error: {e}")
             disease_label = "Error in Prediction"
 
-        # 5. Calculate Medical Confidence
-        # Factor in: model probability + how many symptoms were actually mapped
-        mapping_count = len(mapped_features)
-        
-        # Sanity check: If almost zero features matched, drop confidence
-        if mapping_count == 0:
-            confidence_score *= 0.5
+        # 5. Calculate Medical Confidence & Explainability
+        # Check matching features for explainability
+        important_features = []
+        if hasattr(self._model, 'feature_importances_'):
+            importances = self._model.feature_importances_
+            fi = list(zip(features, importances))
+            fi.sort(key=lambda x: x[1], reverse=True)
+            # Find the top 3 features the user ACTUALLY HAS that drove the prediction
+            for feat, imp in fi:
+                if row.get(feat, 0) > 0 and feat not in ['Age', 'Gender', 'Severity', 'Duration_Min_Days']:
+                    important_features.append(feat)
+                if len(important_features) >= 3:
+                    break
             
-        final_confidence = "Low"
-        if confidence_score > 0.7 and mapping_count >= 1:
-            final_confidence = "High"
-        elif confidence_score > 0.4:
-            final_confidence = "Moderate"
-        else:
-            final_confidence = "Low"
-
-        # 6. Sanity Validation Layer: Handle "hand numb" vs "Unknown Viral illness"
-        # If confidence is too low or disease seems unlikely, provide caveat
-        if final_confidence == "Low" and disease_label == "Unknown Viral Illness":
-            disease_label = "Undetermined Condition (Low Confidence)"
+        # 6. Comprehensive Risk Engine Logic
+        risk_level, risk_score = calculate_risk(
+            prediction=disease_label, 
+            confidence=confidence_score, 
+            severity=severity, 
+            duration_days=duration, 
+            symptoms=list(mapped_features.keys())
+        )
 
         return {
-            "disease": disease_label,
-            "confidence": final_confidence,
-            "confidence_score": round(confidence_score, 2),
-            "matched_symptoms": list(mapped_features.keys())
+            "condition": disease_label,
+            "confidence": round(confidence_score, 2),
+            "risk_level": risk_level,
+            "risk_score": risk_score,
+            "important_features": important_features
+        }
+
+    # Backward compatibility method if needed
+    def predict_with_metadata(self, *args, **kwargs) -> dict:
+        res = self.predict(*args, **kwargs)
+        # Adapt new schema to old schema just in case something internally relies on it
+        return {
+            "disease": res["condition"],
+            "confidence": "High" if res["confidence"] > 0.7 else "Moderate" if res["confidence"] > 0.4 else "Low",
+            "confidence_score": res["confidence"],
+            "matched_symptoms": res["important_features"]
         }
 
     @property

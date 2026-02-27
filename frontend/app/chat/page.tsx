@@ -75,13 +75,13 @@ export default function ChatPage() {
                         <ThemeToggle />
                         <LanguageSwitcher />
                         <div className="w-px h-6 bg-borderDark hidden sm:block" />
-                        <button
-                            onClick={() => signOut()}
-                            className="p-2 hover:bg-danger/10 text-textMuted hover:text-danger rounded-xl transition-all"
+                        <a
+                            href="/logout"
+                            className="p-3 hover:bg-danger/10 text-textMuted hover:text-danger rounded-xl transition-all flex items-center justify-center min-w-[44px] min-h-[44px]"
                             title="Sign Out"
                         >
                             <LogOut className="w-5 h-5" />
-                        </button>
+                        </a>
                     </div>
                 </motion.nav>
 

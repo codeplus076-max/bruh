@@ -3,7 +3,9 @@ from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import os
 import json
-from openai import OpenAI
+from openai import AsyncOpenAI
+import asyncio
+from functools import lru_cache
 from app.ml.predictor import DiseasePredictor
 
 router = APIRouter(prefix="", tags=["predict"])
@@ -11,16 +13,27 @@ router = APIRouter(prefix="", tags=["predict"])
 # Always load from the ml/ directory relative to this file's location — works on Render and locally
 predictor = DiseasePredictor()
 
-# Initialize OpenAI-compatible client (supports both OpenAI and OpenRouter keys)
+# Initialize OpenAI-compatible client
 openai_api_key = os.getenv("OPENAI_API_KEY")
 if openai_api_key and openai_api_key.startswith("sk-or-"):
-    # OpenRouter key — use their OpenAI-compatible endpoint
-    client = OpenAI(
+    client = AsyncOpenAI(
         api_key=openai_api_key,
         base_url="https://openrouter.ai/api/v1"
     )
 else:
-    client = OpenAI(api_key=openai_api_key) if openai_api_key else None
+    client = AsyncOpenAI(api_key=openai_api_key) if openai_api_key else None
+
+@lru_cache(maxsize=500)
+def get_cached_prediction_metadata(age: int, gender: int, severity: int, duration: float, symptoms: str):
+    return predictor.predict_with_metadata(
+        age=age, gender=gender, severity=severity, duration=duration, clinical_symptoms=symptoms
+    )
+
+@lru_cache(maxsize=500)
+def get_cached_prediction(age: int, gender: int, severity: int, duration: float):
+    return predictor.predict(
+        age=age, gender=gender, severity=severity, duration=duration
+    )
 
 class PredictRequest(BaseModel):
     Age: int
@@ -31,6 +44,8 @@ class PredictRequest(BaseModel):
 class PredictResponse(BaseModel):
     predictions: List[Dict[str, Any]] = []
     risk_level: str
+    risk_score: int
+    important_features: List[str]
     urgency: str
     confidence: str
     first_aid: List[str]
@@ -106,26 +121,12 @@ async def chat_endpoint(request: ChatRequest):
     if not client:
         raise HTTPException(status_code=500, detail="OpenAI API key not configured")
         
-    system_prompt = f"""You are a senior specialized Medical Triage AI for UPCHAAR. 
-Your primary goal is to extract structured clinical data for a diagnostic ML model.
-
-### CONVERSATION RULES:
-1. **NO DEMOGRAPHICS**: NEVER ask the user for their Age, Gender, or personal identity. These are handled by the system.
-2. **SYMPTOM FOCUS**: Ask intelligent follow-up questions about the symptoms. Examples:
-   - "Where exactly is the pain located?"
-   - "How long have you been feeling this way?"
-   - "Is the pain constant or does it come and go?"
-3. **EFFICIENCY**: Ask NO MORE than 2-3 clarifying questions. 
-4. **TRIGGER**: Once you have a basic understanding of the symptoms, duration, and severity, call the `analyze_symptoms` function immediately.
-
-### TONE:
-- Professional, empathetic, and clinical.
-- Reply in the user's language: {request.language}
-
-### EXTRACTION PROTOCOL:
-- Extract ONLY clinical symptoms (e.g., "throbbing headache", "high fever").
-- Map severity to 1 (mild/nagging), 2 (moderate/interfering), 3 (severe/emergency).
-"""
+    system_prompt = f"""You are a fast Medical Triage AI. Extract structured data for ML model.
+RULES:
+1. NO DEMOGRAPHICS: Never ask Age/Gender.
+2. SYMPTOM FOCUS: Ask 1-2 quick questions max (e.g., location, duration).
+3. TRIGGER: Call `analyze_symptoms` immediately once symptoms are known.
+Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe)."""
 
     messages = [{"role": "system", "content": system_prompt}]
     for msg in request.messages:
@@ -136,11 +137,12 @@ Your primary goal is to extract structured clinical data for a diagnostic ML mod
         # Use gpt-4o-mini for better tool precision if available, fallback to 3.5
         model_name = "gpt-4o-mini" if not os.getenv("OPENAI_API_KEY", "").startswith("sk-") or "openrouter" in str(client.base_url) else "gpt-3.5-turbo"
         
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model_name,
             messages=messages,
             tools=tools,
-            tool_choice="auto"
+            tool_choice="auto",
+            max_tokens=300
         )
         
         response_message = response.choices[0].message
@@ -162,12 +164,13 @@ Your primary goal is to extract structured clinical data for a diagnostic ML mod
                 else:
                     try:
                         # Use the demographics from the request payload
-                        ml_result = predictor.predict_with_metadata(
-                            age=request.age,
-                            gender=request.gender,
-                            severity=args.get("severity", 1),
-                            duration=args.get("duration_days", 1.0),
-                            clinical_symptoms=args.get("clinical_symptoms", "")
+                        ml_result = await asyncio.to_thread(
+                            get_cached_prediction_metadata,
+                            request.age,
+                            request.gender,
+                            args.get("severity", 1),
+                            args.get("duration_days", 1.0),
+                            args.get("clinical_symptoms", "")
                         )
                     except Exception as e:
                         print(f"ML Model failed: {e}")
@@ -218,10 +221,12 @@ Your primary goal is to extract structured clinical data for a diagnostic ML mod
                     "clinical_symptoms": args.get("clinical_symptoms", "None reported"),
                     "is_injury": args.get("is_injury", False),
                     "risk_level": risk_assessment["risk_level"],
+                    "risk_score": risk_assessment.get("risk_score", 0), # Added risk score
                     "urgency": risk_assessment["urgency"],
                     "confidence": ml_result["confidence"],
                     "confidence_score": ml_result["confidence_score"],
                     "matched_symptoms": ml_result["matched_symptoms"],
+                    "important_features": ml_result["matched_symptoms"], # Explicitly map important features
                     "first_aid": guidance["first_aid"],
                     "home_remedies": guidance["home_remedies"],
                     "routine": guidance["routine"],
@@ -269,9 +274,11 @@ Your primary goal is to extract structured clinical data for a diagnostic ML mod
                     """
                 })
                 
-                final_response = client.chat.completions.create(
+                # Ensure generation is fast with minimal tokens
+                final_response = await client.chat.completions.create(
                     model=model_name,
-                    messages=messages
+                    messages=messages,
+                    max_tokens=350
                 )
                 
                 return ChatResponse(
@@ -309,15 +316,22 @@ def debug_model():
 async def predict_disease(request: PredictRequest):
     try:
         try:
-            disease = predictor.predict(
-                age=request.Age,
-                gender=request.Gender,
-                severity=request.Severity,
-                duration=request.Duration_Min_Days
+            prediction_result = await asyncio.to_thread(
+                get_cached_prediction,
+                request.Age,
+                request.Gender,
+                request.Severity,
+                request.Duration_Min_Days
             )
+            disease = prediction_result.get("condition", "Unknown")
+            risk_score = prediction_result.get("risk_score", 0)
+            important_features = prediction_result.get("important_features", [])
         except Exception as e:
             print(f"ML Model failed: {e}. Falling back to mock prediction.")
             disease = "Mock Disease (Model Not Loaded)"
+            risk_score = 0
+            important_features = []
+        
         # Run the new Clinical Triage risk engine
         from app.triage.risk_engine import evaluate_patient_risk
         
@@ -346,8 +360,10 @@ async def predict_disease(request: PredictRequest):
         )
             
         return PredictResponse(
-            predictions=[{"disease": disease, "probability": 0.85}], # Simulated prob since we only get top prediction
+            predictions=[{"disease": disease, "probability": prediction_result.get("confidence", 0.5)}],
             risk_level=risk_assessment["risk_level"],
+            risk_score=risk_score,
+            important_features=important_features,
             urgency=risk_assessment["urgency"],
             confidence=risk_assessment["confidence"],
             first_aid=guidance["first_aid"],

@@ -10,7 +10,6 @@
 backend/venv/
 venv/
 __pycache__/
-*.json
-!frontend/package.json
-!frontend/tsconfig.json
-!frontend/package-lock.json
+
+# Datasets
+*.csv

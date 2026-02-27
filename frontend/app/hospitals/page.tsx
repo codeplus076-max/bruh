@@ -64,7 +64,7 @@ export default function HospitalsPage() {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => router.push("/chat")}
-                            className="p-2 hover:bg-primary/10 text-textMuted hover:text-primary rounded-xl transition-all mr-2"
+                            className="p-3 hover:bg-primary/10 text-textMuted hover:text-primary rounded-xl transition-all mr-2 flex items-center justify-center min-w-[44px] min-h-[44px]"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
@@ -82,14 +82,16 @@ export default function HospitalsPage() {
                             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                             <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary">Live GIS Node</span>
                         </div>
-                        <ThemeToggle />
                         <LanguageSwitcher />
-                        <button
-                            onClick={() => signOut()}
-                            className="p-2 hover:bg-danger/10 text-textMuted hover:text-danger rounded-xl transition-all"
+                        <ThemeToggle />
+                        <div className="w-px h-6 bg-borderDark hidden sm:block" />
+                        <a
+                            href="/logout"
+                            className="p-3 hover:bg-danger/10 text-textMuted hover:text-danger rounded-xl transition-all flex items-center justify-center min-w-[44px] min-h-[44px]"
+                            title="Sign Out"
                         >
                             <LogOut className="w-5 h-5" />
-                        </button>
+                        </a>
                     </div>
                 </motion.nav>
 
