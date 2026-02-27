@@ -2,8 +2,8 @@
 
 declare global {
     interface Window {
-        SpeechRecognition: any; // We'll use more specific casts where used if needed, but defining the class type is better
-        webkitSpeechRecognition: any;
+        SpeechRecognition: SpeechRecognitionClass;
+        webkitSpeechRecognition: SpeechRecognitionClass;
     }
 
     // Define minimum needed for SpeechRecognition
@@ -22,6 +22,10 @@ declare global {
     interface SpeechRecognitionEvent extends Event {
         results: SpeechRecognitionResultList;
         resultIndex: number;
+    }
+
+    interface SpeechRecognitionClass {
+        new(): SpeechRecognition;
     }
 
     interface SpeechRecognitionErrorEvent extends Event {
@@ -241,7 +245,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognitionClass) {
                 recognitionRef.current = new SpeechRecognitionClass();
                 if (recognitionRef.current) {

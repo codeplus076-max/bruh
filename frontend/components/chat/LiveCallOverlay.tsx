@@ -2,8 +2,8 @@
 
 declare global {
     interface Window {
-        SpeechRecognition: any;
-        webkitSpeechRecognition: any;
+        SpeechRecognition: typeof SpeechRecognition;
+        webkitSpeechRecognition: typeof SpeechRecognition;
     }
 
     // Define minimum needed for SpeechRecognition
@@ -22,6 +22,15 @@ declare global {
     interface SpeechRecognitionEvent extends Event {
         results: SpeechRecognitionResultList;
         resultIndex: number;
+    }
+
+    interface SpeechRecognitionClass {
+        new(): SpeechRecognition;
+    }
+
+    interface Window {
+        SpeechRecognition: SpeechRecognitionClass;
+        webkitSpeechRecognition: SpeechRecognitionClass;
     }
 }
 

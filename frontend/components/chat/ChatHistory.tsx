@@ -16,7 +16,7 @@ interface ChatSession {
         disease?: string;
     };
     symptoms?: string;
-    messages?: any[];
+    messages?: { role: "user" | "assistant"; content: string }[];
 }
 
 export function ChatHistory() {
@@ -38,7 +38,7 @@ export function ChatHistory() {
                     limit(10)
                 );
                 const querySnapshot = await getDocs(q);
-                const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatSession));
                 setHistory(docs);
             } catch (e) {
                 console.error("Error fetching history:", e);
