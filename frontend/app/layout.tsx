@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 
+import { ChatProvider } from "@/context/ChatStateContext";
+
 // Primary body font - Technical, super clean
 const outfit = Outfit({
   subsets: ["latin"],
@@ -33,7 +35,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${outfit.variable} ${syne.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          {children}
+          <AuthProvider>
+            <LanguageProvider>
+              <ChatProvider>
+                {children}
+              </ChatProvider>
+            </LanguageProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

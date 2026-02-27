@@ -61,17 +61,20 @@ export default function HospitalsPage() {
             >
                 {/* Navbar */}
                 <motion.nav variants={itemVariants} className="flex items-center justify-between bg-surface/40 backdrop-blur-xl border border-borderDark rounded-2xl px-6 py-3 shadow-glass">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={() => router.push("/chat")}
                             className="p-2 hover:bg-primary/10 text-textMuted hover:text-primary rounded-xl transition-all mr-2"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
-                        <div className="relative w-8 h-8">
-                            <Image src="/logo.png" alt="Upchaar Logo" fill className="object-contain" />
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/20">
+                            <Image src="/logo.png" alt="Upchaar Logo" fill className="object-cover" />
                         </div>
-                        <span className="font-heading font-bold text-lg text-textMain hidden sm:block">Upchaar AI</span>
+                        <div className="flex flex-col">
+                            <span className="font-heading font-bold text-base tracking-tight text-textMain leading-none">UPCHAAR</span>
+                            <span className="text-[10px] text-primary font-mono uppercase tracking-widest opacity-80 mt-1">ai rural triage</span>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4">

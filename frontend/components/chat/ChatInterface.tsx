@@ -9,6 +9,8 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
+import { useChat } from "@/context/ChatStateContext";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Message = { role: "assistant" | "user"; content: string; diagnosis?: any };
@@ -17,7 +19,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function ChatInterface({ input, setInput }: { input: string, setInput: (v: string) => void }) {
     const { lang, t } = useLanguage();
-    const [messages, setMessages] = useState<Message[]>([]);
+    const { user, userProfile } = useAuth();
+    const { messages, setMessages, resetChat } = useChat();
     const [loading, setLoading] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -76,13 +79,30 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         });
     }, [isMuted, lang]);
 
-    // Initialize chat session on mount
+    // Initialize chat session from localStorage or use default greeting
     useEffect(() => {
-        setMessages([{ role: "assistant", content: t.chatGreeting }]);
-        // Delay initial greeting slightly to avoid instant autoplay block
-        setTimeout(() => speak(t.chatGreeting), 300);
+        const savedMessages = localStorage.getItem("upchaar_messages");
+        if (savedMessages) {
+            try {
+                setMessages(JSON.parse(savedMessages));
+            } catch (e) {
+                console.error("Failed to parse saved messages", e);
+                setMessages([{ role: "assistant", content: t.chatGreeting }]);
+            }
+        } else {
+            setMessages([{ role: "assistant", content: t.chatGreeting }]);
+            // Delay initial greeting slightly to avoid instant autoplay block
+            setTimeout(() => speak(t.chatGreeting), 300);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run once on mount
+    }, []); // Run on mount
+
+    // Persist messages to localStorage on change
+    useEffect(() => {
+        if (messages.length > 0) {
+            localStorage.setItem("upchaar_messages", JSON.stringify(messages));
+        }
+    }, [messages]);
 
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
@@ -111,7 +131,9 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                 body: JSON.stringify({
                     // Cleanse diagnosis obj from payload sent to backend to match strict pydantic type
                     messages: newMessagesContext.map(m => ({ role: m.role, content: m.content })),
-                    language: lang
+                    language: lang,
+                    age: userProfile?.age || 30,
+                    gender: userProfile?.gender === "Male" ? 1 : 0
                 }),
             });
 
@@ -125,7 +147,11 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             if (data.diagnosis) {
                 try {
                     const docRef = await addDoc(collection(db, "sessions"), {
-                        symptoms: newMessagesContext.filter(m => m.role === "user").map(m => m.content).join(", "),
+                        symptoms: data.diagnosis?.clinical_symptoms || newMessagesContext.filter(m => m.role === "user").map(m => m.content).join(", "),
+                        age: data.diagnosis?.age || "N/A",
+                        gender: data.diagnosis?.gender || "N/A",
+                        is_injury: data.diagnosis?.is_injury || false,
+                        messages: [...messages, { role: "user", content: text }, aiMsg],
                         predictions: data.diagnosis,
                         risk_level: data.diagnosis.risk_level || "Unknown",
                         guidance: {
@@ -138,7 +164,8 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                         timestamp: new Date().toISOString(),
                         createdAt: serverTimestamp(),
                         language: lang,
-                        userId: "anonymous" // In a full implementation, use auth.currentUser.uid
+                        userId: user?.uid || "anonymous",
+                        username: user?.displayName || "Guest"
                     });
                     aiMsg.diagnosis.sessionId = docRef.id;
                 } catch (dbErr) {

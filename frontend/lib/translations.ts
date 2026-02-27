@@ -45,6 +45,7 @@ export const translations = {
         voiceInputListening: "Listening now...",
         voiceInputErrorNotSupported: "Voice not supported in this browser",
         voiceInputErrorMicrophone: "Microphone error",
+        chatHistory: "History",
     },
 
     hi: {
@@ -88,6 +89,7 @@ export const translations = {
         voiceInputListening: "अब सुन रहा हूँ...",
         voiceInputErrorNotSupported: "इस ब्राउज़र में वॉयस इनपुट समर्थित नहीं है",
         voiceInputErrorMicrophone: "माइक्रोफ़ोन त्रुटि",
+        chatHistory: "इतिहास",
     },
 
     mr: {
@@ -131,6 +133,7 @@ export const translations = {
         voiceInputListening: "आता ऐकत आहे...",
         voiceInputErrorNotSupported: "या ब्राउझरमध्ये व्हॉइस इनपुट समर्थित नाही",
         voiceInputErrorMicrophone: "मायक्रोफोन त्रुटी",
+        chatHistory: "इतिहास",
     },
 };
 

@@ -12,6 +12,8 @@ import { useAuth } from "@/context/AuthContext";
 import { Activity, ShieldAlert, Cpu, MapPin, LogOut } from "lucide-react";
 import Image from "next/image";
 
+import { ChatHistory } from "@/components/chat/ChatHistory";
+
 // Lazy load heavy components
 const ChatInterface = dynamic(() => import("@/components/chat/ChatInterface").then(mod => mod.ChatInterface), {
     loading: () => <div className="p-8 text-center text-primary animate-pulse">Initializing Neural Interface...</div>,
@@ -55,18 +57,21 @@ export default function ChatPage() {
             <div className="absolute inset-x-0 top-0 h-[600px] bg-hero-glow pointer-events-none opacity-40 mix-blend-screen" />
 
             <motion.div
-                className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 lg:pt-12 space-y-8"
+                className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 lg:pt-12 space-y-8"
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
             >
                 {/* Navbar */}
                 <motion.nav variants={itemVariants} className="flex items-center justify-between bg-surface/40 backdrop-blur-xl border border-borderDark rounded-2xl px-6 py-3 shadow-glass">
-                    <div className="flex items-center gap-3">
-                        <div className="relative w-8 h-8">
-                            <Image src="/logo.png" alt="Upchaar Logo" fill className="object-contain" />
+                    <div className="flex items-center gap-4">
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/20">
+                            <Image src="/logo.png" alt="Upchaar Logo" fill className="object-cover" />
                         </div>
-                        <span className="font-heading font-bold text-lg text-textMain hidden sm:block">Upchaar AI</span>
+                        <div className="flex flex-col">
+                            <span className="font-heading font-bold text-base tracking-tight text-textMain leading-none">UPCHAAR</span>
+                            <span className="text-[10px] text-primary font-mono uppercase tracking-widest opacity-80 mt-1">ai rural triage</span>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -84,8 +89,15 @@ export default function ChatPage() {
                 </motion.nav>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* Sidebar Area (Left/History) */}
+                    <div className="hidden lg:block lg:col-span-3 space-y-6 sticky top-12 h-[calc(100vh-100px)]">
+                        <motion.div variants={itemVariants} className="h-full">
+                            <ChatHistory />
+                        </motion.div>
+                    </div>
+
                     {/* Main Chat Area */}
-                    <div className="lg:col-span-12 space-y-6">
+                    <div className="lg:col-span-9 space-y-6">
                         <motion.header variants={itemVariants} className="space-y-4">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-primary/20 text-primary text-[10px] font-mono tracking-widest uppercase">
                                 <Cpu className="w-3 h-3" />
@@ -105,7 +117,7 @@ export default function ChatPage() {
                             </div>
                         </motion.section>
 
-                        <motion.div variants={itemVariants} className="relative z-20 shadow-2xl rounded-2xl overflow-hidden border border-borderDark">
+                        <motion.div variants={itemVariants} className="relative z-20 shadow-2xl rounded-2xl overflow-hidden border border-borderDark bg-surface">
                             <Suspense fallback={<div className="h-[500px] bg-surface rounded-2xl animate-pulse flex items-center justify-center text-primary/40">Initializing Neural Engine...</div>}>
                                 <ChatInterface input={chatInput} setInput={setChatInput} />
                             </Suspense>

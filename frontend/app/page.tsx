@@ -20,6 +20,8 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
+    const [age, setAge] = useState("");
+    const [gender, setGender] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -35,8 +37,30 @@ export default function LoginPage() {
             if (isLogin) {
                 await signInWithEmailAndPassword(auth, email, password);
             } else {
+                // Validation for registration
+                if (!age || !gender) {
+                    throw new Error("Age and Gender are required for medical registration.");
+                }
+                const ageNum = parseInt(age);
+                if (isNaN(ageNum) || ageNum < 0 || ageNum > 120) {
+                    throw new Error("Please enter a valid age between 0 and 120.");
+                }
+
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: username });
+
+                // Save profile to Firestore
+                const { db } = await import("@/lib/firebase");
+                const { doc, setDoc } = await import("firebase/firestore");
+
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    fullName: username,
+                    age: ageNum,
+                    gender: gender,
+                    language: lang,
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
             }
             router.push("/chat");
         } catch (err: any) {
@@ -60,8 +84,8 @@ export default function LoginPage() {
             >
                 <div className="text-center space-y-4">
                     <div className="flex justify-center">
-                        <div className="relative w-24 h-24 rounded-full bg-primary/10 overflow-hidden border border-primary/20 p-2">
-                            <Image src="/logo.png" alt="Upchaar Logo" fill className="object-contain p-2" />
+                        <div className="relative w-28 h-28 rounded-full bg-primary/5 overflow-hidden border border-primary/10 p-4">
+                            <Image src="/logo.png" alt="Upchaar Logo" fill className="object-cover" />
                         </div>
                     </div>
                     <div>
@@ -72,17 +96,47 @@ export default function LoginPage() {
 
                 <form onSubmit={handleAuth} className="space-y-4">
                     {!isLogin && (
-                        <div className="relative">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
-                            <input
-                                type="text"
-                                placeholder="Username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className="w-full bg-surface border border-borderDark rounded-xl px-10 py-3 text-sm focus:border-primary/50 transition-all outline-none"
-                                required
-                            />
-                        </div>
+                        <>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
+                                <input
+                                    type="text"
+                                    placeholder="Full Name"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    className="w-full bg-surface border border-borderDark rounded-xl px-10 py-3 text-sm focus:border-primary/50 transition-all outline-none"
+                                    required
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        placeholder="Age"
+                                        min="0"
+                                        max="120"
+                                        value={age}
+                                        onChange={(e) => setAge(e.target.value)}
+                                        className="w-full bg-surface border border-borderDark rounded-xl px-4 py-3 text-sm focus:border-primary/50 transition-all outline-none"
+                                        required
+                                    />
+                                </div>
+                                <div className="relative">
+                                    <select
+                                        value={gender}
+                                        onChange={(e) => setGender(e.target.value)}
+                                        className="w-full bg-surface border border-borderDark rounded-xl px-4 py-3 text-sm focus:border-primary/50 transition-all outline-none appearance-none"
+                                        required
+                                    >
+                                        <option value="" disabled>Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Prefer not to say">Prefer not to say</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </>
                     )}
                     <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />

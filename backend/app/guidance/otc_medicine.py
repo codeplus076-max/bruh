@@ -7,7 +7,7 @@ def get_otc_medicines(symptoms: List[str], age: int, risk_level: str) -> List[Di
     medicines = []
     s_lower = [s.lower().replace("_", " ") for s in symptoms]
 
-    if any("fever" in s or "headache" in s or "pain" in s for s in s_lower):
+    if any("fever" in s or "headache" in s or "pain" in s or "injury" in s or "fracture" in s for s in s_lower):
         if age >= 12:
             medicines.append({
                 "name": "Paracetamol (Acetaminophen)",
@@ -47,12 +47,24 @@ def get_otc_medicines(symptoms: List[str], age: int, risk_level: str) -> List[Di
                 "warning": "Do NOT give honey or lozenges to children under 1 year old due to choking and botulism risks."
             })
 
-    if any("congestion" in s for s in s_lower):
+    if any("congestion" in s or "nose" in s for s in s_lower):
         medicines.append({
             "name": "Saline Nasal Drops",
             "purpose": "Moisturize nasal passages and wash away mucus.",
             "guidance": "2-3 drops in each nostril as needed.",
             "warning": "Use a dedicated sterile dropper per person to prevent cross-contamination."
         })
+
+    if any("chills" in s or "shivering" in s for s in s_lower):
+        medicines.append({
+            "name": "Paracetamol (Acetaminophen)",
+            "purpose": "Control high fever and chills.",
+            "guidance": "500-1000mg as needed, max 4 doses/day.",
+            "warning": "Fever with chills in rural areas may indicate Malaria or Typhoid. See a doctor."
+        })
+
+    if any("rash" in s or "yellowish" in s or "stiff neck" in s for s in s_lower):
+        # These are high-risk symptoms where we don't want to encourage self-medication
+        pass
 
     return medicines

@@ -2,7 +2,7 @@ import os
 import joblib
 import pandas as pd
 import numpy as np
-from functools import lru_cache
+from .symptom_mapper import SymptomMapper
 
 class DiseasePredictor:
     """
@@ -41,45 +41,89 @@ class DiseasePredictor:
             print(f"Warning: Model or meta not found in {self.model_path}. Using mock predictions.")
             self.__class__._model = None
 
-    @lru_cache(maxsize=1024)
-    def predict(self, age: int, gender: int, severity: int, duration: float) -> str:
+    def predict(self, age: int, gender: int, severity: int, duration: float, clinical_symptoms: str = "") -> str:
+        """Legacy wrapper for backward compatibility."""
+        res = self.predict_with_metadata(age, gender, severity, duration, clinical_symptoms)
+        return res["disease"]
+
+    def predict_with_metadata(self, age: int, gender: int, severity: int, duration: float, clinical_symptoms: str) -> dict:
         """
-        Predicts disease probabilistically.
-        Cached with LRU since inputs are deterministic for the same symptom payload.
+        Predicts disease with medical confidence scoring and symptom mapping.
         """
-        if self._model and self._meta:
-            input_dict = {
-                'Age': age,
-                'Gender': gender,
-                'Severity': severity,
-                'Duration_Min_Days': duration
+        if not self._model or not self._meta:
+            return {
+                "disease": "Mock Disease (Model Not Loaded)",
+                "confidence": "Low",
+                "confidence_score": 0.0,
+                "matched_symptoms": []
             }
-            
-            # The model was trained on ~38 columns. We need to fill missing ones with 0.
-            features = self._meta.get('features', [])
-            row = {}
-            for f in features:
-                row[f] = input_dict.get(f, 0)  # Default all unseen symptoms to 0
+
+        # 1. Map text symptoms to feature flags
+        mapped_features = SymptomMapper.extract_features(clinical_symptoms)
+        
+        # 2. Build input dictionary
+        input_dict = {
+            'Age': age,
+            'Gender': gender,
+            'Severity': severity,
+            'Duration_Min_Days': duration
+        }
+        input_dict.update(mapped_features)
+        
+        # 3. Create DataFrame for inference
+        features = self._meta.get('features', [])
+        row = {f: input_dict.get(f, 0) for f in features}
+        df = pd.DataFrame([row])
+        
+        # 4. Perform Inference
+        disease_label = "Unknown Disease"
+        confidence_score = 0.0
+        
+        try:
+            # Get probabilities if supported
+            if hasattr(self._model, "predict_proba"):
+                probas = self._model.predict_proba(df)[0]
+                max_idx = np.argmax(probas)
+                confidence_score = float(probas[max_idx])
                 
-            df = pd.DataFrame([row])
+                classes = self._meta.get('classes', [])
+                if 0 <= max_idx < len(classes):
+                    disease_label = str(classes[max_idx])
+            else:
+                # Fallback to direct prediction
+                disease_label = str(self._model.predict(df)[0])
+                confidence_score = 0.5 # Default for non-probabilistic models
+        except Exception as e:
+            print(f"Prediction error: {e}")
+            disease_label = "Error in Prediction"
+
+        # 5. Calculate Medical Confidence
+        # Factor in: model probability + how many symptoms were actually mapped
+        mapping_count = len(mapped_features)
+        
+        # Sanity check: If almost zero features matched, drop confidence
+        if mapping_count == 0:
+            confidence_score *= 0.5
             
-            # Predict returns an encoded integer OR direct string label
-            pred_val = self._model.predict(df)[0]
-            
-            # If it's a string (our light RF model), just return it
-            if isinstance(pred_val, str) or isinstance(pred_val, np.str_):
-                return str(pred_val)
-                
-            # Decode the integer back to a string disease label (legacy model)
-            classes = self._meta.get('classes', [])
-            if hasattr(pred_val, 'item'):
-                pred_val = pred_val.item() # get pure int
-                
-            if isinstance(pred_val, int) and 0 <= pred_val < len(classes):
-                return str(classes[pred_val])
-            return "Unknown Disease"
+        final_confidence = "Low"
+        if confidence_score > 0.7 and mapping_count >= 1:
+            final_confidence = "High"
+        elif confidence_score > 0.4:
+            final_confidence = "Moderate"
         else:
-            return "Mock Disease (Model Not Loaded)"
+            final_confidence = "Low"
+
+        # 6. Sanity Validation Layer: Handle "hand numb" vs "Unknown Viral illness"
+        # If confidence is too low or disease seems unlikely, provide caveat
+        if final_confidence == "Low" and disease_label == "Unknown Viral Illness":
+            disease_label = "Undetermined Condition (Low Confidence)"
+
+        return {
+            "disease": disease_label,
+            "confidence": final_confidence,
+            "confidence_score": round(confidence_score, 2),
+            "matched_symptoms": list(mapped_features.keys())
+        }
 
     @property
     def is_loaded(self) -> bool:

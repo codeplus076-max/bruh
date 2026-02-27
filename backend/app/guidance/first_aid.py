@@ -18,9 +18,15 @@ def get_first_aid(symptoms: List[str], disease: str) -> List[str]:
     if any("breath" in s for s in s_lower):
         advice.add("Help the patient sit upright to make breathing easier. Loosen any tight clothing.")
 
+    if any("injury" in s or "fracture" in s or "fall" in s for s in s_lower):
+        advice.add("Immobilize the injured part using a splint or makeshift support. Do NOT try to realign a suspected broken bone.")
+        advice.add("Minimize movement to prevent further injury or internal bleeding.")
+    
     if disease_lower == "dengue":
         advice.add("Ensure strict hydration. Do not give Aspirin or Ibuprofen.")
     elif disease_lower == "malaria":
         advice.add("Keep the patient cool if feverish, and warm if shivering. Ensure hydration.")
+    elif "injury" in disease_lower:
+        advice.add("Seek professional medical evaluation for a possible x-ray or wound cleaning.")
 
     return list(advice)

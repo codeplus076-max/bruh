@@ -49,28 +49,49 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[ChatMessage]
     language: str = "en"
+    age: int
+    gender: int # 1=M, 0=F
 
 class ChatResponse(BaseModel):
     role: str
     content: str
     diagnosis: Optional[Dict[str, Any]] = None
 
-# Module-level tools list — can be imported by tests and reused without rebuilding each request
+# Module-level tools list
 tools = [
     {
         "type": "function",
         "function": {
             "name": "analyze_symptoms",
-            "description": "Trigger the medical ML model to get a diagnosis once age, gender, severity, and duration are known.",
+            "description": "Retrieved structured medical data and trigger diagnostic ML model.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "age": {"type": "integer"},
-                    "gender": {"type": "integer", "description": "1 for Male, 0 for Female"},
-                    "severity": {"type": "integer", "description": "1 (mild), 2 (moderate), or 3 (severe)"},
-                    "duration_days": {"type": "integer"}
+                    "severity": {"type": "integer", "description": "1 (mild), 2 (moderate), 3 (severe)"},
+                    "duration_days": {"type": "integer"},
+                    "clinical_symptoms": {
+                        "type": "string", 
+                        "description": "LIST OF SYMPTOMS ONLY. No demographic info."
+                    },
+                    "is_injury": {"type": "boolean"},
+                    "injury_type": {"type": "string"},
+                    # Granular Symptom Flags for ML precision
+                    "chest_pain": {"type": "boolean"},
+                    "breathlessness": {"type": "boolean"},
+                    "fever": {"type": "boolean"},
+                    "cough": {"type": "boolean"},
+                    "headache": {"type": "boolean"},
+                    "vomiting": {"type": "boolean"},
+                    "diarrhea": {"type": "boolean"},
+                    "sore_throat": {"type": "boolean"},
+                    "rash": {"type": "boolean"},
+                    "joint_pain": {"type": "boolean"},
+                    "muscle_ache": {"type": "boolean"},
+                    "chills": {"type": "boolean"},
+                    "stiff_neck": {"type": "boolean"},
+                    "yellowish_skin": {"type": "boolean"}
                 },
-                "required": ["age", "gender", "severity", "duration_days"]
+                "required": ["severity", "duration_days", "clinical_symptoms", "is_injury"]
             }
         }
     }
@@ -82,17 +103,16 @@ async def chat_endpoint(request: ChatRequest):
     if not client:
         raise HTTPException(status_code=500, detail="OpenAI API key not configured")
         
-    system_prompt = f"""You are a highly empathetic and professional rural health triage assistant.
-Your goal is to politely understand the patient's symptoms and organically gather 4 key pieces of information:
-1. Patient's Age
-2. Patient's Gender (try to infer organically, or ask gently)
-3. Duration of symptoms (in days)
-4. Severity of symptoms (1=mild, 2=moderate, 3=severe)
+    system_prompt = f"""You are a specialized Medical Triage AI. Your primary goal is to extract structured data for a diagnostic ML model.
 
-Converse naturally in this locale language code: {request.language}
-Ask one or two questions at a time. Keep responses concise and supportive.
-Once you have ALL 4 required pieces of information, you MUST call the `analyze_symptoms` function to get a medical triage assessment.
-Do NOT attempt to diagnose the patient yourself without calling the function.
+### EXTRACTION PROTOCOL:
+1. Identify: Duration (days), Severity (1-3), and Clinical Symptoms.
+2. Isolate Clinical Symptoms: Extract ONLY the clinical terms (e.g., "fever", "nausea").
+3. DO NOT ASK FOR AGE OR GENDER. These are provided by the system.
+4. Focus exclusively on medical inquiry.
+
+CONVERSE NATURALLY in language: {request.language}. Be empathetic but focused.
+Once all data points are clear, call `analyze_symptoms`.
 """
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -101,8 +121,11 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
         
     
     try:
+        # Use gpt-4o-mini for better tool precision if available, fallback to 3.5
+        model_name = "gpt-4o-mini" if not os.getenv("OPENAI_API_KEY", "").startswith("sk-") or "openrouter" in str(client.base_url) else "gpt-3.5-turbo"
+        
         response = client.chat.completions.create(
-            model="openai/gpt-3.5-turbo",
+            model=model_name,
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -115,36 +138,62 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
             if tool_call.function.name == "analyze_symptoms":
                 args = json.loads(tool_call.function.arguments)
                 
-                try:
-                    # Run the actual XGB/RF ML model locally
-                    disease = predictor.predict(
-                        age=args.get("age", 30),
-                        gender=args.get("gender", 1),
-                        severity=args.get("severity", 1),
-                        duration=args.get("duration_days", 1.0)
-                    )
-                except Exception as e:
-                    print(f"ML Model failed: {e}. Falling back to mock prediction.")
-                    disease = "Mock Disease (Model Not Loaded)"
+                # 1. Prediction Mapping & ML Logic
+                if args.get("is_injury"):
+                    injury_type = args.get("injury_type", "Injury")
+                    ml_result = {
+                        "disease": f"Physical Injury ({injury_type})",
+                        "confidence": "High",
+                        "confidence_score": 1.0,
+                        "matched_symptoms": ["injury"]
+                    }
+                else:
+                    try:
+                        # Use the demographics from the request payload
+                        ml_result = predictor.predict_with_metadata(
+                            age=request.age,
+                            gender=request.gender,
+                            severity=args.get("severity", 1),
+                            duration=args.get("duration_days", 1.0),
+                            clinical_symptoms=args.get("clinical_symptoms", "")
+                        )
+                    except Exception as e:
+                        print(f"ML Model failed: {e}")
+                        ml_result = {
+                            "disease": "System Error (ML Failed)",
+                            "confidence": "Low",
+                            "confidence_score": 0.0,
+                            "matched_symptoms": []
+                        }
+
+                disease = ml_result["disease"]
                 
-                # Analyze risk with the new clinical engine
+                # Debug Logging
+                print(f"--- ML DIAGNOSIS DEBUG ---")
+                print(f"Inputs: Age={args.get('age')}, Gender={args.get('gender')}, Clinical={args.get('clinical_symptoms')}")
+                print(f"Mapped Symptoms: {ml_result['matched_symptoms']}")
+                print(f"Prediction: {disease} (Conf: {ml_result['confidence']}, Score: {ml_result['confidence_score']})")
+                
+                # 2. Risk & Guidance Engine
                 from app.triage.risk_engine import evaluate_patient_risk
                 from app.guidance.guidance_engine import generate_guidance
                 
                 risk_assessment = evaluate_patient_risk(
-                    age=args.get("age", 30),
+                    age=request.age,
                     base_severity=args.get("severity", 1),
                     symptoms=args,
                     ml_disease=disease
                 )
                 
-                # Extract symptoms for guidance logic
-                symptoms_list = [str(k) for k, v in args.items() if isinstance(v, bool) and v] + [disease]
-                    
+                # Guidance symptoms list: Combine tools + mapped symptoms + disease
+                symptoms_list = [str(k) for k, v in args.items() if v is True and k not in ["is_injury", "gender", "age", "severity", "duration_days"]]
+                symptoms_list += ml_result["matched_symptoms"]
+                symptoms_list += [disease]
+                
                 guidance = generate_guidance(
                     symptoms=symptoms_list,
                     disease=disease,
-                    age=args.get("age", 30),
+                    age=request.age,
                     severity_score=args.get("severity", 1),
                     risk_level=risk_assessment["risk_level"],
                     urgency=risk_assessment["urgency"]
@@ -152,9 +201,15 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
                     
                 diagnosis_data = {
                     "disease": disease,
+                    "age": request.age,
+                    "gender": "Male" if request.gender == 1 else "Female",
+                    "clinical_symptoms": args.get("clinical_symptoms", "None reported"),
+                    "is_injury": args.get("is_injury", False),
                     "risk_level": risk_assessment["risk_level"],
                     "urgency": risk_assessment["urgency"],
-                    "confidence": risk_assessment["confidence"],
+                    "confidence": ml_result["confidence"],
+                    "confidence_score": ml_result["confidence_score"],
+                    "matched_symptoms": ml_result["matched_symptoms"],
                     "first_aid": guidance["first_aid"],
                     "home_remedies": guidance["home_remedies"],
                     "routine": guidance["routine"],
@@ -167,7 +222,8 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
                     "emergency": risk_assessment["emergency"]
                 }
                 
-                # Send the function result back to OpenAI to generate a final empathetic response
+                # Send the function result back to OpenAI to generate a final response
+                # CRITICAL: We instruct the AI to provide guidance IMMEDIATELY.
                 messages.append({
                     "role": "assistant",
                     "content": None,
@@ -189,8 +245,20 @@ Do NOT attempt to diagnose the patient yourself without calling the function.
                     "content": json.dumps(diagnosis_data)
                 })
                 
+                # Enhanced Instruction for proactive guidance
+                messages.append({
+                    "role": "system", 
+                    "content": """
+                    PROACTIVE GUIDANCE ENFORCEMENT:
+                    1. State the diagnosis clearly and empathetically.
+                    2. IMMEDIATELY provide the essential First Aid, Home Remedies, and Recovery Routine from the tool output.
+                    3. Do NOT wait for the patient to ask for these. 
+                    4. Keep instructions clear, bulleted, and in the user's language.
+                    """
+                })
+                
                 final_response = client.chat.completions.create(
-                    model="openai/gpt-3.5-turbo",
+                    model=model_name,
                     messages=messages
                 )
                 
