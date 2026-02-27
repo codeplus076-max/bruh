@@ -2,8 +2,31 @@
 
 declare global {
     interface Window {
-        SpeechRecognition: any;
+        SpeechRecognition: any; // We'll use more specific casts where used if needed, but defining the class type is better
         webkitSpeechRecognition: any;
+    }
+
+    // Define minimum needed for SpeechRecognition
+    interface SpeechRecognition extends EventTarget {
+        continuous: boolean;
+        interimResults: boolean;
+        lang: string;
+        onresult: (event: SpeechRecognitionEvent) => void;
+        onerror: (event: SpeechRecognitionErrorEvent) => void;
+        onend: () => void;
+        start(): void;
+        stop(): void;
+        abort(): void;
+    }
+
+    interface SpeechRecognitionEvent extends Event {
+        results: SpeechRecognitionResultList;
+        resultIndex: number;
+    }
+
+    interface SpeechRecognitionErrorEvent extends Event {
+        error: string;
+        message: string;
     }
 }
 
@@ -51,49 +74,6 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     const bottomRef = useRef<HTMLDivElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
-
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognitionClass) {
-                recognitionRef.current = new SpeechRecognitionClass();
-                if (recognitionRef.current) {
-                    recognitionRef.current.continuous = false;
-                    recognitionRef.current.interimResults = true;
-
-                    recognitionRef.current.onresult = (e: SpeechRecognitionEvent) => {
-                        const transcript = Array.from(e.results)
-                            .map((result) => result[0])
-                            .map((result) => result.transcript)
-                            .join("");
-
-                        setInput(transcript);
-
-                        if (e.results[0].isFinal) {
-                            setIsListening(false);
-                            handleSend(transcript);
-                        }
-                    };
-                    recognitionRef.current.onend = () => setIsListening(false);
-                    recognitionRef.current.onerror = (err: SpeechRecognitionErrorEvent) => {
-                        console.error("STT Error:", err);
-                        setIsListening(false);
-                    };
-                }
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Run only once on mount
-
-    const toggleSTT = () => {
-        if (isListening) {
-            recognitionRef.current?.stop();
-        } else {
-            recognitionRef.current.lang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
-            recognitionRef.current?.start();
-            setIsListening(true);
-        }
-    };
 
     const playAudio = useCallback(async (text: string, index: number) => {
         if (playingMessageId === index) {
@@ -178,47 +158,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         }
     }, [lang, playingMessageId]);
 
-    // Initialize chat session from localStorage or use default greeting
-    useEffect(() => {
-        const savedMessages = localStorage.getItem("upchaar_messages");
-        if (savedMessages) {
-            try {
-                setMessages(JSON.parse(savedMessages));
-            } catch (e) {
-                console.error("Failed to parse saved messages", e);
-                setMessages([{ role: "assistant", content: t.chatGreeting }]);
-            }
-        } else {
-            setMessages([{ role: "assistant", content: t.chatGreeting }]);
-            // Auto-speak greeting if enabled
-            setTimeout(() => {
-                if (autoSpeak) playAudio(t.chatGreeting, 0);
-            }, 1000);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Run on mount
-
-    // Persist messages to localStorage on change
-    useEffect(() => {
-        if (messages.length > 0) {
-            localStorage.setItem("upchaar_messages", JSON.stringify(messages));
-        }
-    }, [messages]);
-
-    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
-
-    useEffect(() => {
-        // Cleanup speech on unmount
-        const currentAudio = audioRef.current;
-        return () => {
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.src = "";
-            }
-        };
-    }, []);
-
-    const handleSend = async (transcript?: string) => {
+    const handleSend = useCallback(async (transcript?: string) => {
         const text = typeof transcript === "string" ? transcript : input.trim();
         if (!text || loading) return;
 
@@ -297,7 +237,91 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         } finally {
             setLoading(false);
         }
+    }, [input, loading, sessionId, messages, setMessages, lang, userProfile, user, loadSession, autoSpeak, playAudio, t]);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            if (SpeechRecognitionClass) {
+                recognitionRef.current = new SpeechRecognitionClass();
+                if (recognitionRef.current) {
+                    recognitionRef.current.continuous = false;
+                    recognitionRef.current.interimResults = true;
+
+                    recognitionRef.current.onresult = (e: SpeechRecognitionEvent) => {
+                        const transcript = Array.from(e.results)
+                            .map((result) => result[0])
+                            .map((result) => result.transcript)
+                            .join("");
+
+                        setInput(transcript);
+
+                        if (e.results[0].isFinal) {
+                            setIsListening(false);
+                            handleSend(transcript);
+                        }
+                    };
+                    recognitionRef.current.onend = () => setIsListening(false);
+                    recognitionRef.current.onerror = (err: SpeechRecognitionErrorEvent) => {
+                        console.error("STT Error:", err);
+                        setIsListening(false);
+                    };
+                }
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [handleSend]);
+
+    const toggleSTT = () => {
+        if (isListening) {
+            recognitionRef.current?.stop();
+        } else if (recognitionRef.current) {
+            recognitionRef.current.lang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
+            recognitionRef.current.start();
+            setIsListening(true);
+        }
     };
+
+    // Initialize chat session from localStorage or use default greeting
+    useEffect(() => {
+        const savedMessages = localStorage.getItem("upchaar_messages");
+        if (savedMessages) {
+            try {
+                setMessages(JSON.parse(savedMessages));
+            } catch (e) {
+                console.error("Failed to parse saved messages", e);
+                setMessages([{ role: "assistant", content: t.chatGreeting }]);
+            }
+        } else {
+            setMessages([{ role: "assistant", content: t.chatGreeting }]);
+            // Auto-speak greeting if enabled
+            setTimeout(() => {
+                if (autoSpeak) playAudio(t.chatGreeting, 0);
+            }, 1000);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Run on mount
+
+    // Persist messages to localStorage on change
+    useEffect(() => {
+        if (messages.length > 0) {
+            localStorage.setItem("upchaar_messages", JSON.stringify(messages));
+        }
+    }, [messages]);
+
+    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
+
+    useEffect(() => {
+        // Cleanup speech on unmount
+        const currentAudio = audioRef.current;
+        return () => {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.src = "";
+            }
+        };
+    }, []);
+
 
     return (
         <div className="flex flex-col h-[600px] glass-panel overflow-hidden relative">

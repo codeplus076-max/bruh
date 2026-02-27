@@ -5,6 +5,24 @@ declare global {
         SpeechRecognition: any;
         webkitSpeechRecognition: any;
     }
+
+    // Define minimum needed for SpeechRecognition
+    interface SpeechRecognition extends EventTarget {
+        continuous: boolean;
+        interimResults: boolean;
+        lang: string;
+        onresult: (event: SpeechRecognitionEvent) => void;
+        onerror: (event: SpeechRecognitionErrorEvent) => void;
+        onend: () => void;
+        start(): void;
+        stop(): void;
+        abort(): void;
+    }
+
+    interface SpeechRecognitionEvent extends Event {
+        results: SpeechRecognitionResultList;
+        resultIndex: number;
+    }
 }
 
 import { motion, AnimatePresence } from "framer-motion";

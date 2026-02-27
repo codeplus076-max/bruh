@@ -337,7 +337,7 @@ export default function ReportPage() {
 
                             {/* Medical Guidance Sections */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-borderDark pt-8">
-                                {data.guidance?.first_aid?.length > 0 && (
+                                {data.guidance?.first_aid && data.guidance.first_aid.length > 0 && (
                                     <div className="space-y-3">
                                         <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-widest">🩹 First Aid</h3>
                                         <ul className="space-y-2">
@@ -351,7 +351,7 @@ export default function ReportPage() {
                                     </div>
                                 )}
 
-                                {data.guidance?.home_remedies?.length > 0 && (
+                                {data.guidance?.home_remedies && data.guidance.home_remedies.length > 0 && (
                                     <div className="space-y-3">
                                         <h3 className="text-xs font-bold text-amber-500 uppercase tracking-widest">☕ Home Care</h3>
                                         <ul className="space-y-2">
@@ -365,11 +365,11 @@ export default function ReportPage() {
                                     </div>
                                 )}
 
-                                {data.guidance?.medicines?.length > 0 && (
+                                {data.guidance?.medicines && data.guidance.medicines.length > 0 && (
                                     <div className="space-y-3">
                                         <h3 className="text-xs font-bold text-teal-400 uppercase tracking-widest">💊 OTC Medicines</h3>
                                         <div className="space-y-3">
-                                            {data.guidance.medicines.map((med: { name: string; guidance: string }, i: number) => (
+                                            {data.guidance.medicines.map((med, i: number) => (
                                                 <div key={i} className="bg-surfaceHighlight/30 p-3 rounded-xl border border-borderDark">
                                                     <p className="text-sm font-bold text-textMain">{med.name}</p>
                                                     <p className="text-xs text-textMuted mt-1">{med.guidance}</p>
@@ -379,7 +379,7 @@ export default function ReportPage() {
                                     </div>
                                 )}
 
-                                {data.guidance?.routine?.length > 0 && (
+                                {data.guidance?.routine && data.guidance.routine.length > 0 && (
                                     <div className="space-y-3">
                                         <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest">📅 Recovery Routine</h3>
                                         <ul className="space-y-2">
