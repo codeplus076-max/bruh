@@ -2,7 +2,9 @@
 
 declare global {
     interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         SpeechRecognition?: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         webkitSpeechRecognition?: any;
     }
 
@@ -55,6 +57,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     const [voiceError, setVoiceError] = useState<string | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recognitionRef = useRef<any>(null);
 
     const playAudio = useCallback(async (text: string, index: number) => {
@@ -230,10 +233,13 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                     recognitionRef.current.continuous = false;
                     recognitionRef.current.interimResults = true;
 
-                    recognitionRef.current.onresult = (e: SpeechRecognitionEvent) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    recognitionRef.current.onresult = (e: any) => {
                         const transcript = Array.from(e.results)
-                            .map((result) => result[0])
-                            .map((result) => result.transcript)
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            .map((result: any) => result[0])
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            .map((result: any) => result.transcript)
                             .join("");
 
                         setInput(transcript);
