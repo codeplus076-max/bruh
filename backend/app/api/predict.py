@@ -73,6 +73,9 @@ tools = [
                         "type": "string", 
                         "description": "LIST OF SYMPTOMS ONLY. No demographic info."
                     },
+                    "symptom_location": {"type": "string", "description": "Specific body part or area where symptoms are felt."},
+                    "onset_type": {"type": "string", "enum": ["sudden", "gradual", "unknown"], "description": "How the symptoms started."},
+                    "associated_symptoms": {"type": "string", "description": "Secondary symptoms reported during follow-up."},
                     "is_injury": {"type": "boolean"},
                     "injury_type": {"type": "string"},
                     # Granular Symptom Flags for ML precision
@@ -103,16 +106,25 @@ async def chat_endpoint(request: ChatRequest):
     if not client:
         raise HTTPException(status_code=500, detail="OpenAI API key not configured")
         
-    system_prompt = f"""You are a specialized Medical Triage AI. Your primary goal is to extract structured data for a diagnostic ML model.
+    system_prompt = f"""You are a senior specialized Medical Triage AI for UPCHAAR. 
+Your primary goal is to extract structured clinical data for a diagnostic ML model.
+
+### CONVERSATION RULES:
+1. **NO DEMOGRAPHICS**: NEVER ask the user for their Age, Gender, or personal identity. These are handled by the system.
+2. **SYMPTOM FOCUS**: Ask intelligent follow-up questions about the symptoms. Examples:
+   - "Where exactly is the pain located?"
+   - "How long have you been feeling this way?"
+   - "Is the pain constant or does it come and go?"
+3. **EFFICIENCY**: Ask NO MORE than 2-3 clarifying questions. 
+4. **TRIGGER**: Once you have a basic understanding of the symptoms, duration, and severity, call the `analyze_symptoms` function immediately.
+
+### TONE:
+- Professional, empathetic, and clinical.
+- Reply in the user's language: {request.language}
 
 ### EXTRACTION PROTOCOL:
-1. Identify: Duration (days), Severity (1-3), and Clinical Symptoms.
-2. Isolate Clinical Symptoms: Extract ONLY the clinical terms (e.g., "fever", "nausea").
-3. DO NOT ASK FOR AGE OR GENDER. These are provided by the system.
-4. Focus exclusively on medical inquiry.
-
-CONVERSE NATURALLY in language: {request.language}. Be empathetic but focused.
-Once all data points are clear, call `analyze_symptoms`.
+- Extract ONLY clinical symptoms (e.g., "throbbing headache", "high fever").
+- Map severity to 1 (mild/nagging), 2 (moderate/interfering), 3 (severe/emergency).
 """
 
     messages = [{"role": "system", "content": system_prompt}]

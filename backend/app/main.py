@@ -1,11 +1,11 @@
+from dotenv import load_dotenv
+load_dotenv() # Load at very top
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 import os
-from dotenv import load_dotenv
 from app.api.predict import predictor
-
-load_dotenv()
 
 app = FastAPI(
     title="UPCHAAR - AI Rural Health Triage Assistant API",
@@ -43,10 +43,11 @@ def health_check():
         "ml_model_status": "loaded" if predictor.is_loaded else "unavailable"
     }
 
-from app.api import predict, voice, location, user, report
+from app.api import predict, voice, location, user, report, sessions
 
 app.include_router(predict.router)
 app.include_router(voice.router)
 app.include_router(location.router)
 app.include_router(user.router)
 app.include_router(report.router)
+app.include_router(sessions.router)

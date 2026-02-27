@@ -4,15 +4,14 @@ import { useState, Suspense, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { VoiceControls } from "@/components/voice/VoiceControls";
+import { LogOut, Activity, ShieldAlert, Cpu, MapPin } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
-import { Activity, ShieldAlert, Cpu, MapPin, LogOut } from "lucide-react";
 import Image from "next/image";
 
-import { ChatHistory } from "@/components/chat/ChatHistory";
+
 
 // Lazy load heavy components
 const ChatInterface = dynamic(() => import("@/components/chat/ChatInterface").then(mod => mod.ChatInterface), {
@@ -88,22 +87,15 @@ export default function ChatPage() {
                     </div>
                 </motion.nav>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    {/* Sidebar Area (Left/History) */}
-                    <div className="hidden lg:block lg:col-span-3 space-y-6 sticky top-12 h-[calc(100vh-100px)]">
-                        <motion.div variants={itemVariants} className="h-full">
-                            <ChatHistory />
-                        </motion.div>
-                    </div>
-
+                <div className="max-w-4xl mx-auto space-y-6">
                     {/* Main Chat Area */}
-                    <div className="lg:col-span-9 space-y-6">
+                    <div className="space-y-6">
                         <motion.header variants={itemVariants} className="space-y-4">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-primary/20 text-primary text-[10px] font-mono tracking-widest uppercase">
                                 <Cpu className="w-3 h-3" />
                                 <span>Upchaar v2.0 Online</span>
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-heading font-bold text-textMain leading-tight">
+                            <h1 className="text-3xl md:text-4xl font-heading font-bold text-textMain leading-tight text-center">
                                 {t.diagnosticChat}
                             </h1>
                         </motion.header>
@@ -124,14 +116,9 @@ export default function ChatPage() {
                         </motion.div>
 
                         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
-                            <div className="flex-1 glass-panel p-4">
-                                <VoiceControls
-                                    onTranscription={(text) => setChatInput((prev) => prev ? prev + " " + text : text)}
-                                />
-                            </div>
                             <button
                                 onClick={() => router.push("/hospitals")}
-                                className="sm:w-64 flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-2xl py-6 font-heading font-bold shadow-neon transition-all group"
+                                className="w-full h-full flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-2xl py-6 font-heading font-bold shadow-neon transition-all group"
                             >
                                 <MapPin className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                 {t.hospitalFind}

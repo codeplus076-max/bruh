@@ -2,15 +2,15 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Translations } from "@/lib/translations";
-import { Send, ActivitySquare, Volume2, VolumeX, FileText } from "lucide-react";
+import { Send, ActivitySquare, Volume2, VolumeX, FileText, Mic, MicOff, Phone, Play, Pause, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
 
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatStateContext";
+import { LiveCallOverlay } from "./LiveCallOverlay";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Message = { role: "assistant" | "user"; content: string; diagnosis?: any };
@@ -20,64 +20,144 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export function ChatInterface({ input, setInput }: { input: string, setInput: (v: string) => void }) {
     const { lang, t } = useLanguage();
     const { user, userProfile } = useAuth();
-    const { messages, setMessages, resetChat } = useChat();
+    const { messages, sessionId, setMessages, resetChat, loadSession } = useChat();
     const [loading, setLoading] = useState(false);
-    const [isMuted, setIsMuted] = useState(false);
+    const [autoSpeak, setAutoSpeak] = useState(false);
+    const [showCall, setShowCall] = useState(false);
+    const [isListening, setIsListening] = useState(false);
+    const [playingMessageId, setPlayingMessageId] = useState<number | null>(null);
+    const [voiceError, setVoiceError] = useState<string | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const recognitionRef = useRef<any>(null);
 
-    const speak = useCallback((content: string) => {
-        if (isMuted || typeof window === "undefined") return;
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognitionRef.current = new SpeechRecognition();
+                recognitionRef.current.continuous = false;
+                recognitionRef.current.interimResults = true;
 
-        // Stop existing speech
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
-        const oldAudio = document.getElementById("tts-audio") as HTMLAudioElement;
-        if (oldAudio) {
-            oldAudio.pause();
-            oldAudio.remove();
+                recognitionRef.current.onresult = (e: any) => {
+                    const transcript = Array.from(e.results)
+                        .map((result: any) => result[0])
+                        .map((result: any) => result.transcript)
+                        .join("");
+
+                    setInput(transcript);
+
+                    if (e.results[0].isFinal) {
+                        setIsListening(false);
+                        handleSend(transcript);
+                    }
+                };
+                recognitionRef.current.onend = () => setIsListening(false);
+                recognitionRef.current.onerror = (err: any) => {
+                    console.error("STT Error:", err);
+                    setIsListening(false);
+                };
+            }
         }
+    }, [setInput]);
 
-        // Clean text (remove emojis and markdown asterisks)
-        const cleanContent = content
-            .replace(/[\u2700-\u27BF\uE000-\uF8FF\u2011-\u26FF]/g, '')
-            .replace(/[\uD83C-\uDBFF][\uDC00-\uDFFF]/g, '')
-            .replace(/[*#_`~]/g, '')
-            .trim();
-        if (!cleanContent) return;
+    const toggleSTT = () => {
+        if (isListening) {
+            recognitionRef.current?.stop();
+        } else {
+            recognitionRef.current.lang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
+            recognitionRef.current?.start();
+            setIsListening(true);
+        }
+    };
 
-        // For English, native browser TTS is 100% reliable
-        if (lang === "en") {
-            const utterance = new SpeechSynthesisUtterance(cleanContent);
-            utterance.lang = "en-US";
-            utterance.rate = 1.0;
-            if (window.speechSynthesis) window.speechSynthesis.speak(utterance);
+    const playAudio = async (text: string, index: number) => {
+        if (playingMessageId === index) {
+            audioRef.current?.pause();
+            setPlayingMessageId(null);
             return;
         }
 
-        // For Hindi (hi) and Marathi (mr), Windows often lacks native voice packs.
-        // We use Google Translate Web TTS via HTML5 Audio to guarantee pronunciation.
-        const tl = lang === "mr" ? "mr" : "hi";
-        // Substring to 200 chars to respect the free web API limit
-        const safeText = encodeURIComponent(cleanContent.substring(0, 200));
-        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${tl}&client=tw-ob&q=${safeText}`;
+        setVoiceError(null);
+        console.log(`[Voice] Starting playback for message ${index}. Text length: ${text.length}`);
+        setPlayingMessageId(index);
 
-        const audio = new Audio(audioUrl);
-        audio.id = "tts-audio";
-
-        audio.play().catch(err => {
-            console.warn("[TTS] Web audio failed (likely autoplay blocked), falling back to native TTS", err);
-            if (window.speechSynthesis) {
-                const utterance = new SpeechSynthesisUtterance(cleanContent);
-                utterance.lang = "hi-IN"; // Force Hindi voice even for Marathi text to read Devanagari
-                utterance.rate = 0.9;
-
-                const voices = window.speechSynthesis.getVoices();
-                const voice = voices.find(v => v.lang.includes('hi') || v.lang.includes('mr'));
-                if (voice) utterance.voice = voice;
-
-                window.speechSynthesis.speak(utterance);
+        // Native Browser Fallback Function
+        const fallbackToSpeechSynthesis = () => {
+            console.warn("[Voice] Falling back to Browser Speech Synthesis.");
+            if (!("speechSynthesis" in window)) {
+                console.error("[Voice] Browser Speech Synthesis not supported.");
+                setPlayingMessageId(null);
+                return;
             }
-        });
-    }, [isMuted, lang]);
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
+            utterance.onend = () => setPlayingMessageId(null);
+            utterance.onerror = (e) => {
+                console.error("[Voice] Browser Synthesis Error:", e);
+                finalFallback();
+            };
+            window.speechSynthesis.speak(utterance);
+        };
+
+        const finalFallback = () => {
+            console.error("[Voice] All voice methods failed.");
+            setVoiceError("Voice unavailable. Showing text guidance.");
+            setPlayingMessageId(null);
+            // Auto-clear error after 5s
+            setTimeout(() => setVoiceError(null), 5000);
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/voice/tts`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text, language: lang })
+            });
+
+            console.log(`[Voice] API Status: ${response.status} | Content-Type: ${response.headers.get("Content-Type")}`);
+            if (response.ok) {
+                const blob = await response.blob();
+                console.log(`[Voice] Blob Size: ${(blob.size / 1024).toFixed(2)} KB | Type: ${blob.type}`);
+                if (blob.size < 100) {
+                    const errorText = await blob.text();
+                    console.error("[Voice] Small blob text content:", errorText.substring(0, 100));
+                    throw new Error("Audio blob too small/invalid");
+                }
+
+                const url = URL.createObjectURL(blob);
+                if (audioRef.current) {
+                    audioRef.current.src = url;
+
+                    // Resume audio context if needed (browser restriction)
+                    const playPromise = audioRef.current.play();
+
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.error("[Voice] Playback blocked by browser:", error);
+                            // If blocked, fallback to speech synth which behaves differently with gestures
+                            fallbackToSpeechSynthesis();
+                        });
+                    }
+
+                    audioRef.current.onended = () => {
+                        setPlayingMessageId(null);
+                        URL.revokeObjectURL(url);
+                    };
+                }
+            } else {
+                throw new Error(`TTS API failed with status ${response.status}`);
+            }
+        } catch (error) {
+            console.error("[Voice] Inworld TTS Failed:", error);
+            fallbackToSpeechSynthesis();
+        }
+    };
+
+    const speak = useCallback((content: string, index: number) => {
+        if (!autoSpeak || typeof window === "undefined") return;
+        playAudio(content, index);
+    }, [autoSpeak, playAudio]);
 
     // Initialize chat session from localStorage or use default greeting
     useEffect(() => {
@@ -91,8 +171,10 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             }
         } else {
             setMessages([{ role: "assistant", content: t.chatGreeting }]);
-            // Delay initial greeting slightly to avoid instant autoplay block
-            setTimeout(() => speak(t.chatGreeting), 300);
+            // Auto-speak greeting if enabled
+            setTimeout(() => {
+                if (autoSpeak) playAudio(t.chatGreeting, 0);
+            }, 1000);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Run on mount
@@ -108,15 +190,30 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
 
     useEffect(() => {
         // Cleanup speech on unmount
-        return () => window.speechSynthesis?.cancel();
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = "";
+            }
+        };
     }, []);
 
-    const handleSend = async () => {
-        const text = input.trim();
+    const handleSend = async (transcript?: string) => {
+        const text = typeof transcript === "string" ? transcript : input.trim();
         if (!text || loading) return;
 
-        setInput("");
-        window.speechSynthesis?.cancel();
+        if (typeof transcript !== "string") setInput("");
+
+        // Stop any current audio
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
+
+        let currentSessionId = sessionId;
+        if (!currentSessionId) {
+            currentSessionId = crypto.randomUUID();
+        }
 
         // Add user message to UI immediately
         const userMsg: Message = { role: "user", content: text };
@@ -142,54 +239,115 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             const data = await res.json();
 
             const aiMsg: Message = { role: "assistant", content: data.content, diagnosis: data.diagnosis };
+            const finalMessages = [...newMessagesContext, aiMsg];
 
-            // Sync to Firestore if it's a diagnosis message
-            if (data.diagnosis) {
-                try {
-                    const docRef = await addDoc(collection(db, "sessions"), {
-                        symptoms: data.diagnosis?.clinical_symptoms || newMessagesContext.filter(m => m.role === "user").map(m => m.content).join(", "),
-                        age: data.diagnosis?.age || "N/A",
-                        gender: data.diagnosis?.gender || "N/A",
-                        is_injury: data.diagnosis?.is_injury || false,
-                        messages: [...messages, { role: "user", content: text }, aiMsg],
-                        predictions: data.diagnosis,
-                        risk_level: data.diagnosis.risk_level || "Unknown",
-                        guidance: {
-                            first_aid: data.diagnosis.first_aid || [],
-                            home_remedies: data.diagnosis.home_remedies || [],
-                            routine: data.diagnosis.routine || [],
-                            medicines: data.diagnosis.medicines || [],
-                            warnings: data.diagnosis.warnings || [],
-                        },
-                        timestamp: new Date().toISOString(),
-                        createdAt: serverTimestamp(),
+            setMessages(finalMessages);
+
+            // Auto-save session to backend
+            if (user) {
+                const token = await user.getIdToken();
+                await fetch(`${API_URL}/sessions/save`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        sessionId: currentSessionId,
+                        messages: finalMessages,
                         language: lang,
-                        userId: user?.uid || "anonymous",
-                        username: user?.displayName || "Guest"
-                    });
-                    aiMsg.diagnosis.sessionId = docRef.id;
-                } catch (dbErr) {
-                    console.error("Firestore sync failed", dbErr);
+                        risk_level: data.diagnosis?.risk_level || "Normal"
+                    }),
+                });
+
+                // Update local context with the session ID if it was new
+                if (!sessionId) {
+                    loadSession(finalMessages, currentSessionId);
                 }
             }
 
-            setMessages(prev => [...prev, aiMsg]);
-            speak(data.content);
+            if (autoSpeak) {
+                playAudio(aiMsg.content, newMessagesContext.length);
+            }
         } catch (err) {
             console.error("Chat error:", err);
             const errorMsg: Message = { role: "assistant", content: t.chatError };
-            setMessages(prev => [...prev, errorMsg]);
-            speak(t.chatError);
+            setMessages((prev: Message[]) => [...prev, errorMsg]);
+            if (autoSpeak) playAudio(t.chatError, newMessagesContext.length);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex flex-col h-[560px] glass-panel overflow-hidden relative">
+        <div className="flex flex-col h-[600px] glass-panel overflow-hidden relative">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10 mix-blend-screen transform translate-x-1/2 -translate-y-1/2" />
 
-            <div className="bg-surfaceHighlight/50 backdrop-blur-md px-6 py-4 border-b border-borderDark flex items-center justify-between">
+            {/* Inworld Voice Controls Header */}
+            <div className="bg-surfaceHighlight/50 backdrop-blur-md px-6 py-3 border-b border-borderDark flex items-center justify-between z-20">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => resetChat(t.chatGreeting)}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider bg-surface border border-borderDark text-textMuted hover:text-primary hover:border-primary/50 transition-all shadow-sm group"
+                        title="Start a fresh conversation"
+                    >
+                        <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
+                        New Chat
+                    </button>
+
+                    <div className="w-px h-4 bg-borderDark mx-1" />
+
+                    <button
+                        onClick={() => setAutoSpeak(!autoSpeak)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider transition-all shadow-sm ${autoSpeak ? "bg-primary text-white shadow-neon" : "bg-surface border border-borderDark text-textMuted"
+                            }`}
+                        title="Auto-speak AI responses"
+                    >
+                        {autoSpeak ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                        {autoSpeak ? "Auto-Voice On" : "Auto-Voice Off"}
+                    </button>
+
+                    <button
+                        onClick={() => setShowCall(true)}
+                        className="relative flex items-center gap-2 px-4 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all group overflow-hidden"
+                    >
+                        <motion.div
+                            className="absolute inset-0 bg-white/20"
+                            animate={{ x: ["-100%", "100%"] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        />
+                        <div className="relative flex items-center gap-2">
+                            <span className="flex h-2 w-2 relative">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                            </span>
+                            <Phone className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
+                            Talk Live
+                        </div>
+                    </button>
+                </div>
+
+                <div className="flex items-center gap-2 text-[9px] text-textMuted uppercase tracking-[0.2em] font-black opacity-60">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    Inworld AI Powered
+                </div>
+
+                <AnimatePresence>
+                    {voiceError && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-danger/90 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-md flex items-center gap-2"
+                        >
+                            <VolumeX className="w-3.5 h-3.5" />
+                            {voiceError}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            <div className="bg-surface/30 backdrop-blur-sm px-6 py-4 border-b border-borderDark flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg border border-primary/20 shadow-neon">
                         <ActivitySquare className="w-5 h-5 text-primary" />
@@ -199,18 +357,11 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                         <p className="text-primaryVibrant/70 text-xs tracking-wider uppercase mt-0.5">{t.chatSubtitle}</p>
                     </div>
                 </div>
-                <button
-                    onClick={() => setIsMuted(!isMuted)}
-                    className={`p-2 rounded-full border transition-colors ${isMuted ? 'bg-surface border-borderDark text-textMuted' : 'bg-primary/10 border-primary/30 text-primary shadow-neon'}`}
-                    title={isMuted ? "Unmute AI Voice" : "Mute AI Voice"}
-                >
-                    {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar z-10">
                 <AnimatePresence initial={false}>
-                    {messages.map((m, i) => (
+                    {messages.map((m: Message, i: number) => (
                         <motion.div
                             key={i}
                             initial={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -218,10 +369,19 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                             transition={{ type: "spring", stiffness: 200, damping: 20 }}
                             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                         >
-                            <div className={`max-w-[85%] px-5 py-3.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg ${m.role === "user"
+                            <div className={`max-w-[85%] px-5 py-3.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg relative group ${m.role === "user"
                                 ? "bg-primary/10 text-primary border border-primary/30 rounded-2xl rounded-tr-sm"
                                 : "bg-surface text-textMain border border-borderDark rounded-2xl rounded-tl-sm ring-1 ring-white/5"
                                 }`}>
+                                {m.role === "assistant" && (
+                                    <button
+                                        onClick={() => playAudio(m.content, i)}
+                                        className="absolute -right-12 top-0 p-2 rounded-full bg-surface border border-borderDark text-textMuted opacity-0 group-hover:opacity-100 transition-all hover:text-primary hover:border-primary/50"
+                                        title="Play Speech"
+                                    >
+                                        {playingMessageId === i ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                                    </button>
+                                )}
                                 {m.content}
 
                                 {m.diagnosis && (
@@ -353,25 +513,50 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             </div>
 
             <div className="p-4 bg-surfaceHighlight/40 backdrop-blur-lg border-t border-borderDark z-10">
-                <div className="flex items-center gap-3 relative">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type to chat..."
-                        className="flex-1 bg-surface border border-borderDark rounded-full px-5 py-3.5 text-sm text-textMain outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-textMuted/60"
-                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                        disabled={loading}
-                    />
-                    <button
-                        onClick={handleSend}
-                        disabled={loading || !input.trim()}
-                        className="p-3.5 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primaryVibrant disabled:opacity-50 disabled:hover:bg-primary/10 border border-primary/20 rounded-full transition-colors flex items-center justify-center shadow-neon"
-                    >
-                        <Send className="w-4 h-4" />
-                    </button>
+                <div className="flex items-center gap-3 relative max-w-4xl mx-auto">
+                    <div className="flex-1 relative group">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder={t.chatPlaceholderSymptoms || "Type to chat..."}
+                            className="w-full bg-surface border border-borderDark rounded-full py-4 pl-6 pr-28 text-sm text-textMain outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-textMuted/60 shadow-inner"
+                            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                            disabled={loading}
+                        />
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                            <button
+                                onClick={toggleSTT}
+                                className={`p-2.5 rounded-full transition-all ${isListening ? "bg-danger text-white animate-pulse" : "bg-primary/5 text-primary hover:bg-primary/10"
+                                    }`}
+                                title="Voice Input"
+                            >
+                                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5 shadow-sm" />}
+                            </button>
+                            <button
+                                onClick={() => handleSend()}
+                                disabled={loading || !input.trim()}
+                                className="p-2.5 bg-primary text-white rounded-full hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20"
+                            >
+                                <Send className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <audio ref={audioRef} className="hidden" />
+
+            <LiveCallOverlay
+                isOpen={showCall}
+                onClose={() => setShowCall(false)}
+                language={lang}
+                onTranscription={(text) => {
+                    setInput(text);
+                    handleSend(text);
+                }}
+                lastAiResponse={messages.length > 0 && messages[messages.length - 1].role === "assistant" ? messages[messages.length - 1].content : undefined}
+            />
         </div>
     );
 }
