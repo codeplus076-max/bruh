@@ -1,6 +1,5 @@
 import os
 import joblib
-import pandas as pd
 import numpy as np
 from .symptom_mapper import SymptomMapper
 from .risk_engine import calculate_risk
@@ -25,7 +24,7 @@ class DiseasePredictor:
                 model_dir or os.path.dirname(os.path.abspath(__file__)), 
                 "model_meta_v2.joblib"
             )
-            cls._instance.load_model()
+            # DELIBERATE LAZY LOADING: Do not load the model here to prevent Render 512MB RAM OOM on Uvicorn Boot.
         return cls._instance
 
     def load_model(self):
@@ -33,11 +32,12 @@ class DiseasePredictor:
         if self._model is not None and self._meta is not None:
             return
 
-        print(f"Loading ML Model from disk into memory: {self.model_path}")
+        print(f"Loading ML Model from disk into memory (Memory Mapped): {self.model_path}")
         if os.path.exists(self.model_path) and os.path.exists(self.meta_path):
-            self.__class__._model = joblib.load(self.model_path)
-            self.__class__._meta = joblib.load(self.meta_path)
-            print("Successfully loaded custom XGBoost model and metadata.")
+            # Use mmap_mode='r' to prevent loading the entire payload into active RAM
+            self.__class__._model = joblib.load(self.model_path, mmap_mode='r')
+            self.__class__._meta = joblib.load(self.meta_path, mmap_mode='r')
+            print("Successfully lazy-loaded custom XGBoost model and metadata.")
         else:
             print(f"Warning: Model or meta not found in {self.model_path}. Using mock predictions.")
             self.__class__._model = None
@@ -48,6 +48,10 @@ class DiseasePredictor:
         Predicts disease with medical confidence scoring, risk engine integration,
         and precise standardized JSON-like output schemas.
         """
+        # Lazy load strictly at inference time
+        if not self.is_loaded:
+            self.load_model()
+
         if not self._model or not self._meta:
             return {
                 "condition": "Mock Disease (Model Not Loaded)",
@@ -69,10 +73,12 @@ class DiseasePredictor:
         }
         input_dict.update(mapped_features)
         
-        # 3. Create DataFrame for inference
+        # 3. Create Numpy Array for inference (Bypass Pandas to conserve ~50MB RAM)
         features = self._meta.get('features', [])
         row = {f: input_dict.get(f, 0) for f in features}
-        df = pd.DataFrame([row])
+        
+        # XGBoost expects a 2D array if Pandas is excluded
+        X_infer = np.array([[row[f] for f in features]])
         
         # 4. Perform Inference
         disease_label = "Unknown Disease"
@@ -81,7 +87,7 @@ class DiseasePredictor:
         try:
             # Get probabilities if supported
             if hasattr(self._model, "predict_proba"):
-                probas = self._model.predict_proba(df)[0]
+                probas = self._model.predict_proba(X_infer)[0]
                 max_idx = np.argmax(probas)
                 confidence_score = float(probas[max_idx])
                 
@@ -90,7 +96,7 @@ class DiseasePredictor:
                     disease_label = str(classes[max_idx])
             else:
                 # Fallback to direct prediction
-                disease_label = str(self._model.predict(df)[0])
+                disease_label = str(self._model.predict(X_infer)[0])
                 confidence_score = 0.5 # Default for non-probabilistic models
         except Exception as e:
             print(f"Prediction error: {e}")
