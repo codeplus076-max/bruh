@@ -38,7 +38,7 @@ const itemVariants: Variants = {
 
 export default function HospitalsPage() {
     const { t } = useLanguage();
-    const { user, signOut } = useAuth();
+    const { user } = useAuth();
     const router = useRouter();
 
     useEffect(() => {

@@ -36,7 +36,7 @@ const itemVariants: Variants = {
 
 export default function ChatPage() {
     const { t } = useLanguage();
-    const { user, signOut } = useAuth();
+    const { user } = useAuth();
     const router = useRouter();
     const [chatInput, setChatInput] = useState("");
 
