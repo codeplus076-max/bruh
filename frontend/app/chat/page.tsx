@@ -4,14 +4,12 @@ import { useState, Suspense, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { LogOut, Activity, ShieldAlert, Cpu, MapPin } from "lucide-react";
+import { LogOut, ShieldAlert, Cpu, MapPin } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
-
-
 
 // Lazy load heavy components
 const ChatInterface = dynamic(() => import("@/components/chat/ChatInterface").then(mod => mod.ChatInterface), {
@@ -37,7 +35,7 @@ const itemVariants: Variants = {
 };
 
 export default function ChatPage() {
-    const { lang, t } = useLanguage();
+    const { t } = useLanguage();
     const { user, signOut } = useAuth();
     const router = useRouter();
     const [chatInput, setChatInput] = useState("");

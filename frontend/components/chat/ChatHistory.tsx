@@ -6,14 +6,24 @@ import { collection, query, where, orderBy, getDocs, limit } from "firebase/fire
 import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatStateContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { History, MessageSquare, ChevronRight, Clock } from "lucide-react";
+import { History, ChevronRight, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+
+interface ChatSession {
+    id: string;
+    risk_level?: string;
+    predictions?: {
+        disease?: string;
+    };
+    symptoms?: string;
+    messages?: any[];
+}
 
 export function ChatHistory() {
     const { user } = useAuth();
     const { loadSession } = useChat();
-    const { lang, t } = useLanguage();
-    const [history, setHistory] = useState<any[]>([]);
+    const { t } = useLanguage();
+    const [history, setHistory] = useState<ChatSession[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -66,7 +76,7 @@ export function ChatHistory() {
                             key={session.id}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            onClick={() => loadSession(session.messages)}
+                            onClick={() => loadSession(session.messages || [], session.id)}
                             className="w-full text-left p-4 rounded-xl border border-borderDark hover:border-primary/40 hover:bg-primary/5 transition-all group relative overflow-hidden"
                         >
                             <div className="flex flex-col gap-1">

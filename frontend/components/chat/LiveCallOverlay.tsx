@@ -1,8 +1,15 @@
 "use client";
 
+declare global {
+    interface Window {
+        SpeechRecognition: any;
+        webkitSpeechRecognition: any;
+    }
+}
+
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, MicOff, PhoneOff, Volume2, Loader2 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { Mic, MicOff, PhoneOff, Volume2, ActivitySquare } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface LiveCallOverlayProps {
     isOpen: boolean;
@@ -15,36 +22,10 @@ interface LiveCallOverlayProps {
 export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, lastAiResponse }: LiveCallOverlayProps) {
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
-    const recognitionRef = useRef<any>(null);
+    const recognitionRef = useRef<SpeechRecognition | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                recognitionRef.current = new SpeechRecognition();
-                recognitionRef.current.continuous = false;
-                recognitionRef.current.interimResults = false;
-
-                recognitionRef.current.onresult = (event: any) => {
-                    const transcript = event.results[0][0].transcript;
-                    onTranscription(transcript);
-                    setIsListening(false);
-                };
-
-                recognitionRef.current.onerror = () => setIsListening(false);
-                recognitionRef.current.onend = () => setIsListening(false);
-            }
-        }
-    }, [onTranscription]);
-
-    useEffect(() => {
-        if (isOpen && lastAiResponse) {
-            playResponse(lastAiResponse);
-        }
-    }, [isOpen, lastAiResponse]);
-
-    const playResponse = async (text: string) => {
+    const playResponse = useCallback(async (text: string) => {
         setIsSpeaking(true);
         const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
         console.log(`LiveCall: Stream fetch from ${API_URL}/voice/stream`);
@@ -94,9 +75,10 @@ export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, la
             console.error("LiveCall: TTS fetch error:", error);
             fallbackToSpeechSynth();
         }
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [language]); // onTranscription is stable
 
-    const startListening = () => {
+    const startListening = useCallback(() => {
         if (recognitionRef.current && !isSpeaking) {
             try {
                 recognitionRef.current.lang = language === "hi" ? "hi-IN" : language === "mr" ? "mr-IN" : "en-US";
@@ -106,7 +88,35 @@ export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, la
                 console.warn("Speech recognition already started or failed:", e);
             }
         }
-    };
+    }, [isSpeaking, language]);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognitionClass) {
+                recognitionRef.current = new SpeechRecognitionClass();
+                if (recognitionRef.current) {
+                    recognitionRef.current.continuous = false;
+                    recognitionRef.current.interimResults = false;
+
+                    recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+                        const transcript = event.results[0][0].transcript;
+                        onTranscription(transcript);
+                        setIsListening(false);
+                    };
+
+                    recognitionRef.current.onerror = () => setIsListening(false);
+                    recognitionRef.current.onend = () => setIsListening(false);
+                }
+            }
+        }
+    }, [onTranscription]);
+
+    useEffect(() => {
+        if (isOpen && lastAiResponse) {
+            playResponse(lastAiResponse);
+        }
+    }, [isOpen, lastAiResponse, playResponse]);
 
     const toggleMic = () => {
         if (isListening) {
@@ -181,4 +191,3 @@ export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, la
     );
 }
 
-import { ActivitySquare } from "lucide-react";

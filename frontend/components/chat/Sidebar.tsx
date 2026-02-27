@@ -1,23 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Plus, MessageSquare, Clock, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { Plus, MessageSquare, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { useChat } from "@/context/ChatStateContext";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+interface ChatHistoryItem {
+    sessionId: string;
+    title: string;
+    createdAt: number;
+}
 
 export function Sidebar() {
     const { messages, sessionId, loadSession, resetChat } = useChat();
     const { user } = useAuth();
     const { t } = useLanguage();
-    const [history, setHistory] = useState<any[]>([]);
+    const [history, setHistory] = useState<ChatHistoryItem[]>([]);
     const [isOpen, setIsOpen] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    const fetchHistory = async () => {
+    const fetchHistory = useCallback(async () => {
         if (!user) return;
         setLoading(true);
         try {
@@ -34,11 +40,11 @@ export function Sidebar() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
 
     useEffect(() => {
         if (user) fetchHistory();
-    }, [user, messages.length]); // Refresh when new messages added
+    }, [user, messages.length, fetchHistory]); // Refresh when new messages added
 
     const openSession = async (id: string) => {
         if (!user) return;

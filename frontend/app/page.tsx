@@ -12,7 +12,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { motion } from "framer-motion";
-import { LogIn, UserPlus, HeartPulse, Mail, Lock, User } from "lucide-react";
+import { LogIn, UserPlus, Mail, Lock, User } from "lucide-react";
 import Image from "next/image";
 
 export default function LoginPage() {
@@ -63,8 +63,8 @@ export default function LoginPage() {
                 });
             }
             router.push("/chat");
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError((err as Error).message);
         } finally {
             setLoading(false);
         }

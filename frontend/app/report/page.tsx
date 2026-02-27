@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
@@ -19,14 +19,33 @@ import {
 import jsPDF from "jspdf";
 import Image from "next/image";
 
+interface SessionData {
+    username?: string;
+    age?: number;
+    gender?: string;
+    language?: string;
+    symptoms?: string;
+    predictions?: {
+        disease?: string;
+    };
+    risk_level?: string;
+    guidance?: {
+        first_aid?: string[];
+        home_remedies?: string[];
+        medicines?: Array<{ name: string; guidance: string }>;
+        routine?: string[];
+    };
+    timestamp?: string;
+}
+
 export default function ReportPage() {
-    const { t, lang } = useLanguage();
+    const { lang } = useLanguage();
     const { user, userProfile } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const sessionId = searchParams.get("id");
 
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<SessionData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -209,8 +228,8 @@ export default function ReportPage() {
                 doc.text(section.label, margin, y);
                 y += 6;
                 doc.setFont("helvetica", "normal");
-                section.data.forEach((item: any) => {
-                    const textContent = section.type === 'meds' ? `${item.name}: ${item.guidance}` : item;
+                section.data.forEach((item: string | { name: string; guidance: string }) => {
+                    const textContent = section.type === 'meds' ? `${(item as { name: string; guidance: string }).name}: ${(item as { name: string; guidance: string }).guidance}` : item;
                     const splitText = doc.splitTextToSize(`• ${textContent}`, 160);
                     doc.text(splitText, margin + 5, y);
                     y += splitText.length * 6;
@@ -350,7 +369,7 @@ export default function ReportPage() {
                                     <div className="space-y-3">
                                         <h3 className="text-xs font-bold text-teal-400 uppercase tracking-widest">💊 OTC Medicines</h3>
                                         <div className="space-y-3">
-                                            {data.guidance.medicines.map((med: any, i: number) => (
+                                            {data.guidance.medicines.map((med: { name: string; guidance: string }, i: number) => (
                                                 <div key={i} className="bg-surfaceHighlight/30 p-3 rounded-xl border border-borderDark">
                                                     <p className="text-sm font-bold text-textMain">{med.name}</p>
                                                     <p className="text-xs text-textMuted mt-1">{med.guidance}</p>

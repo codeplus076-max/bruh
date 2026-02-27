@@ -2,7 +2,23 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
-type Message = { role: "assistant" | "user"; content: string; diagnosis?: any };
+interface Diagnosis {
+    disease?: string;
+    confidence?: string;
+    risk_level?: string;
+    is_high_risk?: boolean;
+    urgency?: string;
+    first_aid?: string[];
+    home_remedies?: string[];
+    medicines?: Array<{ name: string; purpose: string; guidance: string; warning?: string }>;
+    routine?: string[];
+    when_to_seek_care?: string[];
+    warnings?: string[];
+    explanation?: string[];
+    sessionId?: string;
+}
+
+type Message = { role: "assistant" | "user"; content: string; diagnosis?: Diagnosis };
 
 interface ChatContextType {
     messages: Message[];

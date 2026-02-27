@@ -1,7 +1,13 @@
 "use client";
 
+declare global {
+    interface Window {
+        SpeechRecognition: any;
+        webkitSpeechRecognition: any;
+    }
+}
+
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Translations } from "@/lib/translations";
 import { Send, ActivitySquare, Volume2, VolumeX, FileText, Mic, MicOff, Phone, Play, Pause, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -12,8 +18,23 @@ import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatStateContext";
 import { LiveCallOverlay } from "./LiveCallOverlay";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Message = { role: "assistant" | "user"; content: string; diagnosis?: any };
+interface Diagnosis {
+    disease?: string;
+    confidence?: string;
+    risk_level?: string;
+    is_high_risk?: boolean;
+    urgency?: string;
+    first_aid?: string[];
+    home_remedies?: string[];
+    medicines?: Array<{ name: string; purpose: string; guidance: string; warning?: string }>;
+    routine?: string[];
+    when_to_seek_care?: string[];
+    warnings?: string[];
+    explanation?: string[];
+    sessionId?: string;
+}
+
+type Message = { role: "assistant" | "user"; content: string; diagnosis?: Diagnosis };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -29,37 +50,40 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     const [voiceError, setVoiceError] = useState<string | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const recognitionRef = useRef<any>(null);
+    const recognitionRef = useRef<SpeechRecognition | null>(null);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-            if (SpeechRecognition) {
-                recognitionRef.current = new SpeechRecognition();
-                recognitionRef.current.continuous = false;
-                recognitionRef.current.interimResults = true;
+            const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognitionClass) {
+                recognitionRef.current = new SpeechRecognitionClass();
+                if (recognitionRef.current) {
+                    recognitionRef.current.continuous = false;
+                    recognitionRef.current.interimResults = true;
 
-                recognitionRef.current.onresult = (e: any) => {
-                    const transcript = Array.from(e.results)
-                        .map((result: any) => result[0])
-                        .map((result: any) => result.transcript)
-                        .join("");
+                    recognitionRef.current.onresult = (e: SpeechRecognitionEvent) => {
+                        const transcript = Array.from(e.results)
+                            .map((result) => result[0])
+                            .map((result) => result.transcript)
+                            .join("");
 
-                    setInput(transcript);
+                        setInput(transcript);
 
-                    if (e.results[0].isFinal) {
+                        if (e.results[0].isFinal) {
+                            setIsListening(false);
+                            handleSend(transcript);
+                        }
+                    };
+                    recognitionRef.current.onend = () => setIsListening(false);
+                    recognitionRef.current.onerror = (err: SpeechRecognitionErrorEvent) => {
+                        console.error("STT Error:", err);
                         setIsListening(false);
-                        handleSend(transcript);
-                    }
-                };
-                recognitionRef.current.onend = () => setIsListening(false);
-                recognitionRef.current.onerror = (err: any) => {
-                    console.error("STT Error:", err);
-                    setIsListening(false);
-                };
+                    };
+                }
             }
         }
-    }, [setInput]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Run only once on mount
 
     const toggleSTT = () => {
         if (isListening) {
@@ -71,7 +95,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         }
     };
 
-    const playAudio = async (text: string, index: number) => {
+    const playAudio = useCallback(async (text: string, index: number) => {
         if (playingMessageId === index) {
             audioRef.current?.pause();
             setPlayingMessageId(null);
@@ -152,12 +176,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             console.error("[Voice] Inworld TTS Failed:", error);
             fallbackToSpeechSynthesis();
         }
-    };
-
-    const speak = useCallback((content: string, index: number) => {
-        if (!autoSpeak || typeof window === "undefined") return;
-        playAudio(content, index);
-    }, [autoSpeak, playAudio]);
+    }, [lang, playingMessageId]);
 
     // Initialize chat session from localStorage or use default greeting
     useEffect(() => {
@@ -190,10 +209,11 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
 
     useEffect(() => {
         // Cleanup speech on unmount
+        const currentAudio = audioRef.current;
         return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.src = "";
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.src = "";
             }
         };
     }, []);
@@ -423,7 +443,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                                                 <div className="mt-2 p-3 bg-teal-500/10 border border-teal-500/20 rounded-xl">
                                                     <p className="text-sm font-bold text-teal-400 mb-2 flex items-center gap-1.5">💊 Safe OTC Medicines</p>
                                                     <div className="space-y-2.5">
-                                                        {m.diagnosis.medicines.map((med: any, idx: number) => (
+                                                        {m.diagnosis.medicines.map((med: { name: string; purpose: string; guidance: string; warning?: string }, idx: number) => (
                                                             <div key={idx} className="bg-surface/50 p-2 rounded-lg border border-borderDark text-xs">
                                                                 <p className="font-bold text-teal-300">{med.name} <span className="text-textMuted font-normal">— {med.purpose}</span></p>
                                                                 <p className="text-textMain/80 mt-1 leading-relaxed">🔹 {med.guidance}</p>
