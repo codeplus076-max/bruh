@@ -59,9 +59,10 @@ def health_check():
         "ml_model_status": "loaded" if predictor.is_loaded else "unavailable"
     }
 
-from app.api import predict, voice, location, user, report, sessions
+from app.api import predict, voice, location, user, report, sessions, summary
 
 app.include_router(predict.router)
+app.include_router(summary.router)
 app.include_router(voice.router)
 app.include_router(location.router)
 app.include_router(user.router)

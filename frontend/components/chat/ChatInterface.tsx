@@ -14,6 +14,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatStateContext";
 import { LiveCallOverlay } from "./LiveCallOverlay";
+import { SummaryCard } from "./SummaryCard";
+import { GenerateSummaryResponse } from "@/types/summary";
 
 const audioCache = new Map<string, string>();
 
@@ -48,6 +50,9 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     const [isListening, setIsListening] = useState(false);
     const [playingMessageId, setPlayingMessageId] = useState<number | null>(null);
     const [voiceError, setVoiceError] = useState<string | null>(null);
+    const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+    const [reportSummary, setReportSummary] = useState<GenerateSummaryResponse | null>(null);
+
     const bottomRef = useRef<HTMLDivElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const recognitionRef = useRef<ISpeechRecognition | null>(null);
@@ -168,6 +173,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         const userMsg: Message = { role: "user", content: text };
         const newMessagesContext = [...messages, userMsg];
         setMessages(newMessagesContext);
+        setReportSummary(null); // Clear previous report when continuing chat
         setLoadingStatus("Analyzing symptoms...");
         setLoading(true);
 
@@ -233,6 +239,37 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             setLoading(false);
         }
     }, [input, setInput, loading, sessionId, messages, setMessages, lang, userProfile, user, loadSession, autoSpeak, playAudio, t]);
+
+    const handleGenerateReport = async (diagnosisData: Diagnosis) => {
+        if (!diagnosisData) return;
+        setIsGeneratingReport(true);
+        try {
+            const res = await fetch(`${API_URL}/generate-summary`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    messages: messages.map(m => ({ role: m.role, content: m.content })),
+                    diagnosis: diagnosisData,
+                    patient_profile: {
+                        name: user?.displayName || "Unknown",
+                        age: userProfile?.age?.toString() || "Unknown",
+                        gender: userProfile?.gender || "Unknown"
+                    },
+                    language: lang
+                }),
+            });
+
+            if (!res.ok) throw new Error("Failed to generate report");
+
+            const data: GenerateSummaryResponse = await res.json();
+            setReportSummary(data);
+        } catch (err) {
+            console.error("Report generation error:", err);
+            // We could show a toast here if we had a toast system
+        } finally {
+            setIsGeneratingReport(false);
+        }
+    };
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -326,7 +363,10 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             <div className="bg-surfaceHighlight/50 backdrop-blur-md px-4 sm:px-6 py-3 border-b border-borderDark flex flex-col sm:flex-row items-center justify-between z-20 gap-3 sm:gap-0">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 w-full sm:w-auto">
                     <button
-                        onClick={() => resetChat(t.chatGreeting)}
+                        onClick={() => {
+                            resetChat(t.chatGreeting);
+                            setReportSummary(null); // Clear report on new chat
+                        }}
                         className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider bg-surface border border-borderDark text-textMuted hover:text-primary hover:border-primary/50 transition-all shadow-sm group"
                         title="Start a fresh conversation"
                     >
@@ -557,15 +597,54 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                                                     </p>
                                                 </div>
                                             )}
+
+                                            {!m.diagnosis.sessionId && (
+                                                <div className="mt-4 pt-4 border-t border-borderDark">
+                                                    <button
+                                                        onClick={() => handleGenerateReport(m.diagnosis!)}
+                                                        disabled={isGeneratingReport}
+                                                        className="w-full py-3 bg-gradient-to-r from-primary to-primary-light hover:from-primary-light hover:to-primary text-white text-sm rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-neon disabled:opacity-50"
+                                                    >
+                                                        {isGeneratingReport ? (
+                                                            <span className="flex items-center gap-2">
+                                                                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                                                Generating Summary...
+                                                            </span>
+                                                        ) : (
+                                                            <>
+                                                                <FileText className="w-4 h-4" /> Generate Patient Report
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}
                             </div>
                         </motion.div>
                     ))}
+
+                    {/* Rendering the summary card directly in the chat window if it exists */}
+                    {reportSummary && (
+                        <motion.div
+                            key="report-summary-card"
+                            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                            className="w-full pb-4"
+                        >
+                            <SummaryCard summary={reportSummary.structured_data} rawText={reportSummary.summary_text} />
+                        </motion.div>
+                    )}
+
                     {loading && (
                         <motion.div
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                            key="loading-indicator"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
                             className="flex justify-start"
                         >
                             <div className="bg-surface border border-borderDark rounded-2xl rounded-tl-sm px-5 py-4 shadow-glass max-w-[85%]">
