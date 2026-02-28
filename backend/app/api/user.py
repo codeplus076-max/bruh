@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Header
 from typing import Optional
 from app.firebase_config import db
-from firebase_admin import auth
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -12,6 +11,7 @@ async def get_user_profile(authorization: Optional[str] = Header(None)):
     
     token = authorization.split("Bearer ")[1]
     try:
+        from firebase_admin import auth  # Deferred import — saves ~150MB at boot
         decoded_token = auth.verify_id_token(token)
         uid = decoded_token["uid"]
         

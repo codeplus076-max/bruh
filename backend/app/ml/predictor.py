@@ -42,10 +42,9 @@ class DiseasePredictor:
 
         print(f"Loading ML Model from disk into memory (Memory Mapped): {self.model_path}")
         if os.path.exists(self.model_path) and os.path.exists(self.meta_path):
-            # Use mmap_mode='r' to prevent loading the entire payload into active RAM
-            self.__class__._model = joblib.load(self.model_path, mmap_mode='r')
-            self.__class__._meta = joblib.load(self.meta_path, mmap_mode='r')
-            print("Successfully lazy-loaded custom XGBoost model and metadata.")
+            self.__class__._model = joblib.load(self.model_path)
+            self.__class__._meta = joblib.load(self.meta_path)
+            print("Successfully loaded XGBoost model and metadata.")
         else:
             print(f"Warning: Model or meta not found in {self.model_path}. Using mock predictions.")
             self.__class__._model = None
