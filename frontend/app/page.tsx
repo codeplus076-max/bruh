@@ -42,8 +42,8 @@ export default function LoginPage() {
                     throw new Error("Age and Gender are required for medical registration.");
                 }
                 const ageNum = parseInt(age);
-                if (isNaN(ageNum) || ageNum < 0 || ageNum > 120) {
-                    throw new Error("Please enter a valid age between 0 and 120.");
+                if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
+                    throw new Error("Please enter a valid age between 18 and 100.");
                 }
 
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -113,8 +113,8 @@ export default function LoginPage() {
                                     <input
                                         type="number"
                                         placeholder="Age"
-                                        min="0"
-                                        max="120"
+                                        min="18"
+                                        max="100"
                                         value={age}
                                         onChange={(e) => setAge(e.target.value)}
                                         className="w-full bg-surface border border-borderDark rounded-xl px-4 py-3 text-sm focus:border-primary/50 transition-all outline-none"
