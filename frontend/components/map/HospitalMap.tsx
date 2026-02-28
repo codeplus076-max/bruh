@@ -1,11 +1,38 @@
 "use client";
 
-import { useState } from "react";
+/**
+ * HospitalMap.tsx
+ *
+ * NATIVE GPS INTEGRATION (MIT App Inventor / WebViewer)
+ * -------------------------------------------------------
+ * When this web app is embedded inside an MIT App Inventor WebViewer,
+ * the native Android/iOS app calls:
+ *
+ *   window.receiveNativeLocation(latitude, longitude)
+ *
+ * This component registers that global function on mount and
+ * automatically uses it when the app detects it is running inside
+ * MIT App Inventor (via: typeof window.AppInventor !== "undefined").
+ *
+ * PRIORITY ORDER:
+ *   1. Native GPS  → MIT App Inventor calls window.receiveNativeLocation()
+ *   2. Browser GPS → navigator.geolocation.getCurrentPosition()
+ *   3. Offline     → Demo fallback hospital card
+ *
+ * CLEANUP:
+ *   The global window.receiveNativeLocation is deleted on component unmount
+ *   to prevent stale closures and memory leaks.
+ */
+
+import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Translations } from "@/lib/translations";
-import { MapPin, AlertCircle, Crosshair, Globe, Navigation } from "lucide-react";
+import { MapPin, AlertCircle, Crosshair, Globe, Navigation, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
 
+// --------------------
+// Types
+// --------------------
 type Hospital = {
     name: string;
     address: string;
@@ -24,8 +51,18 @@ type Hospital = {
     specialty?: string;
 };
 
+
+// Window types for native bridges are centralized in types/native-bridge.d.ts
+
+
+// --------------------
+// Dynamic Map (no SSR)
+// --------------------
 const MapComponent = dynamic(() => import("./Map"), { ssr: false });
 
+// --------------------
+// Star Rating sub-component
+// --------------------
 function StarRating({ rating }: { rating: number }) {
     const full = Math.floor(rating);
     const half = rating - full >= 0.5;
@@ -58,58 +95,198 @@ function StarRating({ rating }: { rating: number }) {
     );
 }
 
+// --------------------
+// Main Component
+// --------------------
 export function HospitalMap({ t }: { t: Translations }) {
     const [hospitals, setHospitals] = useState<Hospital[]>([]);
     const [loading, setLoading] = useState(false);
+    const [locationStatus, setLocationStatus] = useState<"idle" | "waiting_native" | "fetching_browser" | "fetching_hospitals">("idle");
     const [error, setError] = useState<string | null>(null);
     const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
+    const [isNativeApp, setIsNativeApp] = useState(false);
 
-    const findHospitals = () => {
+    // Ref to hold a resolve function for the pending native location promise
+    const nativeLocationResolveRef = useRef<((loc: { lat: number; lng: number }) => void) | null>(null);
+    // Ref to prevent duplicate location triggers
+    const locationReceivedRef = useRef(false);
+
+    // ---------------------------------------------------------------
+    // Detect MIT App Inventor environment (safe: after component mounts)
+    // ---------------------------------------------------------------
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setIsNativeApp(typeof window.AppInventor !== "undefined");
+        }
+    }, []);
+
+    // ---------------------------------------------------------------
+    // Register global window.receiveNativeLocation on mount
+    // Cleanup on unmount to avoid stale closures
+    // ---------------------------------------------------------------
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        window.receiveNativeLocation = (lat: number | string, lng: number | string) => {
+            // Guard against duplicate calls (e.g. GPS polling from native side)
+            if (locationReceivedRef.current) return;
+            locationReceivedRef.current = true;
+
+            const parsedLat = Number(lat);
+            const parsedLng = Number(lng);
+
+            if (isNaN(parsedLat) || isNaN(parsedLng)) {
+                console.error("[GPS Bridge] Received invalid coordinates:", lat, lng);
+                return;
+            }
+
+            const loc = { lat: parsedLat, lng: parsedLng };
+            setUserLoc(loc);
+
+            // If there's a pending promise waiting for native location, resolve it
+            if (nativeLocationResolveRef.current) {
+                nativeLocationResolveRef.current(loc);
+                nativeLocationResolveRef.current = null;
+            }
+        };
+
+        // Cleanup: remove global function to prevent memory leaks / stale ref
+        return () => {
+            if (typeof window !== "undefined") {
+                delete window.receiveNativeLocation;
+            }
+        };
+    }, []); // Run only once on mount
+
+    // ---------------------------------------------------------------
+    // Fetch hospitals from backend given a lat/lng
+    // ---------------------------------------------------------------
+    const fetchHospitals = useCallback(async (latitude: number, longitude: number) => {
+        setLocationStatus("fetching_hospitals");
         setLoading(true);
-        setError(null);
-        if (!navigator.geolocation) {
-            setError(t.hospitalNoAccess);
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const res = await fetch(`${apiUrl}/hospitals/nearby?lat=${latitude}&lng=${longitude}`);
+            if (!res.ok) throw new Error("api_error");
+            const data = await res.json();
+            setHospitals(data.hospitals);
+        } catch {
+            // Offline fallback card
+            setHospitals([{
+                name: "Central Medical Center (Demo)",
+                address: "Network disconnected. Offline fallback.",
+                distance_km: 0,
+                lat: latitude + 0.01,
+                lng: longitude + 0.01,
+                emergency: true,
+                maps_url: `https://www.google.com/maps/search/hospital/@${latitude},${longitude},14z`,
+                phone: "+1-800-RURAL-MED",
+                opening_hours: "24/7"
+            }]);
+        } finally {
             setLoading(false);
+            setLocationStatus("idle");
+        }
+    }, []);
+
+    // ---------------------------------------------------------------
+    // Main "Find Hospitals" handler — uses native GPS or browser GPS
+    // ---------------------------------------------------------------
+    const findHospitals = useCallback(async () => {
+        setError(null);
+        setHospitals([]);
+        locationReceivedRef.current = false; // Reset duplicate guard for new search
+
+        // ------------------------------------
+        // PATH 1: MIT App Inventor native GPS
+        // ------------------------------------
+        if (isNativeApp) {
+            setLocationStatus("waiting_native");
+            setLoading(true);
+
+            try {
+                // Create a promise that resolves when the native app calls
+                // window.receiveNativeLocation(), or times out after 10 seconds
+                const nativeLocation = await new Promise<{ lat: number; lng: number }>((resolve, reject) => {
+                    nativeLocationResolveRef.current = resolve;
+
+                    // 10-second timeout in case GPS is unavailable
+                    setTimeout(() => {
+                        nativeLocationResolveRef.current = null;
+                        reject(new Error("Native GPS timed out after 10 seconds."));
+                    }, 10_000);
+                });
+
+                setUserLoc(nativeLocation);
+                await fetchHospitals(nativeLocation.lat, nativeLocation.lng);
+
+            } catch (err) {
+                const message = err instanceof Error ? err.message : "Native GPS failed.";
+                console.error("[GPS Bridge] Error:", message);
+                setError(t.hospitalNoAccess + " (Native GPS unavailable — try browser mode)");
+                setLoading(false);
+                setLocationStatus("idle");
+            }
             return;
         }
+
+        // ------------------------------------
+        // PATH 2: Standard Browser GPS fallback
+        // ------------------------------------
+        if (!navigator.geolocation) {
+            setError(t.hospitalNoAccess);
+            return;
+        }
+
+        setLocationStatus("fetching_browser");
+        setLoading(true);
+
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                 const { latitude, longitude } = position.coords;
                 setUserLoc({ lat: latitude, lng: longitude });
-                try {
-                    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-                    const res = await fetch(`${apiUrl}/hospitals/nearby?lat=${latitude}&lng=${longitude}`);
-                    if (!res.ok) throw new Error("api_error");
-                    const data = await res.json();
-                    setHospitals(data.hospitals);
-                } catch {
-                    setHospitals([{
-                        name: "Central Medical Center (Demo)",
-                        address: "Network disconnected. Offline fallback.",
-                        distance_km: 0,
-                        lat: latitude + 0.01,
-                        lng: longitude + 0.01,
-                        emergency: true,
-                        maps_url: `https://www.google.com/maps/search/hospital/@${latitude},${longitude},14z`,
-                        phone: "+1-800-RURAL-MED",
-                        opening_hours: "24/7"
-                    }]);
-                }
-                setLoading(false);
+                await fetchHospitals(latitude, longitude);
             },
-            () => {
+            (geoError) => {
+                console.error("[Browser GPS] Error:", geoError.message);
                 setError(t.hospitalNoAccess);
                 setLoading(false);
+                setLocationStatus("idle");
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10_000,
+                maximumAge: 0
             }
         );
+    }, [isNativeApp, fetchHospitals, t.hospitalNoAccess]);
+
+    // ---------------------------------------------------------------
+    // Dynamic button label based on current loading state
+    // ---------------------------------------------------------------
+    const getButtonLabel = () => {
+        if (locationStatus === "waiting_native") return "Waiting for GPS…";
+        if (locationStatus === "fetching_browser") return "Fetching location…";
+        if (locationStatus === "fetching_hospitals") return "Loading hospitals…";
+        return t.hospitalFind;
     };
 
+    // ---------------------------------------------------------------
+    // Render
+    // ---------------------------------------------------------------
     return (
         <div className="glass-panel flex flex-col p-1">
             <div className="p-5 border-b border-borderDark flex flex-col gap-4">
                 <h3 className="text-sm uppercase tracking-widest text-textMuted font-bold flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-primary" />
                     {t.hospitalTitle}
+                    {/* Native GPS indicator badge */}
+                    {isNativeApp && (
+                        <span className="ml-auto flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-bold text-emerald-400">
+                            <Smartphone className="w-3 h-3" />
+                            Native GPS
+                        </span>
+                    )}
                 </h3>
 
                 <button
@@ -119,10 +296,23 @@ export function HospitalMap({ t }: { t: Translations }) {
                 >
                     <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                     <Crosshair className={`w-4 h-4 ${loading ? 'animate-spin text-primary' : 'text-primary'}`} />
-                    <span className="font-medium tracking-wide">{loading ? t.hospitalLocating : t.hospitalFind}</span>
+                    <span className="font-medium tracking-wide">{getButtonLabel()}</span>
                 </button>
 
-                {error && <p className="text-danger text-xs px-2 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {error}</p>}
+                {/* Waiting for native GPS sub-message */}
+                {locationStatus === "waiting_native" && (
+                    <p className="text-xs text-primary/70 px-2 flex items-center gap-1 animate-pulse">
+                        <Smartphone className="w-3 h-3" />
+                        Waiting for location from native app…
+                    </p>
+                )}
+
+                {error && (
+                    <p className="text-danger text-xs px-2 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {error}
+                    </p>
+                )}
             </div>
 
             <div className="relative border-b border-borderDark bg-background/50">
@@ -252,11 +442,12 @@ export function HospitalMap({ t }: { t: Translations }) {
                 {hospitals.length === 0 && !loading && !userLoc && (
                     <div className="py-12 px-4 text-center text-textMuted/40">
                         <MapPin className="w-8 h-8 mx-auto mb-3 opacity-20" />
-                        <p className="text-xs uppercase tracking-widest">Connect GPS to populate list</p>
+                        <p className="text-xs uppercase tracking-widest">
+                            {isNativeApp ? "Tap button — native GPS will activate" : "Connect GPS to populate list"}
+                        </p>
                     </div>
                 )}
             </div>
         </div>
     );
 }
-

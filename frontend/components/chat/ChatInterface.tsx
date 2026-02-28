@@ -16,6 +16,7 @@ import { useChat } from "@/context/ChatStateContext";
 import { LiveCallOverlay } from "./LiveCallOverlay";
 import { SummaryCard } from "./SummaryCard";
 import { GenerateSummaryResponse } from "@/types/summary";
+import { handleAIVoice, cancelAIVoice } from "@/lib/voiceHandler";
 
 const audioCache = new Map<string, string>();
 
@@ -67,22 +68,16 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
         setVoiceError(null);
         setPlayingMessageId(index);
 
-        // Native Browser Fallback Function
+        // Unified cross-platform fallback:
+        // MIT App Inventor → Web Speech API → silent
         const fallbackToSpeechSynthesis = () => {
-            console.warn("[Voice] Falling back to Browser Speech Synthesis.");
-            if (!("speechSynthesis" in window)) {
-                console.error("[Voice] Browser Speech Synthesis not supported.");
-                setPlayingMessageId(null);
-                return;
-            }
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang === "hi" ? "hi-IN" : lang === "mr" ? "mr-IN" : "en-US";
-            utterance.onend = () => setPlayingMessageId(null);
-            utterance.onerror = (e) => {
-                console.error("[Voice] Browser Synthesis Error:", e);
-                finalFallback();
-            };
-            window.speechSynthesis.speak(utterance);
+            console.warn("[Voice] Falling back to cross-platform voice handler.");
+            handleAIVoice(
+                text,
+                lang,
+                () => setPlayingMessageId(null),
+                () => finalFallback()
+            );
         };
 
         const finalFallback = () => {
@@ -344,13 +339,15 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
     useEffect(() => {
-        // Cleanup speech on unmount
+        // Cleanup all speech on unmount — covers both native TTS bridge and Web Speech API
         const currentAudio = audioRef.current;
         return () => {
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio.src = "";
             }
+            // Cancel any in-progress cross-platform voice (MIT App or browser)
+            cancelAIVoice();
         };
     }, []);
 
