@@ -5,25 +5,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+import gc
 import os
 from app.api.predict import predictor
-from contextlib import asynccontextmanager
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Load ML Model completely into memory before accepting any requests
-    print("Initiating Global ML Model Load Sequence for Triage Engine...")
-    predictor.load_model()
-    yield
-    print("Server shutting down, clearing ML Context.")
-    predictor._model = None
-    predictor._meta = None
 
 app = FastAPI(
     title="UPCHAAR - AI Rural Health Triage Assistant API",
     description="Backend for the AI Triage Assistant",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.0.0"
 )
 
 # Configure CORS
@@ -37,8 +26,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add GZip compression for large JSON payloads (like Hospital Lists)
-app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
+# Add GZip compression only for large JSON payloads (hospital lists etc)
+# minimum_size raised to 2000 bytes - avoids compressing small chat/summary responses
+app.add_middleware(GZipMiddleware, minimum_size=2000, compresslevel=3)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -58,8 +48,14 @@ async def global_exception_handler(request: Request, exc: Exception):
 @app.get("/health")
 def health_check():
     """
-    Enhanced health check for Render monitoring.
+    Enhanced health check for Render cold starts. 
+    Verifies that the ML model has been loaded into memory.
     """
+    model_loaded = predictor.is_loaded
+    if not model_loaded:
+        # Pings the singleton to attempt load
+        predictor.load_model()
+        
     return {
         "status": "healthy", 
         "ml_model_status": "loaded" if predictor.is_loaded else "unavailable"

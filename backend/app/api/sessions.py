@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from app.firebase_config import db
+from firebase_admin import auth
 import time
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
@@ -23,7 +24,6 @@ async def get_uid(authorization: str):
         raise HTTPException(status_code=401, detail="Invalid token")
     token = authorization.split("Bearer ")[1]
     try:
-        from firebase_admin import auth  # Deferred import — saves ~150MB at boot
         decoded = auth.verify_id_token(token)
         return decoded["uid"]
     except Exception:

@@ -23,13 +23,13 @@ if openai_api_key and openai_api_key.startswith("sk-or-"):
 else:
     client = AsyncOpenAI(api_key=openai_api_key) if openai_api_key else None
 
-@lru_cache(maxsize=100)
+@lru_cache(maxsize=64)
 def get_cached_prediction_metadata(age: int, gender: int, severity: int, duration: float, symptoms: str):
     return predictor.predict_with_metadata(
         age=age, gender=gender, severity=severity, duration=duration, clinical_symptoms=symptoms
     )
 
-@lru_cache(maxsize=100)
+@lru_cache(maxsize=64)
 def get_cached_prediction(age: int, gender: int, severity: int, duration: float):
     return predictor.predict(
         age=age, gender=gender, severity=severity, duration=duration
@@ -121,13 +121,20 @@ async def chat_endpoint(request: ChatRequest):
     if not client:
         raise HTTPException(status_code=500, detail="OpenAI API key not configured")
         
-    system_prompt = f"Med-AI. Extract data to call `analyze_symptoms` ASAP. NO AGE/GENDER Qs. Ask 1 short symptom Q in {request.language} if needed."
+    system_prompt = f"""You are a fast Medical Triage AI. Extract structured data for ML model.
+RULES:
+1. NO DEMOGRAPHICS: Never ask Age/Gender.
+2. SYMPTOM FOCUS: Ask 1-2 quick questions max (e.g., location, duration).
+3. TRIGGER: Call `analyze_symptoms` immediately once symptoms are known.
+Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe)."""
 
     messages = [{"role": "system", "content": system_prompt}]
     for msg in request.messages:
         messages.append({"role": msg.role, "content": msg.content})
         
+    
     try:
+        # Use gpt-4o-mini for better tool precision if available, fallback to 3.5
         model_name = "gpt-4o-mini" if not os.getenv("OPENAI_API_KEY", "").startswith("sk-") or "openrouter" in str(client.base_url) else "gpt-3.5-turbo"
         
         response = await client.chat.completions.create(
@@ -135,7 +142,7 @@ async def chat_endpoint(request: ChatRequest):
             messages=messages,
             tools=tools,
             tool_choice="auto",
-            max_tokens=150
+            max_tokens=600
         )
         
         response_message = response.choices[0].message
@@ -258,14 +265,20 @@ async def chat_endpoint(request: ChatRequest):
                 # Enhanced Instruction for proactive guidance
                 messages.append({
                     "role": "system", 
-                    "content": "State diagnosis, then list First Aid, Home Remedies, and Routine immediately in bullets."
+                    "content": """
+                    PROACTIVE GUIDANCE ENFORCEMENT:
+                    1. State the diagnosis clearly and empathetically.
+                    2. IMMEDIATELY provide the essential First Aid, Home Remedies, and Recovery Routine from the tool output.
+                    3. Do NOT wait for the patient to ask for these. 
+                    4. Keep instructions clear, bulleted, and in the user's language.
+                    """
                 })
                 
                 # Ensure generation is fast with minimal tokens
                 final_response = await client.chat.completions.create(
                     model=model_name,
                     messages=messages,
-                    max_tokens=250
+                    max_tokens=350
                 )
                 
                 return ChatResponse(
