@@ -24,7 +24,15 @@ class DiseasePredictor:
                 model_dir or os.path.dirname(os.path.abspath(__file__)), 
                 "model_meta_v2.joblib"
             )
-            # DELIBERATE LAZY LOADING: Do not load the model here to prevent Render 512MB RAM OOM on Uvicorn Boot.
+            # Pre-load path definition
+            cls._instance.model_path = os.path.join(
+                model_dir or os.path.dirname(os.path.abspath(__file__)), 
+                "triage_model_v2.joblib"
+            )
+            cls._instance.meta_path = os.path.join(
+                model_dir or os.path.dirname(os.path.abspath(__file__)), 
+                "model_meta_v2.joblib"
+            )
         return cls._instance
 
     def load_model(self):
@@ -48,8 +56,8 @@ class DiseasePredictor:
         Predicts disease with medical confidence scoring, risk engine integration,
         and precise standardized JSON-like output schemas.
         """
-        # Lazy load strictly at inference time
         if not self.is_loaded:
+            # Fallback if somehow not loaded at boot
             self.load_model()
 
         if not self._model or not self._meta:

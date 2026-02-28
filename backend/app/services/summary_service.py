@@ -30,19 +30,12 @@ async def extract_patient_info(messages: List[Dict[str, str]]) -> Dict[str, Any]
         if role in ["user", "assistant"]:
             history_text += f"{role.upper()}: {msg.get('content', '')}\n"
 
-    system_prompt = """You are a medical data extraction bot. 
-Extract the following clinical information from the conversation history if available:
-1. Symptoms (Extract a list of symptoms)
-2. Duration of symptoms (e.g., '2 days', '1 week')
-3. Severity description (e.g., 'Mild', 'Severe', 'Moderate to Severe', default to 'Unknown')
-
-Respond ONLY with a JSON object exactly following this structure:
+    system_prompt = """Extract from history directly as JSON:
 {
     "symptoms": ["string"],
     "duration": "string",
     "severity": "string"
-}
-"""
+}"""
 
     try:
         response = await client.chat.completions.create(
@@ -52,7 +45,7 @@ Respond ONLY with a JSON object exactly following this structure:
                 {"role": "user", "content": history_text}
             ],
             response_format={"type": "json_object"},
-            max_tokens=300
+            max_tokens=150
         )
         
         result_content = response.choices[0].message.content
