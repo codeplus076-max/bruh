@@ -52,7 +52,6 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
     const [voiceError, setVoiceError] = useState<string | null>(null);
     const [isGeneratingReport, setIsGeneratingReport] = useState(false);
     const [reportSummary, setReportSummary] = useState<GenerateSummaryResponse | null>(null);
-    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
     const bottomRef = useRef<HTMLDivElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -191,8 +190,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                     messages: newMessagesContext.map(m => ({ role: m.role, content: m.content })),
                     language: lang,
                     age: userProfile?.age || 30,
-                    gender: userProfile?.gender === "Male" ? 1 : 0,
-                    ...(userLocation ? { lat: userLocation.lat, lng: userLocation.lng } : {})
+                    gender: userProfile?.gender === "Male" ? 1 : 0
                 }),
             });
 
@@ -240,7 +238,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             clearTimeout(statusTimer);
             setLoading(false);
         }
-    }, [input, setInput, loading, sessionId, messages, setMessages, lang, userProfile, user, loadSession, autoSpeak, playAudio, t, userLocation]);
+    }, [input, setInput, loading, sessionId, messages, setMessages, lang, userProfile, user, loadSession, autoSpeak, playAudio, t]);
 
     const handleGenerateReport = async (diagnosisData: Diagnosis) => {
         if (!diagnosisData) return;
@@ -342,16 +340,6 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
             localStorage.setItem("upchaar_messages", JSON.stringify(messages));
         }
     }, [messages]);
-
-    // Silently request user location for hospital search feature
-    useEffect(() => {
-        if (typeof navigator !== "undefined" && navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                () => { } // ignore permission denied silently
-            );
-        }
-    }, []);
 
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
