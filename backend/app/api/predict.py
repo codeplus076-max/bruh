@@ -66,6 +66,8 @@ class ChatRequest(BaseModel):
     language: str = "en"
     age: int
     gender: int # 1=M, 0=F
+    lat: Optional[float] = None  # User location for hospital search
+    lng: Optional[float] = None
 
 class ChatResponse(BaseModel):
     role: str
@@ -112,6 +114,24 @@ tools = [
                 "required": ["severity", "duration_days", "clinical_symptoms", "is_injury"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "find_nearby_hospitals",
+            "description": "Find hospitals near the user's location. Call this ONLY when the user explicitly asks for nearby hospitals, clinics, emergency rooms, or wants to know where to go for treatment.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "urgency": {
+                        "type": "string",
+                        "enum": ["emergency", "urgent", "routine"],
+                        "description": "How urgently the user needs a hospital."
+                    }
+                },
+                "required": ["urgency"]
+            }
+        }
     }
 ]
 
@@ -126,6 +146,7 @@ RULES:
 1. NO DEMOGRAPHICS: Never ask Age/Gender.
 2. SYMPTOM FOCUS: Ask 1-2 quick questions max (e.g., location, duration).
 3. TRIGGER: Call `analyze_symptoms` immediately once symptoms are known.
+4. HOSPITALS: Call `find_nearby_hospitals` ONLY if the user explicitly asks for a hospital, clinic, or emergency room near them.
 Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe)."""
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -287,6 +308,77 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                     diagnosis=diagnosis_data
                 )
                 
+        # --- HOSPITAL SEARCH TOOL HANDLER ---
+        if response_message.tool_calls:
+            tool_call = response_message.tool_calls[0]
+            if tool_call.function.name == "find_nearby_hospitals":
+                args = json.loads(tool_call.function.arguments)
+                urgency = args.get("urgency", "routine")
+                
+                if not request.lat or not request.lng:
+                    # If user has no location sharing, prompt them to use the hospitals page
+                    return ChatResponse(
+                        role="assistant",
+                        content=(
+                            "🏥 I'd love to find hospitals near you, but I need your location. "
+                            "Please enable location access on the **Hospitals** page to see nearby hospitals on an interactive map, or share your coordinates with me."
+                        )
+                    )
+                
+                # Call the existing hospital service internally
+                from app.api.location import _fetch_hospitals_from_google, calculate_distance, infer_specialty
+                try:
+                    rounded_lat = round(request.lat, 3)
+                    rounded_lng = round(request.lng, 3)
+                    raw_results = _fetch_hospitals_from_google(rounded_lat, rounded_lng)
+                    
+                    if not raw_results:
+                        return ChatResponse(
+                            role="assistant",
+                            content="🏥 I couldn't find any hospitals near your location at the moment. Please check the **Hospitals** tab for more options."
+                        )
+                    
+                    # Format top 5 hospitals for a concise chat response
+                    top5 = raw_results[:5]
+                    hospital_lines = []
+                    for i, place in enumerate(top5, 1):
+                        geometry = place.get("geometry", {}).get("location", {})
+                        h_lat = geometry.get("lat", 0)
+                        h_lng = geometry.get("lng", 0)
+                        dist = calculate_distance(request.lat, request.lng, h_lat, h_lng)
+                        name = place.get("name", "Unknown")
+                        address = place.get("vicinity", "")
+                        place_id = place.get("place_id", "")
+                        maps_url = f"https://www.google.com/maps/place/?q=place_id:{place_id}" if place_id else f"https://maps.google.com/?q={h_lat},{h_lng}"
+                        open_now = place.get("opening_hours", {}).get("open_now")
+                        status_emoji = "🟢" if open_now else ("🔴" if open_now is False else "⚪")
+                        types = place.get("types", [])
+                        specialty = infer_specialty(types, name)
+                        hospital_lines.append(
+                            f"{i}. **{name}** {status_emoji}\n"
+                            f"   📍 {address} ({dist} km away)\n"
+                            f"   🏷️ {specialty}\n"
+                            f"   🗺️ [Directions]({maps_url})"
+                        )
+                    
+                    urgency_prefix = {
+                        "emergency": "🚨 **Emergency!** Here are the nearest hospitals — go immediately!\n\n",
+                        "urgent": "⚠️ **Urgent Care Needed.** Here are the nearest hospitals:\n\n",
+                        "routine": "🏥 Here are nearby hospitals for your reference:\n\n"
+                    }.get(urgency, "🏥 Nearby hospitals:\n\n")
+                    
+                    hospital_text = urgency_prefix + "\n\n".join(hospital_lines)
+                    hospital_text += "\n\n*For more details including ratings, phone numbers and hours, visit the **Hospitals** page.*"
+                    
+                    return ChatResponse(role="assistant", content=hospital_text)
+                    
+                except Exception as e:
+                    print(f"Hospital search in chat failed: {e}")
+                    return ChatResponse(
+                        role="assistant",
+                        content="🏥 I had trouble fetching nearby hospitals right now. Please visit the **Hospitals** tab for a full map view."
+                    )
+        
         # If no function call, just return the AI's standard conversational text
         return ChatResponse(
             role="assistant",
