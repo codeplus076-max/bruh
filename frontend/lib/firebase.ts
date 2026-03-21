@@ -11,8 +11,21 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// Check if the API key exists to avoid build-time crashes on Vercel
+const isConfigured = !!firebaseConfig.apiKey;
+
+// Initialize Firebase with dummy config if actual config is missing during build phase
+const app = getApps().length > 0
+    ? getApp()
+    : initializeApp(isConfigured ? firebaseConfig : {
+        apiKey: "dummy-key-for-nextjs-builds",
+        authDomain: "dummy-domain.firebaseapp.com",
+        projectId: "dummy-project",
+        storageBucket: "dummy-bucket.appspot.com",
+        messagingSenderId: "1234567890",
+        appId: "1:1234567890:web:1234567890"
+    });
+
 const auth = getAuth(app);
 const db = getFirestore(app);
 
