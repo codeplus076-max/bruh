@@ -18,7 +18,7 @@ const isConfigured = !!firebaseConfig.apiKey;
 const app = getApps().length > 0
     ? getApp()
     : initializeApp(isConfigured ? firebaseConfig : {
-        apiKey: "dummy-key-for-nextjs-builds",
+        apiKey: "AIzaSyDummyKeyForNextJsBuilds1234567890",
         authDomain: "dummy-domain.firebaseapp.com",
         projectId: "dummy-project",
         storageBucket: "dummy-bucket.appspot.com",
