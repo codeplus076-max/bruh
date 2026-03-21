@@ -34,6 +34,12 @@ class InworldTTSService:
 
     async def generate_tts(self, text: str, language: str = "en"):
         """Collects all chunks from stream_tts_iterator for non-streaming response"""
+        # Hindi TTS is handled by the browser's native Web Speech API (hi-IN).
+        # Inworld does not reliably support Hindi, so we intentionally decline here
+        # and let the frontend fallback chain use SpeechSynthesisUtterance.
+        if language == "hi":
+            raise NotImplementedError("Hindi TTS is handled by browser Web Speech API")
+
         # We reuse the stream logic because it's proven to work with Hindi IDs
         print(f"[TTS DEBUG] Switching to stream collection for {language}")
         audio_data = b""

@@ -6,6 +6,10 @@ import math
 import os
 from cachetools import cached, TTLCache
 
+import datetime
+import asyncio
+import httpx
+
 router = APIRouter(prefix="/hospitals", tags=["hospitals"])
 
 class HospitalResponse(BaseModel):
@@ -18,13 +22,12 @@ class HospitalResponse(BaseModel):
     maps_url: str
     phone: Optional[str] = None
     opening_hours: Optional[str] = None
-    # New Google Maps-style fields
     rating: Optional[float] = None
     user_ratings_total: Optional[int] = None
     website: Optional[str] = None
     wheelchair_accessible: Optional[bool] = None
     open_now: Optional[bool] = None
-    specialty: Optional[str] = None   # e.g. "Multispecialty hospital", "Clinic"
+    specialty: Optional[str] = None
 
 class HospitalsListResponse(BaseModel):
     hospitals: List[HospitalResponse]
@@ -37,7 +40,6 @@ def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return round(R * c, 2)
 
-# Map of Google Places types → human-readable specialty labels
 SPECIALTY_LABELS = {
     "hospital": "Hospital",
     "doctor": "Doctor's clinic",
@@ -68,9 +70,13 @@ def infer_specialty(types: list, name: str) -> str:
             return SPECIALTY_LABELS[t]
     return "Hospital"
 
-@cached(cache=TTLCache(maxsize=1000, ttl=604800)) # Cache details (phone, etc) for 7 days
-def fetch_place_details(place_id: str) -> dict:
-    """Fetch phone, website, opening hours, rating, and wheelchair info from Google Place Details API."""
+# Keep the detail cache in memory
+detail_cache = TTLCache(maxsize=1000, ttl=604800)
+
+async def fetch_place_details_async(client: httpx.AsyncClient, place_id: str) -> dict:
+    if place_id in detail_cache:
+        return detail_cache[place_id]
+        
     api_key = os.getenv("MAPS_API_KEY")
     if not api_key:
         return {}
@@ -78,19 +84,14 @@ def fetch_place_details(place_id: str) -> dict:
         url = "https://maps.googleapis.com/maps/api/place/details/json"
         params = {
             "place_id": place_id,
-            "fields": (
-                "formatted_phone_number,"
-                "opening_hours,"
-                "website,"
-                "wheelchair_accessible_entrance,"
-                "rating,"
-                "user_ratings_total"
-            ),
+            "fields": "formatted_phone_number,opening_hours,website,wheelchair_accessible_entrance,rating,user_ratings_total",
             "key": api_key
         }
-        res = requests.get(url, params=params, timeout=5)
+        res = await client.get(url, params=params, timeout=5.0)
         if res.status_code == 200:
-            return res.json().get("result", {})
+            data = res.json().get("result", {})
+            detail_cache[place_id] = data
+            return data
     except Exception:
         pass
     return {}
@@ -100,20 +101,12 @@ async def get_nearby_hospitals(
     lat: float = Query(..., description="User latitude"),
     lng: float = Query(..., description="User longitude")
 ):
-    # Round coordinates to 3 decimal places (approx. 110 meters) to group nearby requests
-    # and maximize cache hits while remaining accurate enough for mapping.
     rounded_lat = round(lat, 3)
     rounded_lng = round(lng, 3)
-    
     return await _get_hospitals_cached(rounded_lat, rounded_lng, lat, lng)
 
-# Cache for 24 hours (86400 seconds), storing up to 500 distinct regional queries in RAM
 @cached(cache=TTLCache(maxsize=500, ttl=86400))
 def _fetch_hospitals_from_google(rounded_lat: float, rounded_lng: float) -> List[dict]:
-    """
-    Internal cached method to fetch the raw data from Google Places.
-    This prevents duplicate identical queries from racking up GCP billing costs.
-    """
     api_key = os.getenv("MAPS_API_KEY")
     if not api_key:
         raise ValueError("MAPS_API_KEY not configured")
@@ -132,14 +125,25 @@ def _fetch_hospitals_from_google(rounded_lat: float, rounded_lng: float) -> List
         api_status = data.get("status", "UNKNOWN")
         if api_status not in ("OK", "ZERO_RESULTS"):
             raise ValueError(f"Google Places API error: {api_status} — {data.get('error_message', 'No details')}")
-        return data.get("results", [])[:10]  # Limit to 10 results
+        return data.get("results", [])[:10]
     else:
         raise ValueError(f"HTTP Error: {response.status_code}")
 
 async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat: float, orig_lng: float) -> HospitalsListResponse:
     try:
+        # 1. Get the base list (cached sync call to avoid overbilling)
         results = _fetch_hospitals_from_google(rounded_lat, rounded_lng)
+        
+        # 2. Parallel fetch for all Place Details using httpx
+        place_ids = [p.get("place_id") for p in results if p.get("place_id")]
+        details_map = {}
+        
+        async with httpx.AsyncClient() as client:
+            tasks = [fetch_place_details_async(client, pid) for pid in place_ids]
+            detail_results = await asyncio.gather(*tasks)
+            details_map = {pid: detail for pid, detail in zip(place_ids, detail_results)}
 
+        # 3. Assemble response
         hospitals = []
         for place in results:
             geometry = place.get("geometry", {}).get("location", {})
@@ -149,24 +153,18 @@ async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat
             if h_lat is None or h_lng is None:
                 continue
 
-            # Compute distance strictly on the *exact* original user coordinates vs the hospital pos
             dist = calculate_distance(orig_lat, orig_lng, h_lat, h_lng)
             name = place.get("name", "Unknown Hospital")
             address = place.get("vicinity", "Unknown Address")
             place_id = place.get("place_id", "")
             types = place.get("types", [])
 
-            # Emergency: only if explicitly tagged or name contains emergency keywords
-            emergency = "emergency" in types or any(
-                kw in name.lower()
-                for kw in ("emergency", "trauma", "casualty", "icu")
-            )
+            emergency = "emergency" in types or any(kw in name.lower() for kw in ("emergency", "trauma", "casualty", "icu"))
 
-            # Google Maps URL for navigation
             maps_url = f"https://www.google.com/maps/place/?q=place_id:{place_id}" if place_id else f"https://www.google.com/maps?q={h_lat},{h_lng}"
 
-            # Fetch detailed info (phone, hours, website, rating, wheelchair)
-            details = fetch_place_details(place_id) if place_id else {}
+            # Get the pre-fetched details
+            details = details_map.get(place_id, {})
 
             phone = details.get("formatted_phone_number")
             website = details.get("website")
@@ -174,7 +172,6 @@ async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat
             user_ratings_total = details.get("user_ratings_total") or place.get("user_ratings_total")
             wheelchair_accessible = details.get("wheelchair_accessible_entrance")
 
-            # Opening hours
             hours_data = details.get("opening_hours", {})
             open_now: Optional[bool] = None
             opening_hours: Optional[str] = None
@@ -182,13 +179,9 @@ async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat
                 open_now = hours_data.get("open_now")
                 weekday_text = hours_data.get("weekday_text", [])
                 if weekday_text:
-                    # Show today's hours
-                    import datetime
-                    today_idx = datetime.datetime.now().weekday()  # Mon=0, Sun=6
-                    # Google weekday_text starts Sunday
+                    today_idx = datetime.datetime.now().weekday()
                     google_idx = (today_idx + 1) % 7
                     if google_idx < len(weekday_text):
-                        # e.g. "Monday: Open 24 hours" → "Open 24 hours"
                         today_text = weekday_text[google_idx]
                         parts = today_text.split(": ", 1)
                         opening_hours = parts[1] if len(parts) == 2 else today_text
@@ -199,7 +192,6 @@ async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat
                 elif open_now is False:
                     opening_hours = "Closed now"
 
-            # From nearbysearch result open_now if details didn't have it
             if open_now is None:
                 nb_hours = place.get("opening_hours", {})
                 if nb_hours:
@@ -225,7 +217,6 @@ async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat
                 specialty=specialty,
             ))
 
-        # Sort by distance
         hospitals.sort(key=lambda x: x.distance_km)
 
         if not hospitals:
@@ -234,7 +225,6 @@ async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat
         return HospitalsListResponse(hospitals=hospitals)
 
     except Exception as e:
-        # Log the real error and return a helpful fallback
         print(f"[location.py] Hospital fetch error: {type(e).__name__}: {e}")
         fallback = HospitalResponse(
             name="Nearby Hospital Search Unavailable",

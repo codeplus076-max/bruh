@@ -198,22 +198,23 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
 
             setMessages(finalMessages);
 
-            // Auto-save session to backend
+            // Auto-save session to backend (Fire-and-forget so it doesn't block voice/UI latency)
             if (user) {
-                const token = await user.getIdToken();
-                await fetch(`${API_URL}/sessions/save`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        sessionId: currentSessionId,
-                        messages: finalMessages,
-                        language: lang,
-                        risk_level: data.diagnosis?.risk_level || "Normal"
-                    }),
-                });
+                user.getIdToken().then(token => {
+                    fetch(`${API_URL}/sessions/save`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            sessionId: currentSessionId,
+                            messages: finalMessages,
+                            language: lang,
+                            risk_level: data.diagnosis?.risk_level || "Normal"
+                        }),
+                    }).catch(e => console.error("Session save error:", e));
+                }).catch(e => console.error("Auth error:", e));
 
                 // Update local context with the session ID if it was new
                 if (!sessionId) {

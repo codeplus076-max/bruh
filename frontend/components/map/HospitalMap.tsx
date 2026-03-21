@@ -254,9 +254,9 @@ export function HospitalMap({ t }: { t: Translations }) {
                 setLocationStatus("idle");
             },
             {
-                enableHighAccuracy: true,
+                enableHighAccuracy: false, // Much faster, sufficient for hospital radius search
                 timeout: 10_000,
-                maximumAge: 0
+                maximumAge: 60_000 // Cache GPS lock for 1 minute
             }
         );
     }, [isNativeApp, fetchHospitals, t.hospitalNoAccess]);
