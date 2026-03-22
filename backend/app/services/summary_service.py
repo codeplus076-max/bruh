@@ -1,3 +1,7 @@
+import json
+import os
+from typing import Dict, Any, List
+
 _client = None
 
 def get_openai_client():
