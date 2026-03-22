@@ -67,4 +67,14 @@ def get_otc_medicines(symptoms: List[str], age: int, risk_level: str) -> List[Di
         # These are high-risk symptoms where we don't want to encourage self-medication
         pass
 
+    # Fallback: If no specific OTC was matched and the patient isn't in an emergency/high risk state,
+    # provide a general mild medicine recommendation as requested by the user.
+    if not medicines and risk_level in ["Low", "Moderate"]:
+        medicines.append({
+            "name": "General Mild Medicine (e.g., Paracetamol 500mg)",
+            "purpose": "Relieve general body ache, mild fever, or discomfort.",
+            "guidance": "Take 1 tablet only if experiencing discomfort or fever. Do not exceed 3 days without doctor consultation.",
+            "warning": "Ensure you have no liver conditions or allergies. Always follow exact package dosage."
+        })
+
     return medicines

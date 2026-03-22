@@ -16,7 +16,7 @@ def generate_guidance(
 ) -> Dict[str, Any]:
     
     first_aid = get_first_aid(symptoms, disease)
-    routine = get_daily_routine(age, severity_score)
+    routine = get_daily_routine(age, severity_score, symptoms, disease)
     warnings = get_safety_warnings(symptoms, disease)
     when_to_seek_care = get_escalation_rules(risk_level, urgency)
     
