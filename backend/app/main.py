@@ -35,7 +35,7 @@ else:
         allow_headers=["*"],
     )
 
-@app.get("/", methods=["GET", "HEAD"])
+@app.get("/")
 @app.head("/")
 def read_root():
     return {"message": "Welcome to UPCHAAR AI Backend!", "health_check": "/health"}
