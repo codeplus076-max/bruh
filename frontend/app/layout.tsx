@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, Syne, Noto_Sans_Devanagari } from "next/font/google";
+import { Outfit, Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { AuthProvider } from "@/context/AuthContext";
@@ -21,14 +21,6 @@ const syne = Syne({
   display: "swap",
 });
 
-// Hindi / Marathi Devanagari script support — prevents boxes rendering
-const notoDevanagari = Noto_Sans_Devanagari({
-  subsets: ["devanagari"],
-  variable: "--font-devanagari",
-  display: "swap",
-  weight: ["400", "500", "700"],
-});
-
 export const metadata: Metadata = {
   title: "UPCHAAR - AI Rural Health Triage",
   description: "Multilingual Symptom Checker & Triage",
@@ -41,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${outfit.variable} ${syne.variable} ${notoDevanagari.variable} font-sans antialiased`}>
+      <body className={`${outfit.variable} ${syne.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
             <LanguageProvider>

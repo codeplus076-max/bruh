@@ -16,9 +16,6 @@ async def text_to_speech(request: TTSRequest):
     try:
         audio_content = await tts_service.generate_tts(request.text, request.language)
         return Response(content=audio_content, media_type="audio/mpeg")
-    except NotImplementedError as e:
-        # Language not supported by Inworld TTS — client should use browser TTS fallback
-        raise HTTPException(status_code=501, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

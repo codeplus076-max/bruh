@@ -24,7 +24,7 @@ export function LiveCallOverlay({ isOpen, onClose, language, onTranscription, la
 
     const playResponse = useCallback(async (text: string) => {
         setIsSpeaking(true);
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://bruh-1-u248.onrender.com";
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
         const fallbackToSpeechSynth = () => {
             console.warn("LiveCall: Falling back to Browser Speech Synthesis.");

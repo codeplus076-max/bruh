@@ -1,27 +1,22 @@
 import json
 import os
+from openai import AsyncOpenAI
 from typing import Dict, Any, List
 
-_client = None
-
-def get_openai_client():
-    global _client
-    if _client is not None:
-        return _client
-    from openai import AsyncOpenAI
-    api_key = os.getenv("OPENAI_API_KEY")
-    if api_key and api_key.startswith("sk-or-"):
-        _client = AsyncOpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
-    else:
-        _client = AsyncOpenAI(api_key=api_key) if api_key else None
-    return _client
+openai_api_key = os.getenv("OPENAI_API_KEY")
+if openai_api_key and openai_api_key.startswith("sk-or-"):
+    client = AsyncOpenAI(
+        api_key=openai_api_key,
+        base_url="https://openrouter.ai/api/v1"
+    )
+else:
+    client = AsyncOpenAI(api_key=openai_api_key) if openai_api_key else None
 
 
 async def extract_patient_info(messages: List[Dict[str, str]]) -> Dict[str, Any]:
     """
     Extracts structured patient information from the conversation history using an LLM.
     """
-    client = get_openai_client()
     if not client:
         return _fallback_extraction()
         
@@ -49,10 +44,6 @@ Respond ONLY with a JSON object exactly following this structure:
 }
 """
 
-    client = get_openai_client()
-    if not client:
-        return "Summary generation unavailable (Missing API Key)"
-        
     try:
         response = await client.chat.completions.create(
             model=model_name,

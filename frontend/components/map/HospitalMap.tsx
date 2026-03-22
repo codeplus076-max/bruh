@@ -165,7 +165,7 @@ export function HospitalMap({ t }: { t: Translations }) {
         setLocationStatus("fetching_hospitals");
         setLoading(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bruh-1-u248.onrender.com";
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
             const res = await fetch(`${apiUrl}/hospitals/nearby?lat=${latitude}&lng=${longitude}`);
             if (!res.ok) throw new Error("api_error");
             const data = await res.json();
@@ -254,9 +254,9 @@ export function HospitalMap({ t }: { t: Translations }) {
                 setLocationStatus("idle");
             },
             {
-                enableHighAccuracy: false, // Much faster, sufficient for hospital radius search
+                enableHighAccuracy: true,
                 timeout: 10_000,
-                maximumAge: 60_000 // Cache GPS lock for 1 minute
+                maximumAge: 0
             }
         );
     }, [isNativeApp, fetchHospitals, t.hospitalNoAccess]);

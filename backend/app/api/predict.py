@@ -1,40 +1,27 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import os
 import json
-# from openai import AsyncOpenAI  # Moved to lazy loader in get_openai_client()
+from openai import AsyncOpenAI
 import asyncio
-import traceback
 from functools import lru_cache
 from app.ml.predictor import DiseasePredictor
-from app.triage.risk_engine import evaluate_patient_risk
-from app.guidance.guidance_engine import generate_guidance
 
 router = APIRouter(prefix="", tags=["predict"])
 
-# Initialize Predictor
+# Always load from the ml/ directory relative to this file's location — works on Render and locally
 predictor = DiseasePredictor()
 
-# Lazy client initialization to save boot RAM
-_client = None
-
-def get_openai_client():
-    global _client
-    if _client is not None:
-        return _client
-    
-    from openai import AsyncOpenAI
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("WARNING: OPENAI_API_KEY missing. Triage will use fallback model.")
-        return None
-        
-    if api_key.startswith("sk-or-"):
-        _client = AsyncOpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
-    else:
-        _client = AsyncOpenAI(api_key=api_key)
-    return _client
+# Initialize OpenAI-compatible client
+openai_api_key = os.getenv("OPENAI_API_KEY")
+if openai_api_key and openai_api_key.startswith("sk-or-"):
+    client = AsyncOpenAI(
+        api_key=openai_api_key,
+        base_url="https://openrouter.ai/api/v1"
+    )
+else:
+    client = AsyncOpenAI(api_key=openai_api_key) if openai_api_key else None
 
 @lru_cache(maxsize=64)
 def get_cached_prediction_metadata(age: int, gender: int, severity: int, duration: float, symptoms: str):
@@ -47,8 +34,6 @@ def get_cached_prediction(age: int, gender: int, severity: int, duration: float)
     return predictor.predict(
         age=age, gender=gender, severity=severity, duration=duration
     )
-
-# --- Pydantic Models ---
 
 class PredictRequest(BaseModel):
     Age: int
@@ -87,8 +72,7 @@ class ChatResponse(BaseModel):
     content: str
     diagnosis: Optional[Dict[str, Any]] = None
 
-# --- OpenAI Tools ---
-
+# Module-level tools list
 tools = [
     {
         "type": "function",
@@ -109,6 +93,7 @@ tools = [
                     "associated_symptoms": {"type": "string", "description": "Secondary symptoms reported during follow-up."},
                     "is_injury": {"type": "boolean"},
                     "injury_type": {"type": "string"},
+                    # Granular Symptom Flags for ML precision
                     "chest_pain": {"type": "boolean"},
                     "breathlessness": {"type": "boolean"},
                     "fever": {"type": "boolean"},
@@ -130,13 +115,9 @@ tools = [
     }
 ]
 
-# --- Endpoints ---
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
-    start_time = asyncio.get_event_loop().time()
-    print(f"DEBUG: Incoming /chat request from language={request.language}")
-    
     if not client:
         raise HTTPException(status_code=500, detail="OpenAI API key not configured")
         
@@ -147,50 +128,42 @@ RULES:
 3. TRIGGER: Call `analyze_symptoms` immediately once symptoms are known.
 Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe)."""
 
-    # Latency Optimization: Truncate history to last 8 messages to reduce token count
-    chat_history = request.messages[-8:] if len(request.messages) > 8 else request.messages
-    
     messages = [{"role": "system", "content": system_prompt}]
-    for msg in chat_history:
+    for msg in request.messages:
         messages.append({"role": msg.role, "content": msg.content})
         
-    client = get_openai_client()
-    if not client:
-        return {"error": "AI service unavailable"}
-        
+    
     try:
+        # Use gpt-4o-mini for better tool precision if available, fallback to 3.5
         model_name = "gpt-4o-mini" if not os.getenv("OPENAI_API_KEY", "").startswith("sk-") or "openrouter" in str(client.base_url) else "gpt-3.5-turbo"
         
-        print(f"DEBUG: Calling OpenAI ({model_name}) for tool/response...")
-        response = await asyncio.wait_for(client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model_name,
             messages=messages,
             tools=tools,
             tool_choice="auto",
             max_tokens=600
-        ), timeout=25.0)
+        )
         
         response_message = response.choices[0].message
-        print(f"DEBUG: OpenAI response received in {asyncio.get_event_loop().time() - start_time:.2f}s")
         
         if response_message.tool_calls:
             tool_call = response_message.tool_calls[0]
             if tool_call.function.name == "analyze_symptoms":
-                print(f"DEBUG: Tool call detected: {tool_call.function.name}")
                 args = json.loads(tool_call.function.arguments)
                 
                 # 1. Prediction Mapping & ML Logic
-                step_start = asyncio.get_event_loop().time()
                 if args.get("is_injury"):
+                    injury_type = args.get("injury_type", "Injury")
                     ml_result = {
-                        "disease": f"Physical Injury ({args.get('injury_type', 'General')})",
+                        "disease": f"Physical Injury ({injury_type})",
                         "confidence": "High",
                         "confidence_score": 1.0,
                         "matched_symptoms": ["injury"]
                     }
                 else:
                     try:
-                        print("DEBUG: Logic - Starting ML Inference...")
+                        # Use the demographics from the request payload
                         ml_result = await asyncio.to_thread(
                             get_cached_prediction_metadata,
                             request.age,
@@ -199,28 +172,35 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                             args.get("duration_days", 1.0),
                             args.get("clinical_symptoms", "")
                         )
-                        print(f"DEBUG: ML Inference took {asyncio.get_event_loop().time() - step_start:.2f}s")
                     except Exception as e:
-                        print(f"ERROR: ML Model failed: {e}")
-                        traceback.print_exc()
-                        ml_result = {"disease": "Analysis Error", "confidence": "Low", "confidence_score": 0.0, "matched_symptoms": []}
+                        print(f"ML Model failed: {e}")
+                        ml_result = {
+                            "disease": "System Error (ML Failed)",
+                            "confidence": "Low",
+                            "confidence_score": 0.0,
+                            "matched_symptoms": []
+                        }
 
                 disease = ml_result["disease"]
-                print(f"DEBUG: Diagnosis: {disease}")
+                
+                # Debug Logging
+                print(f"--- ML DIAGNOSIS DEBUG ---")
+                print(f"Inputs: Age={args.get('age')}, Gender={args.get('gender')}, Clinical={args.get('clinical_symptoms')}")
+                print(f"Mapped Symptoms: {ml_result['matched_symptoms']}")
+                print(f"Prediction: {disease} (Conf: {ml_result['confidence']}, Score: {ml_result['confidence_score']})")
                 
                 # 2. Risk & Guidance Engine
-                step_start = asyncio.get_event_loop().time()
-                print("DEBUG: Logic - Starting Risk Assessment...")
+                from app.triage.risk_engine import evaluate_patient_risk
+                from app.guidance.guidance_engine import generate_guidance
+                
                 risk_assessment = evaluate_patient_risk(
                     age=request.age,
                     base_severity=args.get("severity", 1),
                     symptoms=args,
                     ml_disease=disease
                 )
-                print(f"DEBUG: Risk Assessment took {asyncio.get_event_loop().time() - step_start:.2f}s")
                 
-                step_start = asyncio.get_event_loop().time()
-                print("DEBUG: Logic - Starting Guidance Generation...")
+                # Guidance symptoms list: Combine tools + mapped symptoms + disease
                 symptoms_list = [str(k) for k, v in args.items() if v is True and k not in ["is_injury", "gender", "age", "severity", "duration_days"]]
                 symptoms_list += ml_result["matched_symptoms"]
                 symptoms_list += [disease]
@@ -233,7 +213,6 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                     risk_level=risk_assessment["risk_level"],
                     urgency=risk_assessment["urgency"]
                 )
-                print(f"DEBUG: Guidance Generation took {asyncio.get_event_loop().time() - step_start:.2f}s")
                     
                 diagnosis_data = {
                     "disease": disease,
@@ -242,12 +221,12 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                     "clinical_symptoms": args.get("clinical_symptoms", "None reported"),
                     "is_injury": args.get("is_injury", False),
                     "risk_level": risk_assessment["risk_level"],
-                    "risk_score": risk_assessment.get("calculated_severity_score", 0),
+                    "risk_score": risk_assessment.get("risk_score", 0), # Added risk score
                     "urgency": risk_assessment["urgency"],
                     "confidence": ml_result["confidence"],
                     "confidence_score": ml_result["confidence_score"],
                     "matched_symptoms": ml_result["matched_symptoms"],
-                    "important_features": ml_result["matched_symptoms"],
+                    "important_features": ml_result["matched_symptoms"], # Explicitly map important features
                     "first_aid": guidance["first_aid"],
                     "home_remedies": guidance["home_remedies"],
                     "routine": guidance["routine"],
@@ -260,69 +239,141 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                     "emergency": risk_assessment["emergency"]
                 }
                 
-                # 3. Final OpenAI Call
-                messages.append({"role": "assistant", "content": None, "tool_calls": [{"id": tool_call.id, "type": "function", "function": {"name": "analyze_symptoms", "arguments": tool_call.function.arguments}}]})
-                messages.append({"role": "tool", "tool_call_id": tool_call.id, "name": "analyze_symptoms", "content": json.dumps(diagnosis_data)})
-                messages.append({"role": "system", "content": "FINAL STEP: Empathize, list the diagnosis, and provide the exact guidance from the tool. Be concise."})
+                # Send the function result back to OpenAI to generate a final response
+                # CRITICAL: We instruct the AI to provide guidance IMMEDIATELY.
+                messages.append({
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": tool_call.id,
+                            "type": "function",
+                            "function": {
+                                "name": "analyze_symptoms",
+                                "arguments": tool_call.function.arguments
+                            }
+                        }
+                    ]
+                })
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "name": "analyze_symptoms",
+                    "content": json.dumps(diagnosis_data)
+                })
                 
-                print("DEBUG: Calling OpenAI (Final) for diagnosis summary...")
-                step_start = asyncio.get_event_loop().time()
-                final_response = await asyncio.wait_for(client.chat.completions.create(
+                # Enhanced Instruction for proactive guidance
+                messages.append({
+                    "role": "system", 
+                    "content": """
+                    PROACTIVE GUIDANCE ENFORCEMENT:
+                    1. State the diagnosis clearly and empathetically.
+                    2. IMMEDIATELY provide the essential First Aid, Home Remedies, and Recovery Routine from the tool output.
+                    3. Do NOT wait for the patient to ask for these. 
+                    4. Keep instructions clear, bulleted, and in the user's language.
+                    """
+                })
+                
+                # Ensure generation is fast with minimal tokens
+                final_response = await client.chat.completions.create(
                     model=model_name,
                     messages=messages,
-                    max_tokens=400
-                ), timeout=25.0)
-                print(f"DEBUG: Final OpenAI call took {asyncio.get_event_loop().time() - step_start:.2f}s")
+                    max_tokens=350
+                )
                 
                 return ChatResponse(
                     role="assistant",
                     content=final_response.choices[0].message.content,
                     diagnosis=diagnosis_data
                 )
+                
+        # If no function call, just return the AI's standard conversational text
+        return ChatResponse(
+            role="assistant",
+            content=response_message.content
+        )
         
-        return ChatResponse(role="assistant", content=response_message.content)
-        
-    except asyncio.TimeoutError:
-        print("ERROR: OpenAI Request timed out (>25s)")
-        raise HTTPException(status_code=504, detail="AI Service Timeout")
     except Exception as e:
-        print(f"ERROR: Chat endpoint failed: {str(e)}")
-        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/debug-model")
+def debug_model():
+    """Debug endpoint to check model loading status on the server."""
+    import os as _os
+    from app.ml.predictor import DiseasePredictor as _DP
+    ml_dir = _os.path.dirname(_os.path.abspath(_DP.__init__.__code__.co_filename))
+    model_path = _os.path.join(ml_dir, "triage_model.joblib")
+    meta_path = _os.path.join(ml_dir, "model_meta.joblib")
+    return {
+        "ml_dir": ml_dir,
+        "model_exists": _os.path.exists(model_path),
+        "meta_exists": _os.path.exists(meta_path),
+        "model_loaded": predictor._model is not None,
+        "cwd": _os.getcwd()
+    }
+
 @router.post("/predict", response_model=PredictResponse)
-async def predict_endpoint(request: PredictRequest):
+async def predict_disease(request: PredictRequest):
     try:
-        ml_result = await asyncio.to_thread(
-            get_cached_prediction,
-            request.Age,
-            request.Gender,
-            request.Severity,
-            request.Duration_Min_Days
-        )
-        disease = ml_result["disease"]
+        try:
+            prediction_result = await asyncio.to_thread(
+                get_cached_prediction,
+                request.Age,
+                request.Gender,
+                request.Severity,
+                request.Duration_Min_Days
+            )
+            disease = prediction_result.get("condition", "Unknown")
+            risk_score = prediction_result.get("risk_score", 0)
+            important_features = prediction_result.get("important_features", [])
+        except Exception as e:
+            print(f"ML Model failed: {e}. Falling back to mock prediction.")
+            disease = "Mock Disease (Model Not Loaded)"
+            risk_score = 0
+            important_features = []
+        
+        # Run the new Clinical Triage risk engine
+        from app.triage.risk_engine import evaluate_patient_risk
+        
+        # In the simple /predict endpoint we synthesize a symptoms dict from the body 
+        # (Though we recommend callers use the /chat or send more details)
+        symptoms = {
+            "duration_days": request.Duration_Min_Days
+        }
+        
         risk_assessment = evaluate_patient_risk(
             age=request.Age,
             base_severity=request.Severity,
-            symptoms={},
+            symptoms=symptoms,
             ml_disease=disease
         )
-        return PredictResponse(
-            predictions=[{"disease": disease, "confidence": ml_result["confidence"]}],
+        
+        from app.guidance.guidance_engine import generate_guidance
+        
+        guidance = generate_guidance(
+            symptoms=[disease],
+            disease=disease,
+            age=request.Age,
+            severity_score=request.Severity,
             risk_level=risk_assessment["risk_level"],
-            risk_score=int(risk_assessment.get("calculated_severity_score", 0)),
-            important_features=[],
+            urgency=risk_assessment["urgency"]
+        )
+            
+        return PredictResponse(
+            predictions=[{"disease": disease, "probability": prediction_result.get("confidence", 0.5)}],
+            risk_level=risk_assessment["risk_level"],
+            risk_score=risk_score,
+            important_features=important_features,
             urgency=risk_assessment["urgency"],
-            confidence=ml_result["confidence"],
-            first_aid=[],
-            home_remedies=[],
-            routine=[],
-            medicines=[],
-            warnings=[],
-            when_to_seek_care=[],
-            explanation=[risk_assessment["explanation"]],
+            confidence=risk_assessment["confidence"],
+            first_aid=guidance["first_aid"],
+            home_remedies=guidance["home_remedies"],
+            routine=guidance["routine"],
+            medicines=guidance["medicines"],
+            warnings=guidance["warnings"],
+            when_to_seek_care=guidance["when_to_seek_care"],
+            explanation=risk_assessment["explanation"],
             emergency=risk_assessment["emergency"]
         )
     except Exception as e:
-        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

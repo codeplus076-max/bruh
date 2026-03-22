@@ -38,7 +38,7 @@ interface Diagnosis {
 
 type Message = { role: "assistant" | "user"; content: string; diagnosis?: Diagnosis };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://bruh-1-u248.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function ChatInterface({ input, setInput }: { input: string, setInput: (v: string) => void }) {
     const { lang, t } = useLanguage();
@@ -198,23 +198,22 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
 
             setMessages(finalMessages);
 
-            // Auto-save session to backend (Fire-and-forget so it doesn't block voice/UI latency)
+            // Auto-save session to backend
             if (user) {
-                user.getIdToken().then(token => {
-                    fetch(`${API_URL}/sessions/save`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            sessionId: currentSessionId,
-                            messages: finalMessages,
-                            language: lang,
-                            risk_level: data.diagnosis?.risk_level || "Normal"
-                        }),
-                    }).catch(e => console.error("Session save error:", e));
-                }).catch(e => console.error("Auth error:", e));
+                const token = await user.getIdToken();
+                await fetch(`${API_URL}/sessions/save`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        sessionId: currentSessionId,
+                        messages: finalMessages,
+                        language: lang,
+                        risk_level: data.diagnosis?.risk_level || "Normal"
+                    }),
+                });
 
                 // Update local context with the session ID if it was new
                 if (!sessionId) {

@@ -1,9 +1,9 @@
 import re
-from functools import lru_cache
 
 class SymptomMapper:
     """
     Normalizes user-described symptoms into canonical feature names used by the ML model.
+    Supports synonyms, variations, and multilingual markers.
     """
     
     # Mapping of user terms (keys) to model feature names (values)
@@ -77,14 +77,18 @@ class SymptomMapper:
         "dizziness": "dizziness",
         "fainting": "dizziness",
         "lightheaded": "dizziness",
+        # Expanded mapping with 25+ features
         "spinning head": "dizziness",
         "chakkar": "dizziness",
         "head heaviness": "headache",
         "burning eyes": "fever",
+        "loose motion": "diarrhea",
         "stomach upset": "abdominal_pain",
         "chest tightness": "chest_pain",
         "heart pounding": "chest_pain",
         "breath problem": "breathlessness",
+        "khansi": "cough",
+        "kamzori": "fatigue",
         "sust": "fatigue",
         "sharir dard": "fatigue",
         "numbness": "dizziness",
@@ -117,22 +121,20 @@ class SymptomMapper:
     }
 
     @staticmethod
-    @lru_cache(maxsize=128)
     def extract_features(text: str) -> dict:
         """
         Parses free text and returns a dictionary of indicators (True/False).
-        Uses lru_cache for high-performance repeated lookups.
         """
-        if not text:
-            return {}
-            
         text = text.lower()
         found_features = {}
         
-        # Optimized mapping loop with membership check before regex
         for term, feature in SymptomMapper.SYMPTOM_MAP.items():
-            if term in text:
-                if re.search(rf"\b{term}\b", text):
-                    found_features[feature] = True
-                    
+            if re.search(rf"\b{term}\b", text):
+                found_features[feature] = True
+                
         return found_features
+
+    @staticmethod
+    def get_canonical_name(term: str) -> str:
+        """Returns the model feature name for a given term, or None."""
+        return SymptomMapper.SYMPTOM_MAP.get(term.lower())
