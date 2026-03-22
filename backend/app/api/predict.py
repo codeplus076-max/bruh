@@ -13,7 +13,7 @@ from app.guidance.guidance_engine import generate_guidance
 
 router = APIRouter(prefix="", tags=["predict"])
 
-# Always load from the ml/ directory relative to this file's location
+# Initialize Predictor
 predictor = DiseasePredictor()
 
 # Initialize OpenAI-compatible client
@@ -32,6 +32,36 @@ def get_cached_prediction_metadata(age: int, gender: int, severity: int, duratio
         age=age, gender=gender, severity=severity, duration=duration, clinical_symptoms=symptoms
     )
 
+@lru_cache(maxsize=64)
+def get_cached_prediction(age: int, gender: int, severity: int, duration: float):
+    return predictor.predict(
+        age=age, gender=gender, severity=severity, duration=duration
+    )
+
+# --- Pydantic Models ---
+
+class PredictRequest(BaseModel):
+    Age: int
+    Gender: int
+    Severity: int
+    Duration_Min_Days: float
+
+class PredictResponse(BaseModel):
+    predictions: List[Dict[str, Any]] = []
+    risk_level: str
+    risk_score: int
+    important_features: List[str]
+    urgency: str
+    confidence: str
+    first_aid: List[str]
+    home_remedies: List[str]
+    routine: List[str]
+    medicines: List[Dict[str, str]]
+    warnings: List[str]
+    when_to_seek_care: List[str]
+    explanation: List[str]
+    emergency: bool
+
 class ChatMessage(BaseModel):
     role: str
     content: str
@@ -47,7 +77,8 @@ class ChatResponse(BaseModel):
     content: str
     diagnosis: Optional[Dict[str, Any]] = None
 
-# Module-level tools list
+# --- OpenAI Tools ---
+
 tools = [
     {
         "type": "function",
@@ -88,6 +119,8 @@ tools = [
         }
     }
 ]
+
+# --- Endpoints ---
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
@@ -260,7 +293,7 @@ async def predict_endpoint(request: PredictRequest):
         return PredictResponse(
             predictions=[{"disease": disease, "confidence": ml_result["confidence"]}],
             risk_level=risk_assessment["risk_level"],
-            risk_score=int(risk_assessment["calculated_severity_score"]),
+            risk_score=int(risk_assessment.get("calculated_severity_score", 0)),
             important_features=[],
             urgency=risk_assessment["urgency"],
             confidence=ml_result["confidence"],
