@@ -39,6 +39,16 @@ else:
 def read_root():
     return {"message": "Welcome to UPCHAAR AI Backend!", "health_check": "/health"}
 
+@app.get("/verify-env")
+def verify_env():
+    """Verify that essential secrets are set without exposing them."""
+    return {
+        "openai_key_present": bool(os.getenv("OPENAI_API_KEY")),
+        "maps_key_present": bool(os.getenv("MAPS_API_KEY")),
+        "firebase_auth_present": bool(os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")),
+        "allowed_origins": os.getenv("ALLOWED_ORIGINS", "*")
+    }
+
 # Add GZip compression only for large JSON payloads (hospital lists etc)
 # minimum_size raised to 2000 bytes - avoids compressing small chat/summary responses
 app.add_middleware(GZipMiddleware, minimum_size=2000, compresslevel=3)
