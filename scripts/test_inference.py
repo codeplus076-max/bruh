@@ -1,17 +1,22 @@
 import os
 import sys
+from dotenv import load_dotenv
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend')))
+# Add the project root to the python path to allow importing backend module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.ml.predictor import DiseasePredictor
+load_dotenv('backend/.env')
+
+from backend.app.ml.predictor import DiseasePredictor
 
 def test_inference():
     print("Testing ML Inference Engine Integration...")
     
     predictor = DiseasePredictor()
+    predictor.load_model()
     
     if not predictor.is_loaded:
-        print("Model failed to load. Ensure triage_model_v2.joblib exists.")
+        print("Model (Gemini API) failed to load. Ensure GEMINI_API_KEY is set.")
         return
         
     print("Model loaded successfully.")

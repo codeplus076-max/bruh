@@ -1,209 +1,192 @@
 import os
-import joblib
-import numpy as np
+import json
+import re
+import requests
 from .symptom_mapper import SymptomMapper
 from .risk_engine import calculate_risk
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Gemini-powered Disease Predictor (REST API Version)
+# The XGBoost model files (triage_model_v2.json / model_meta_v2.joblib) are
+# preserved on disk but are NOT loaded during inference.
+# All disease prediction is now handled by the Gemini REST API.
+# ─────────────────────────────────────────────────────────────────────────────
+
+GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+
+PREDICTION_PROMPT = """\
+You are a precise medical AI trained to identify likely diseases from patient data.
+Given the following patient information, identify the SINGLE most likely disease/condition.
+
+Patient Data:
+- Age: {age}
+- Gender: {gender}
+- Symptom Severity (1=mild, 2=moderate, 3=severe): {severity}
+- Duration (days): {duration}
+- Reported Symptoms: {symptoms}
+
+Return ONLY a valid JSON object with no markdown formatting, no code blocks, no extra text:
+{{
+  "condition": "<Most likely disease name, be specific>",
+  "confidence": <float 0.0 to 1.0>,
+  "key_symptoms": ["<symptom1>", "<symptom2>", "<symptom3>"]
+}}
+
+Rules:
+- condition must be a real medical disease name (e.g. "Migraine", "Common Cold", "Type 2 Diabetes")
+- confidence reflects how certain you are (0.9+ = very certain, 0.6-0.9 = likely, below 0.6 = uncertain)
+- key_symptoms lists the 2-3 symptoms that most influenced the diagnosis
+"""
+
 class DiseasePredictor:
     """
-    Singleton AI Disease Predictor. Uses a class-level instance state to ensure 
-    the model weights are only loaded into RAM exactly once per worker process.
+    Singleton Disease Predictor powered by Google Gemini REST API.
+    The local XGBoost model files are preserved on disk but not used for inference.
     """
     _instance = None
-    _model = None
-    _meta = None
 
     def __new__(cls, model_dir: str = None):
         if cls._instance is None:
             cls._instance = super(DiseasePredictor, cls).__new__(cls)
-            base_dir = model_dir or os.path.dirname(os.path.abspath(__file__))
-            # Support both .joblib (sklearn) and .json (XGBoost native) model files
-            joblib_path = os.path.join(base_dir, "triage_model_v2.joblib")
-            json_path = os.path.join(base_dir, "triage_model_v2.json")
-            if os.path.exists(joblib_path):
-                cls._instance.model_path = joblib_path
-                cls._instance.model_format = "joblib"
-            elif os.path.exists(json_path):
-                cls._instance.model_path = json_path
-                cls._instance.model_format = "xgb_json"
-            else:
-                cls._instance.model_path = joblib_path  # Will fail gracefully
-                cls._instance.model_format = "joblib"
-            cls._instance.meta_path = os.path.join(base_dir, "model_meta_v2.joblib")
-            # DELIBERATE LAZY LOADING: Do not load the model here to prevent Render 512MB RAM OOM on Uvicorn Boot.
+            cls._instance._api_key = None
+            cls._instance._initialized = False
         return cls._instance
 
-    def load_model(self):
-        # Prevent reloading if already in memory
-        if self._model is not None and self._meta is not None:
+    def _init_client(self):
+        if self._initialized:
             return
-
-        print(f"Loading ML Model from disk into memory: {self.model_path} (format: {self.model_format})")
-        if os.path.exists(self.model_path) and os.path.exists(self.meta_path):
-            if self.model_format == "xgb_json":
-                try:
-                    import xgboost as xgb
-                    booster = xgb.Booster()
-                    booster.load_model(self.model_path)
-                    self.__class__._model = booster
-                    print("Successfully loaded XGBoost model from JSON format.")
-                except Exception as e:
-                    print(f"XGBoost JSON load failed: {e}. Falling back to joblib.")
-                    self.__class__._model = None
-            else:
-                try:
-                    # Use mmap_mode='r' to prevent loading the entire payload into active RAM
-                    self.__class__._model = joblib.load(self.model_path, mmap_mode='r')
-                    print("Successfully loaded model from joblib format.")
-                except Exception as e:
-                    print(f"Joblib model load failed: {e}")
-                    self.__class__._model = None
-            
-            try:
-                self.__class__._meta = joblib.load(self.meta_path, mmap_mode='r')
-                print("Successfully loaded model metadata.")
-            except Exception as e:
-                print(f"Metadata load failed: {e}")
-                self.__class__._meta = None
+        
+        self._api_key = os.getenv("GEMINI_API_KEY")
+        if self._api_key:
+            print(f"Gemini REST predictor initialized with model: {GEMINI_MODEL}")
         else:
-            missing = []
-            if not os.path.exists(self.model_path):
-                missing.append(self.model_path)
-            if not os.path.exists(self.meta_path):
-                missing.append(self.meta_path)
-            print(f"Warning: Model files not found: {missing}. Using mock predictions.")
-            self.__class__._model = None
-            self.__class__._meta = None
+            print("Warning: GEMINI_API_KEY not set. Predictions will use fallback mock.")
+        self._initialized = True
 
-    def predict(self, age: int, gender: int, severity: int, duration: float, clinical_symptoms: str = "") -> dict:
-        """
-        Predicts disease with medical confidence scoring, risk engine integration,
-        and precise standardized JSON-like output schemas.
-        """
-        # Lazy load strictly at inference time
-        if not self.is_loaded:
-            self.load_model()
+    def load_model(self):
+        """No-op. Gemini predictor has no local model to load."""
+        self._init_client()
 
-        if not self._model or not self._meta:
+    @property
+    def is_loaded(self) -> bool:
+        """Returns True if Gemini API key is configured."""
+        if not self._initialized:
+            self._init_client()
+        return bool(self._api_key)
+
+    def predict(self, age: int, gender: int, severity: int, duration: float,
+                clinical_symptoms: str = "") -> dict:
+        """
+        Predicts disease using Gemini REST API.
+        Returns the same schema as the old XGBoost predictor so all downstream
+        code works without changes.
+        """
+        if not self._initialized:
+            self._init_client()
+
+        condition = "Unknown Condition"
+        confidence_score = 0.0
+        important_features = []
+
+        # Map symptom text → feature flags (kept for risk engine compatibility)
+        mapped_features = SymptomMapper.extract_features(clinical_symptoms)
+
+        if self._api_key:
+            gender_str = "Male" if gender == 1 else "Female"
+            symptom_text = clinical_symptoms.strip() or ", ".join(mapped_features.keys()) or "None reported"
+
+            prompt = PREDICTION_PROMPT.format(
+                age=age,
+                gender=gender_str,
+                severity=severity,
+                duration=duration,
+                symptoms=symptom_text
+            )
+
+            try:
+                # Gemini REST payload
+                payload = {
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {
+                        "temperature": 0.2,
+                        "maxOutputTokens": 2048
+                    }
+                }
+                
+                resp = requests.post(
+                    f"{GEMINI_API_URL}?key={self._api_key}",
+                    json=payload,
+                    timeout=10
+                )
+                
+                if resp.status_code == 200:
+                    data = resp.json()
+                    # Parse REST API response structure
+                    raw = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                    
+                    # Clean the raw text and extract JSON block
+                    raw = raw.strip()
+                    # Find first '{' and last '}'
+                    start_idx = raw.find('{')
+                    end_idx = raw.rfind('}')
+                    if start_idx != -1 and end_idx != -1 and end_idx >= start_idx:
+                        raw = raw[start_idx:end_idx+1]
+                    else:
+                        raise ValueError("No JSON object '{...}' found in response.")
+
+                    parsed = json.loads(raw)
+                    condition = parsed.get("condition", "Unknown Condition")
+                    confidence_score = float(parsed.get("confidence", 0.5))
+                    important_features = parsed.get("key_symptoms", [])
+                    print(f"[Gemini] Predicted: {condition} (conf={confidence_score:.2f})")
+                else:
+                    print(f"[Gemini] REST API error {resp.status_code}: {resp.text}")
+                    condition = "Prediction API Error"
+                    confidence_score = 0.0
+
+            except json.JSONDecodeError as e:
+                print(f"[Gemini] JSON parse error: {e}")
+                condition = "Prediction Parse Error"
+                confidence_score = 0.3
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(f"[Gemini] Prediction error: {e}")
+                condition = "Prediction Service Error"
+                confidence_score = 0.0
+        else:
             return {
-                "condition": "Mock Disease (Model Not Loaded)",
+                "condition": "Mock Disease (Gemini Not Configured)",
                 "confidence": 0.0,
                 "risk_level": "Low",
                 "risk_score": 0,
                 "important_features": []
             }
 
-        # 1. Map text symptoms to feature flags
-        mapped_features = SymptomMapper.extract_features(clinical_symptoms)
-        
-        # 2. Build input dictionary
-        input_dict = {
-            'Age': age,
-            'Gender': gender,
-            'Severity': severity,
-            'Duration_Min_Days': duration
-        }
-        input_dict.update(mapped_features)
-        
-        # 3. Create Numpy Array for inference (Bypass Pandas to conserve ~50MB RAM)
-        features = self._meta.get('features', [])
-        row = {f: input_dict.get(f, 0) for f in features}
-        
-        # XGBoost expects a 2D array if Pandas is excluded
-        X_infer = np.array([[row[f] for f in features]])
-        
-        # 4. Perform Inference
-        disease_label = "Unknown Disease"
-        confidence_score = 0.0
-        
-        try:
-            import xgboost as xgb
-            is_booster = isinstance(self._model, xgb.Booster)
-
-            if is_booster:
-                # XGBoost Booster path
-                classes = self._meta.get('classes', [])
-                dmatrix = xgb.DMatrix(X_infer, feature_names=features)
-                probas = self._model.predict(dmatrix)
-                # predict() on booster returns raw margin or probability matrix depending on objective
-                if probas.ndim == 2:
-                    max_idx = int(np.argmax(probas[0]))
-                    confidence_score = float(probas[0][max_idx])
-                else:
-                    # Binary classification fallback
-                    max_idx = int(round(probas[0]))
-                    confidence_score = float(probas[0]) if max_idx == 1 else 1.0 - float(probas[0])
-                if 0 <= max_idx < len(classes):
-                    disease_label = str(classes[max_idx])
-            elif hasattr(self._model, "predict_proba"):
-                # Sklearn-compatible path
-                probas = self._model.predict_proba(X_infer)[0]
-                max_idx = int(np.argmax(probas))
-                confidence_score = float(probas[max_idx])
-                classes = self._meta.get('classes', [])
-                if 0 <= max_idx < len(classes):
-                    disease_label = str(classes[max_idx])
-            else:
-                # Fallback to direct prediction
-                disease_label = str(self._model.predict(X_infer)[0])
-                confidence_score = 0.5
-        except Exception as e:
-            print(f"Prediction error: {e}")
-            disease_label = "Error in Prediction"
-
-        # 5. Calculate Medical Confidence & Explainability
-        important_features = []
-        try:
-            import xgboost as xgb
-            if isinstance(self._model, xgb.Booster):
-                scores = self._model.get_score(importance_type='gain')
-                fi = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-                for feat, _ in fi:
-                    if row.get(feat, 0) > 0 and feat not in ['Age', 'Gender', 'Severity', 'Duration_Min_Days']:
-                        important_features.append(feat)
-                    if len(important_features) >= 3:
-                        break
-            elif hasattr(self._model, 'feature_importances_'):
-                importances = self._model.feature_importances_
-                fi = list(zip(features, importances))
-                fi.sort(key=lambda x: x[1], reverse=True)
-                for feat, imp in fi:
-                    if row.get(feat, 0) > 0 and feat not in ['Age', 'Gender', 'Severity', 'Duration_Min_Days']:
-                        important_features.append(feat)
-                    if len(important_features) >= 3:
-                        break
-        except Exception as e:
-            print(f"Feature importance error: {e}")
-            
-        # 6. Comprehensive Risk Engine Logic
+        # ── Risk engine (unchanged) ────────────────────────────────────────────
         risk_level, risk_score = calculate_risk(
-            prediction=disease_label, 
-            confidence=confidence_score, 
-            severity=severity, 
-            duration_days=duration, 
+            prediction=condition,
+            confidence=confidence_score,
+            severity=severity,
+            duration_days=duration,
             symptoms=list(mapped_features.keys())
         )
 
         return {
-            "condition": disease_label,
+            "condition": condition,
             "confidence": round(confidence_score, 2),
             "risk_level": risk_level,
             "risk_score": risk_score,
             "important_features": important_features
         }
 
-    # Backward compatibility method if needed
     def predict_with_metadata(self, *args, **kwargs) -> dict:
+        """Backward-compatible wrapper used by the /chat endpoint."""
         res = self.predict(*args, **kwargs)
-        # Adapt new schema to old schema just in case something internally relies on it
         return {
             "disease": res["condition"],
             "confidence": "High" if res["confidence"] > 0.7 else "Moderate" if res["confidence"] > 0.4 else "Low",
             "confidence_score": res["confidence"],
             "matched_symptoms": res["important_features"]
         }
-
-    @property
-    def is_loaded(self) -> bool:
-        """Returns True if the ML payload has successfully initialized into RAM."""
-        return self._model is not None and self._meta is not None
