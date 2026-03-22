@@ -16,14 +16,20 @@ class DiseasePredictor:
     def __new__(cls, model_dir: str = None):
         if cls._instance is None:
             cls._instance = super(DiseasePredictor, cls).__new__(cls)
-            cls._instance.model_path = os.path.join(
-                model_dir or os.path.dirname(os.path.abspath(__file__)), 
-                "triage_model_v2.joblib"
-            )
-            cls._instance.meta_path = os.path.join(
-                model_dir or os.path.dirname(os.path.abspath(__file__)), 
-                "model_meta_v2.joblib"
-            )
+            base_dir = model_dir or os.path.dirname(os.path.abspath(__file__))
+            # Support both .joblib (sklearn) and .json (XGBoost native) model files
+            joblib_path = os.path.join(base_dir, "triage_model_v2.joblib")
+            json_path = os.path.join(base_dir, "triage_model_v2.json")
+            if os.path.exists(joblib_path):
+                cls._instance.model_path = joblib_path
+                cls._instance.model_format = "joblib"
+            elif os.path.exists(json_path):
+                cls._instance.model_path = json_path
+                cls._instance.model_format = "xgb_json"
+            else:
+                cls._instance.model_path = joblib_path  # Will fail gracefully
+                cls._instance.model_format = "joblib"
+            cls._instance.meta_path = os.path.join(base_dir, "model_meta_v2.joblib")
             # DELIBERATE LAZY LOADING: Do not load the model here to prevent Render 512MB RAM OOM on Uvicorn Boot.
         return cls._instance
 
@@ -32,14 +38,40 @@ class DiseasePredictor:
         if self._model is not None and self._meta is not None:
             return
 
-        print(f"Loading ML Model from disk into memory (Memory Mapped): {self.model_path}")
+        print(f"Loading ML Model from disk into memory: {self.model_path} (format: {self.model_format})")
         if os.path.exists(self.model_path) and os.path.exists(self.meta_path):
-            # Use mmap_mode='r' to prevent loading the entire payload into active RAM
-            self.__class__._model = joblib.load(self.model_path, mmap_mode='r')
-            self.__class__._meta = joblib.load(self.meta_path, mmap_mode='r')
-            print("Successfully lazy-loaded custom XGBoost model and metadata.")
+            if self.model_format == "xgb_json":
+                try:
+                    import xgboost as xgb
+                    booster = xgb.Booster()
+                    booster.load_model(self.model_path)
+                    self.__class__._model = booster
+                    print("Successfully loaded XGBoost model from JSON format.")
+                except Exception as e:
+                    print(f"XGBoost JSON load failed: {e}. Falling back to joblib.")
+                    self.__class__._model = None
+            else:
+                try:
+                    # Use mmap_mode='r' to prevent loading the entire payload into active RAM
+                    self.__class__._model = joblib.load(self.model_path, mmap_mode='r')
+                    print("Successfully loaded model from joblib format.")
+                except Exception as e:
+                    print(f"Joblib model load failed: {e}")
+                    self.__class__._model = None
+            
+            try:
+                self.__class__._meta = joblib.load(self.meta_path, mmap_mode='r')
+                print("Successfully loaded model metadata.")
+            except Exception as e:
+                print(f"Metadata load failed: {e}")
+                self.__class__._meta = None
         else:
-            print(f"Warning: Model or meta not found in {self.model_path}. Using mock predictions.")
+            missing = []
+            if not os.path.exists(self.model_path):
+                missing.append(self.model_path)
+            if not os.path.exists(self.meta_path):
+                missing.append(self.meta_path)
+            print(f"Warning: Model files not found: {missing}. Using mock predictions.")
             self.__class__._model = None
             self.__class__._meta = None
 
@@ -85,36 +117,63 @@ class DiseasePredictor:
         confidence_score = 0.0
         
         try:
-            # Get probabilities if supported
-            if hasattr(self._model, "predict_proba"):
+            import xgboost as xgb
+            is_booster = isinstance(self._model, xgb.Booster)
+
+            if is_booster:
+                # XGBoost Booster path
+                classes = self._meta.get('classes', [])
+                dmatrix = xgb.DMatrix(X_infer, feature_names=features)
+                probas = self._model.predict(dmatrix)
+                # predict() on booster returns raw margin or probability matrix depending on objective
+                if probas.ndim == 2:
+                    max_idx = int(np.argmax(probas[0]))
+                    confidence_score = float(probas[0][max_idx])
+                else:
+                    # Binary classification fallback
+                    max_idx = int(round(probas[0]))
+                    confidence_score = float(probas[0]) if max_idx == 1 else 1.0 - float(probas[0])
+                if 0 <= max_idx < len(classes):
+                    disease_label = str(classes[max_idx])
+            elif hasattr(self._model, "predict_proba"):
+                # Sklearn-compatible path
                 probas = self._model.predict_proba(X_infer)[0]
-                max_idx = np.argmax(probas)
+                max_idx = int(np.argmax(probas))
                 confidence_score = float(probas[max_idx])
-                
                 classes = self._meta.get('classes', [])
                 if 0 <= max_idx < len(classes):
                     disease_label = str(classes[max_idx])
             else:
                 # Fallback to direct prediction
                 disease_label = str(self._model.predict(X_infer)[0])
-                confidence_score = 0.5 # Default for non-probabilistic models
+                confidence_score = 0.5
         except Exception as e:
             print(f"Prediction error: {e}")
             disease_label = "Error in Prediction"
 
         # 5. Calculate Medical Confidence & Explainability
-        # Check matching features for explainability
         important_features = []
-        if hasattr(self._model, 'feature_importances_'):
-            importances = self._model.feature_importances_
-            fi = list(zip(features, importances))
-            fi.sort(key=lambda x: x[1], reverse=True)
-            # Find the top 3 features the user ACTUALLY HAS that drove the prediction
-            for feat, imp in fi:
-                if row.get(feat, 0) > 0 and feat not in ['Age', 'Gender', 'Severity', 'Duration_Min_Days']:
-                    important_features.append(feat)
-                if len(important_features) >= 3:
-                    break
+        try:
+            import xgboost as xgb
+            if isinstance(self._model, xgb.Booster):
+                scores = self._model.get_score(importance_type='gain')
+                fi = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+                for feat, _ in fi:
+                    if row.get(feat, 0) > 0 and feat not in ['Age', 'Gender', 'Severity', 'Duration_Min_Days']:
+                        important_features.append(feat)
+                    if len(important_features) >= 3:
+                        break
+            elif hasattr(self._model, 'feature_importances_'):
+                importances = self._model.feature_importances_
+                fi = list(zip(features, importances))
+                fi.sort(key=lambda x: x[1], reverse=True)
+                for feat, imp in fi:
+                    if row.get(feat, 0) > 0 and feat not in ['Age', 'Gender', 'Severity', 'Duration_Min_Days']:
+                        important_features.append(feat)
+                    if len(important_features) >= 3:
+                        break
+        except Exception as e:
+            print(f"Feature importance error: {e}")
             
         # 6. Comprehensive Risk Engine Logic
         risk_level, risk_score = calculate_risk(

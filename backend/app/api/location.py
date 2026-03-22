@@ -70,27 +70,42 @@ def infer_specialty(types: list, name: str) -> str:
 
 @cached(cache=TTLCache(maxsize=1000, ttl=604800)) # Cache details (phone, etc) for 7 days
 def fetch_place_details(place_id: str) -> dict:
-    """Fetch phone, website, opening hours, rating, and wheelchair info from Google Place Details API."""
+    """Fetch phone, website, opening hours, rating, and wheelchair info via Places API v2."""
     api_key = os.getenv("MAPS_API_KEY")
     if not api_key:
         return {}
     try:
-        url = "https://maps.googleapis.com/maps/api/place/details/json"
-        params = {
-            "place_id": place_id,
-            "fields": (
-                "formatted_phone_number,"
-                "opening_hours,"
-                "website,"
-                "wheelchair_accessible_entrance,"
-                "rating,"
-                "user_ratings_total"
-            ),
-            "key": api_key
+        # Places API v2 - Get Place by ID
+        url = f"https://places.googleapis.com/v1/places/{place_id}"
+        headers = {
+            "X-Goog-Api-Key": api_key,
+            "X-Goog-FieldMask": (
+                "formattedAddress,nationalPhoneNumber,regularOpeningHours,"
+                "websiteUri,accessibilityOptions,rating,userRatingCount"
+            )
         }
-        res = requests.get(url, params=params, timeout=5)
+        res = requests.get(url, headers=headers, timeout=5)
         if res.status_code == 200:
-            return res.json().get("result", {})
+            data = res.json()
+            # Normalize to the field names the rest of the code expects
+            result = {}
+            if "nationalPhoneNumber" in data:
+                result["formatted_phone_number"] = data["nationalPhoneNumber"]
+            if "websiteUri" in data:
+                result["website"] = data["websiteUri"]
+            if "rating" in data:
+                result["rating"] = data["rating"]
+            if "userRatingCount" in data:
+                result["user_ratings_total"] = data["userRatingCount"]
+            if "accessibilityOptions" in data:
+                result["wheelchair_accessible_entrance"] = data["accessibilityOptions"].get("wheelchairAccessibleEntrance")
+            if "regularOpeningHours" in data:
+                oh = data["regularOpeningHours"]
+                result["opening_hours"] = {
+                    "open_now": oh.get("openNow"),
+                    "weekday_text": oh.get("weekdayDescriptions", [])
+                }
+            return result
     except Exception:
         pass
     return {}
@@ -111,30 +126,74 @@ async def get_nearby_hospitals(
 @cached(cache=TTLCache(maxsize=500, ttl=86400))
 def _fetch_hospitals_from_google(rounded_lat: float, rounded_lng: float) -> List[dict]:
     """
-    Internal cached method to fetch the raw data from Google Places.
+    Internal cached method to fetch the raw data from Google Places API v2 (Nearby Search).
     This prevents duplicate identical queries from racking up GCP billing costs.
     """
     api_key = os.getenv("MAPS_API_KEY")
     if not api_key:
         raise ValueError("MAPS_API_KEY not configured")
 
-    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-    params = {
-        "location": f"{rounded_lat},{rounded_lng}",
-        "rankby": "distance",
-        "type": "hospital",
-        "key": api_key
+    # New Places API v2 - Nearby Search (POST)
+    url = "https://places.googleapis.com/v1/places:searchNearby"
+    headers = {
+        "X-Goog-Api-Key": api_key,
+        "X-Goog-FieldMask": (
+            "places.id,places.displayName,places.formattedAddress,"
+            "places.location,places.types,places.rating,places.userRatingCount,"
+            "places.regularOpeningHours,places.nationalPhoneNumber,places.websiteUri,"
+            "places.accessibilityOptions"
+        ),
+        "Content-Type": "application/json"
     }
-    response = requests.get(url, params=params, timeout=10)
+    body = {
+        "includedTypes": ["hospital", "doctor", "health"],
+        "maxResultCount": 10,
+        "locationRestriction": {
+            "circle": {
+                "center": {"latitude": rounded_lat, "longitude": rounded_lng},
+                "radius": 5000.0
+            }
+        },
+        "rankPreference": "DISTANCE"
+    }
+    response = requests.post(url, headers=headers, json=body, timeout=10)
 
     if response.status_code == 200:
         data = response.json()
-        api_status = data.get("status", "UNKNOWN")
-        if api_status not in ("OK", "ZERO_RESULTS"):
-            raise ValueError(f"Google Places API error: {api_status} — {data.get('error_message', 'No details')}")
-        return data.get("results", [])[:10]  # Limit to 10 results
+        raw_places = data.get("places", [])
+        # Normalize new API response to a consistent schema for downstream use
+        normalized = []
+        for p in raw_places:
+            loc = p.get("location", {})
+            name_obj = p.get("displayName", {})
+            oh = p.get("regularOpeningHours", {})
+            normalized.append({
+                "place_id": p.get("id", ""),
+                "name": name_obj.get("text", "Unknown Hospital"),
+                "vicinity": p.get("formattedAddress", "Unknown Address"),
+                "geometry": {"location": {"lat": loc.get("latitude"), "lng": loc.get("longitude")}},
+                "types": p.get("types", []),
+                "rating": p.get("rating"),
+                "user_ratings_total": p.get("userRatingCount"),
+                "opening_hours": {"open_now": oh.get("openNow")} if oh else {},
+                # Pre-populated details to avoid a second round-trip
+                "_details": {
+                    "formatted_phone_number": p.get("nationalPhoneNumber"),
+                    "website": p.get("websiteUri"),
+                    "rating": p.get("rating"),
+                    "user_ratings_total": p.get("userRatingCount"),
+                    "wheelchair_accessible_entrance": (p.get("accessibilityOptions") or {}).get("wheelchairAccessibleEntrance"),
+                    "opening_hours": {
+                        "open_now": oh.get("openNow"),
+                        "weekday_text": oh.get("weekdayDescriptions", [])
+                    } if oh else {}
+                }
+            })
+        return normalized
     else:
-        raise ValueError(f"HTTP Error: {response.status_code}")
+        raise ValueError(f"Google Places API v2 error: HTTP {response.status_code} — {response.text[:200]}")
+
+
 
 async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat: float, orig_lng: float) -> HospitalsListResponse:
     try:
@@ -165,8 +224,8 @@ async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat
             # Google Maps URL for navigation
             maps_url = f"https://www.google.com/maps/place/?q=place_id:{place_id}" if place_id else f"https://www.google.com/maps?q={h_lat},{h_lng}"
 
-            # Fetch detailed info (phone, hours, website, rating, wheelchair)
-            details = fetch_place_details(place_id) if place_id else {}
+            # Use pre-populated details from the new Places API v2 response (embedded in one round-trip)
+            details = place.get("_details") or (fetch_place_details(place_id) if place_id else {})
 
             phone = details.get("formatted_phone_number")
             website = details.get("website")
@@ -199,7 +258,7 @@ async def _get_hospitals_cached(rounded_lat: float, rounded_lng: float, orig_lat
                 elif open_now is False:
                     opening_hours = "Closed now"
 
-            # From nearbysearch result open_now if details didn't have it
+            # Fallback: get open_now from the embedded opening_hours in the place dict
             if open_now is None:
                 nb_hours = place.get("opening_hours", {})
                 if nb_hours:
