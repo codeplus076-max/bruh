@@ -55,15 +55,17 @@ app.add_middleware(GZipMiddleware, minimum_size=2000, compresslevel=3)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    # Log the exact error securely to the console for Render logs
+    # Log the exact error securely to the console for Render logs with traceback
+    import traceback
     print(f"Global Error caught on {request.url.path}: {str(exc)}")
+    traceback.print_exc()
     
     # Return a structured error response that the frontend can parse smoothly
     return JSONResponse(
         status_code=500,
         content={
             "error": "Internal Server Error",
-            "message": "An unexpected error occurred while processing your request. Our team has been notified.",
+            "message": str(exc), # Temporarily expose error for debugging
             "path": request.url.path
         },
     )
