@@ -40,6 +40,10 @@ else:
 def read_root():
     return {"message": "Welcome to UPCHAAR AI Backend!", "health_check": "/health"}
 
+@app.get("/ping")
+def ping():
+    return {"status": "ok", "message": "Backend is reachable!"}
+
 @app.get("/verify-env")
 def verify_env():
     """Verify that essential secrets are set without exposing them."""
