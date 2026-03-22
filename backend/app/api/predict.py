@@ -159,7 +159,14 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                         "disease": f"Physical Injury ({injury_type})",
                         "confidence": "High",
                         "confidence_score": 1.0,
-                        "matched_symptoms": ["injury"]
+                        "matched_symptoms": ["injury"],
+                        "first_aid": ["Apply R.I.C.E: Rest, Ice, Compression, Elevation.", "Clean and cover any open wounds.", "Do not move the affected area if fracture is suspected."],
+                        "home_remedies": ["Use an ice pack for 15-20 minutes every 2 hours."],
+                        "routine": ["Rest and avoid putting weight on the injured area."],
+                        "medicines": [{"name": "Acetaminophen", "purpose": "Pain relief", "guidance": "Take as directed on package.", "warning": "Do not exceed maximum daily dose."}],
+                        "warnings": ["Do not apply heat to a fresh injury."],
+                        "when_to_seek_care": ["Severe pain, obvious deformity, bone protruding, or inability to move the limb."],
+                        "explanation": ["Based on your reported physical injury, standard first aid applies."]
                     }
                 else:
                     try:
@@ -178,7 +185,8 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                             "disease": "System Error (ML Failed)",
                             "confidence": "Low",
                             "confidence_score": 0.0,
-                            "matched_symptoms": []
+                            "matched_symptoms": [],
+                            "first_aid": [], "home_remedies": [], "routine": [], "medicines": [], "warnings": [], "when_to_seek_care": [], "explanation": []
                         }
 
                 disease = ml_result["disease"]
@@ -189,9 +197,8 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                 print(f"Mapped Symptoms: {ml_result['matched_symptoms']}")
                 print(f"Prediction: {disease} (Conf: {ml_result['confidence']}, Score: {ml_result['confidence_score']})")
                 
-                # 2. Risk & Guidance Engine
+                # 2. Risk Engine
                 from app.triage.risk_engine import evaluate_patient_risk
-                from app.guidance.guidance_engine import generate_guidance
                 
                 risk_assessment = evaluate_patient_risk(
                     age=request.age,
@@ -199,21 +206,6 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                     symptoms=args,
                     ml_disease=disease
                 )
-                
-                # Guidance symptoms list: Combine tools + mapped symptoms + disease
-                symptoms_list = [str(k) for k, v in args.items() if v is True and k not in ["is_injury", "gender", "age", "severity", "duration_days"]]
-                symptoms_list += ml_result["matched_symptoms"]
-                symptoms_list += [disease]
-                
-                guidance = generate_guidance(
-                    symptoms=symptoms_list,
-                    disease=disease,
-                    age=request.age,
-                    severity_score=args.get("severity", 1),
-                    risk_level=risk_assessment["risk_level"],
-                    urgency=risk_assessment["urgency"]
-                )
-                    
                 diagnosis_data = {
                     "disease": disease,
                     "age": request.age,
@@ -227,15 +219,15 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
                     "confidence_score": ml_result["confidence_score"],
                     "matched_symptoms": ml_result["matched_symptoms"],
                     "important_features": ml_result["matched_symptoms"], # Explicitly map important features
-                    "first_aid": guidance["first_aid"],
-                    "home_remedies": guidance["home_remedies"],
-                    "routine": guidance["routine"],
-                    "medicines": guidance["medicines"],
-                    "warnings": guidance["warnings"],
-                    "when_to_seek_care": guidance["when_to_seek_care"],
+                    "first_aid": ml_result.get("first_aid", []),
+                    "home_remedies": ml_result.get("home_remedies", []),
+                    "routine": ml_result.get("routine", []),
+                    "medicines": ml_result.get("medicines", []),
+                    "warnings": ml_result.get("warnings", []),
+                    "when_to_seek_care": ml_result.get("when_to_seek_care", []),
                     "is_high_risk": risk_assessment["risk_level"] in ["High", "Emergency"],
                     "extracted_symptoms": args,
-                    "explanation": risk_assessment["explanation"],
+                    "explanation": ml_result.get("explanation", risk_assessment["explanation"]),
                     "emergency": risk_assessment["emergency"]
                 }
                 
@@ -347,17 +339,6 @@ async def predict_disease(request: PredictRequest):
             symptoms=symptoms,
             ml_disease=disease
         )
-        
-        from app.guidance.guidance_engine import generate_guidance
-        
-        guidance = generate_guidance(
-            symptoms=[disease],
-            disease=disease,
-            age=request.Age,
-            severity_score=request.Severity,
-            risk_level=risk_assessment["risk_level"],
-            urgency=risk_assessment["urgency"]
-        )
             
         return PredictResponse(
             predictions=[{"disease": disease, "probability": prediction_result.get("confidence", 0.5)}],
@@ -366,13 +347,13 @@ async def predict_disease(request: PredictRequest):
             important_features=important_features,
             urgency=risk_assessment["urgency"],
             confidence=risk_assessment["confidence"],
-            first_aid=guidance["first_aid"],
-            home_remedies=guidance["home_remedies"],
-            routine=guidance["routine"],
-            medicines=guidance["medicines"],
-            warnings=guidance["warnings"],
-            when_to_seek_care=guidance["when_to_seek_care"],
-            explanation=risk_assessment["explanation"],
+            first_aid=prediction_result.get("first_aid", []),
+            home_remedies=prediction_result.get("home_remedies", []),
+            routine=prediction_result.get("routine", []),
+            medicines=prediction_result.get("medicines", []),
+            warnings=prediction_result.get("warnings", []),
+            when_to_seek_care=prediction_result.get("when_to_seek_care", []),
+            explanation=prediction_result.get("explanation", risk_assessment["explanation"]),
             emergency=risk_assessment["emergency"]
         )
     except Exception as e:

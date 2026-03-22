@@ -16,8 +16,8 @@ GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
 PREDICTION_PROMPT = """\
-You are a precise medical AI trained to identify likely diseases from patient data.
-Given the following patient information, identify the SINGLE most likely disease/condition.
+You are a precise medical AI trained to identify likely diseases from patient data and provide actionable home care guidance.
+Given the following patient information, identify the SINGLE most likely disease/condition and construct a comprehensive triage plan.
 
 Patient Data:
 - Age: {age}
@@ -26,17 +26,30 @@ Patient Data:
 - Duration (days): {duration}
 - Reported Symptoms: {symptoms}
 
-Return ONLY a valid JSON object with no markdown formatting, no code blocks, no extra text:
+Return ONLY a valid JSON object with no markdown formatting, no code blocks, no extra text matching this exact schema:
 {{
   "condition": "<Most likely disease name, be specific>",
   "confidence": <float 0.0 to 1.0>,
-  "key_symptoms": ["<symptom1>", "<symptom2>", "<symptom3>"]
+  "key_symptoms": ["<symptom1>", "<symptom2>", "<symptom3>"],
+  "first_aid": ["<immediate action 1>", "<immediate action 2>"],
+  "home_remedies": ["<remedy 1>", "<diet plan 1>"],
+  "routine": ["<daily habit 1>"],
+  "medicines": [
+    {{"name": "<low dosage OTC med>", "purpose": "<why>", "guidance": "<how to take>", "warning": "<optional side effect>"}}
+  ],
+  "warnings": ["<critical warning>", "Do NOT self-medicate with antibiotics. They only treat bacterial infections and can be harmful if misused."],
+  "when_to_seek_care": ["<hospital trigger 1>"],
+  "explanation": ["<medical reasoning>"]
 }}
 
 Rules:
-- condition must be a real medical disease name (e.g. "Migraine", "Common Cold", "Type 2 Diabetes")
-- confidence reflects how certain you are (0.9+ = very certain, 0.6-0.9 = likely, below 0.6 = uncertain)
-- key_symptoms lists the 2-3 symptoms that most influenced the diagnosis
+- condition must be a real medical disease name (e.g. "Migraine", "Common Cold", "Type 2 Diabetes").
+- confidence reflects how certain you are (0.9+ = very certain, 0.6-0.9 = likely, below 0.6 = uncertain).
+- key_symptoms lists the 2-3 symptoms that most influenced the diagnosis.
+- keep recommended medicines to strictly LOW DOSAGE, LOW POWER, Safe OTC Medicines only.
+- focus heavily on supportive home care, home remedies, first aid, and diet plans (if needed).
+- explicitly enforce the rule that antibiotics should NEVER be self-medicated.
+- explanation must contain Medical Reasoning explaining the diagnosis.
 """
 
 class DiseasePredictor:
@@ -88,6 +101,13 @@ class DiseasePredictor:
         condition = "Unknown Condition"
         confidence_score = 0.0
         important_features = []
+        first_aid = []
+        home_remedies = []
+        routine = []
+        medicines = []
+        warnings = []
+        when_to_seek_care = []
+        explanation = []
 
         # Map symptom text → feature flags (kept for risk engine compatibility)
         mapped_features = SymptomMapper.extract_features(clinical_symptoms)
@@ -117,7 +137,7 @@ class DiseasePredictor:
                 resp = requests.post(
                     f"{GEMINI_API_URL}?key={self._api_key}",
                     json=payload,
-                    timeout=10
+                    timeout=30
                 )
                 
                 if resp.status_code == 200:
@@ -139,7 +159,19 @@ class DiseasePredictor:
                     condition = parsed.get("condition", "Unknown Condition")
                     confidence_score = float(parsed.get("confidence", 0.5))
                     important_features = parsed.get("key_symptoms", [])
+                    first_aid = parsed.get("first_aid", [])
+                    home_remedies = parsed.get("home_remedies", [])
+                    routine = parsed.get("routine", [])
+                    medicines = parsed.get("medicines", [])
+                    warnings = parsed.get("warnings", ["Do NOT self-medicate with antibiotics."])
+                    when_to_seek_care = parsed.get("when_to_seek_care", [])
+                    explanation = parsed.get("explanation", [])
                     print(f"[Gemini] Predicted: {condition} (conf={confidence_score:.2f})")
+                elif resp.status_code == 429:
+                    print("[Gemini] Rate limit exceeded (HTTP 429).")
+                    condition = "API Rate Limit Exceeded"
+                    confidence_score = 0.0
+                    warnings = ["Google Gemini API rate limit exceeded. Please wait a moment and try again."]
                 else:
                     print(f"[Gemini] REST API error {resp.status_code}: {resp.text}")
                     condition = "Prediction API Error"
@@ -161,7 +193,14 @@ class DiseasePredictor:
                 "confidence": 0.0,
                 "risk_level": "Low",
                 "risk_score": 0,
-                "important_features": []
+                "important_features": [],
+                "first_aid": [],
+                "home_remedies": [],
+                "routine": [],
+                "medicines": [],
+                "warnings": [],
+                "when_to_seek_care": [],
+                "explanation": []
             }
 
         # ── Risk engine (unchanged) ────────────────────────────────────────────
@@ -178,7 +217,14 @@ class DiseasePredictor:
             "confidence": round(confidence_score, 2),
             "risk_level": risk_level,
             "risk_score": risk_score,
-            "important_features": important_features
+            "important_features": important_features,
+            "first_aid": first_aid,
+            "home_remedies": home_remedies,
+            "routine": routine,
+            "medicines": medicines,
+            "warnings": warnings,
+            "when_to_seek_care": when_to_seek_care,
+            "explanation": explanation
         }
 
     def predict_with_metadata(self, *args, **kwargs) -> dict:
@@ -188,5 +234,12 @@ class DiseasePredictor:
             "disease": res["condition"],
             "confidence": "High" if res["confidence"] > 0.7 else "Moderate" if res["confidence"] > 0.4 else "Low",
             "confidence_score": res["confidence"],
-            "matched_symptoms": res["important_features"]
+            "matched_symptoms": res["important_features"],
+            "first_aid": res["first_aid"],
+            "home_remedies": res["home_remedies"],
+            "routine": res["routine"],
+            "medicines": res["medicines"],
+            "warnings": res["warnings"],
+            "when_to_seek_care": res["when_to_seek_care"],
+            "explanation": res["explanation"]
         }
