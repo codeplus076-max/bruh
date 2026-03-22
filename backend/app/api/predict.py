@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import os
 import json
-from openai import AsyncOpenAI
+# from openai import AsyncOpenAI  # Moved to lazy loader in get_openai_client()
 import asyncio
 import traceback
 from functools import lru_cache
@@ -16,15 +16,25 @@ router = APIRouter(prefix="", tags=["predict"])
 # Initialize Predictor
 predictor = DiseasePredictor()
 
-# Initialize OpenAI-compatible client
-openai_api_key = os.getenv("OPENAI_API_KEY")
-if openai_api_key and openai_api_key.startswith("sk-or-"):
-    client = AsyncOpenAI(
-        api_key=openai_api_key,
-        base_url="https://openrouter.ai/api/v1"
-    )
-else:
-    client = AsyncOpenAI(api_key=openai_api_key) if openai_api_key else None
+# Lazy client initialization to save boot RAM
+_client = None
+
+def get_openai_client():
+    global _client
+    if _client is not None:
+        return _client
+    
+    from openai import AsyncOpenAI
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("WARNING: OPENAI_API_KEY missing. Triage will use fallback model.")
+        return None
+        
+    if api_key.startswith("sk-or-"):
+        _client = AsyncOpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
+    else:
+        _client = AsyncOpenAI(api_key=api_key)
+    return _client
 
 @lru_cache(maxsize=64)
 def get_cached_prediction_metadata(age: int, gender: int, severity: int, duration: float, symptoms: str):
@@ -140,6 +150,10 @@ Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe
     messages = [{"role": "system", "content": system_prompt}]
     for msg in request.messages:
         messages.append({"role": msg.role, "content": msg.content})
+        
+    client = get_openai_client()
+    if not client:
+        return {"error": "AI service unavailable"}
         
     try:
         model_name = "gpt-4o-mini" if not os.getenv("OPENAI_API_KEY", "").startswith("sk-") or "openrouter" in str(client.base_url) else "gpt-3.5-turbo"

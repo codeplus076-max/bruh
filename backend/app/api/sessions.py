@@ -1,9 +1,7 @@
 from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
-from app.firebase_config import db
-from firebase_admin import auth
-import time
+from app.firebase_config import get_db
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
@@ -19,11 +17,13 @@ class SessionSaveRequest(BaseModel):
     title: Optional[str] = None
     risk_level: Optional[str] = "Normal"
 
-async def get_uid(authorization: str):
+
+async def get_uid(authorization: Optional[str]):
     if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=401, detail="Unauthorized")
     token = authorization.split("Bearer ")[1]
     try:
+        from firebase_admin import auth
         decoded = auth.verify_id_token(token)
         return decoded["uid"]
     except Exception:
@@ -32,6 +32,7 @@ async def get_uid(authorization: str):
 @router.post("/save")
 async def save_session(request: SessionSaveRequest, authorization: Optional[str] = Header(None)):
     uid = await get_uid(authorization)
+    db = get_db()
     if not db:
         raise HTTPException(status_code=500, detail="Database not ready")
     

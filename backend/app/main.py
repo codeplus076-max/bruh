@@ -1,34 +1,14 @@
-from dotenv import load_dotenv
-load_dotenv() # Load at very top
-
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 import gc
 import os
-from app.api.predict import predictor
-
-from contextlib import asynccontextmanager
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Load ML Model once on startup
-    print("STARTUP: Warming up ML model...")
-    try:
-        predictor.load_model()
-        print(f"STARTUP: ML Model loaded. Status: {predictor.is_loaded}")
-    except Exception as e:
-        print(f"STARTUP ERROR: Failed to pre-load model: {e}")
-    yield
-    # Clean up on shutdown
-    print("SHUTDOWN: Cleaning up...")
 
 app = FastAPI(
     title="UPCHAAR - AI Rural Health Triage Assistant API",
     description="Backend for the AI Triage Assistant",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.0.0"
 )
 
 # Global Request Logger
@@ -37,27 +17,20 @@ async def log_requests(request: Request, call_next):
     print(f"DEBUG: Incoming Request: {request.method} {request.url.path}")
     response = await call_next(request)
     print(f"DEBUG: Response Status: {response.status_code}")
+    # Trigger GC after every response to keep RAM floor low on 512MB limit
+    if request.url.path == "/chat":
+        gc.collect()
     return response
 
-# Configure CORS — Must come before middleware registration
+# Configure CORS
 origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
-
-if "*" in origins:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=False, # Browsers reject allow_credentials=True when origin is "*"
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-else:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"] if "*" in origins else origins,
+    allow_credentials=False if "*" in origins else True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 @app.head("/")
@@ -70,7 +43,6 @@ def ping():
 
 @app.get("/verify-env")
 def verify_env():
-    """Verify that essential secrets are set without exposing them."""
     return {
         "openai_key_present": bool(os.getenv("OPENAI_API_KEY")),
         "maps_key_present": bool(os.getenv("MAPS_API_KEY")),
@@ -78,54 +50,33 @@ def verify_env():
         "allowed_origins": os.getenv("ALLOWED_ORIGINS", "*")
     }
 
-# Add GZip compression only for large JSON payloads (hospital lists etc)
-# minimum_size raised to 2000 bytes - avoids compressing small chat/summary responses
-app.add_middleware(GZipMiddleware, minimum_size=2000, compresslevel=3)
+app.add_middleware(GZipMiddleware, minimum_size=2000)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    # Log the exact error securely to the console for Render logs with traceback
     import traceback
     print(f"Global Error caught on {request.url.path}: {str(exc)}")
     traceback.print_exc()
-    
-    # Return a structured error response that the frontend can parse smoothly
     response = JSONResponse(
         status_code=500,
-        content={
-            "error": "Internal Server Error",
-            "message": str(exc), # Temporarily expose error for debugging
-            "path": request.url.path
-        },
+        content={"error": "Internal Server Error", "message": str(exc), "path": request.url.path},
     )
-    # Manual CORS headers for errors
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
     return response
 
 @app.get("/health")
 def health_check():
-    """
-    Enhanced health check for Render cold starts. 
-    Verifies that the ML model has been loaded into memory.
-    """
-    model_loaded = predictor.is_loaded
-    if not model_loaded:
-        # Pings the singleton to attempt load
-        predictor.load_model()
-        
-    return {
-        "status": "healthy", 
-        "ml_model_status": "loaded" if predictor.is_loaded else "unavailable"
-    }
+    return {"status": "healthy"}
 
-from app.api import predict, voice, location, user, report, sessions, summary
-
-app.include_router(predict.router)
-app.include_router(summary.router)
-app.include_router(voice.router)
-app.include_router(location.router)
-app.include_router(user.router)
-app.include_router(report.router)
-app.include_router(sessions.router)
+# EXTREME LEAN: Lazy Router Inclusion
+@app.on_event("startup")
+def include_routers():
+    from app.api import predict, voice, location, user, report, sessions, summary
+    app.include_router(predict.router)
+    app.include_router(summary.router)
+    app.include_router(voice.router)
+    app.include_router(location.router)
+    app.include_router(user.router)
+    app.include_router(report.router)
+    app.include_router(sessions.router)
+    print("BOOT: Ultra-lean router initialization complete.")

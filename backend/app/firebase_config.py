@@ -1,42 +1,44 @@
-import firebase_admin
-from firebase_admin import credentials, firestore
 import os
 
-def initialize_firebase():
+_db = None
+
+def get_db():
+    """Lazy initialization of Firebase to save RAM on 512MB Free Tier."""
+    global _db
+    if _db is not None:
+        return _db
+        
     try:
+        import firebase_admin
+        from firebase_admin import credentials, firestore
+        
         if not firebase_admin._apps:
-            # 1. Try JSON string from environment variable (Best for Render/Vercel)
+            # 1. Try JSON string
             service_account_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
             if service_account_json:
                 import json
-                try:
-                    # Parse JSON string and initialize
-                    cred_dict = json.loads(service_account_json)
-                    cred = credentials.Certificate(cred_dict)
-                    firebase_admin.initialize_app(cred)
-                    print("Firebase initialized via FIREBASE_SERVICE_ACCOUNT_JSON string.")
-                except Exception as je:
-                    print(f"Error parsing FIREBASE_SERVICE_ACCOUNT_JSON: {je}")
-                    return None
-            
-            # 2. Try Local File Path (Fallback for local dev)
+                cred_dict = json.loads(service_account_json)
+                cred = credentials.Certificate(cred_dict)
+                firebase_admin.initialize_app(cred)
+                print("Firebase initialized via ENV string (Lazy).")
+            # 2. Try File Path
             else:
                 cred_path = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH")
                 if cred_path and os.path.exists(cred_path):
                     cred = credentials.Certificate(cred_path)
                     firebase_admin.initialize_app(cred)
-                    print(f"Firebase initialized with service account file: {cred_path}")
+                    print("Firebase initialized via FILE (Lazy).")
                 else:
-                    # 3. Last Resort: Default Application Credentials
+                    # 3. Default
                     try:
                         firebase_admin.initialize_app()
-                        print("Firebase initialized with default credentials (likely local GCloud auth).")
+                        print("Firebase initialized via Default Credentials (Lazy).")
                     except Exception as e:
-                        print(f"Warning: Firebase Admin could not be initialized. History/Profiles will fail. Error: {e}")
+                        print(f"Warning: Firebase Admin skipping. Error: {e}")
                         return None
-        return firestore.client()
+                        
+        _db = firestore.client()
+        return _db
     except Exception as e:
-        print(f"Critical error in initialize_firebase: {e}")
+        print(f"Critical error in get_db: {e}")
         return None
-
-db = initialize_firebase()

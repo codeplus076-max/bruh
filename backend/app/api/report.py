@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
-from app.firebase_config import db
-from firebase_admin import auth
+from app.firebase_config import get_db
 
 router = APIRouter(prefix="/report", tags=["report"])
 
 class ReportGenerateRequest(BaseModel):
     session_id: str
+
 
 @router.post("/generate")
 async def generate_report_data(
@@ -19,9 +19,11 @@ async def generate_report_data(
     
     token = authorization.split("Bearer ")[1]
     try:
+        from firebase_admin import auth
         decoded_token = auth.verify_id_token(token)
         uid = decoded_token["uid"]
         
+        db = get_db()
         if not db:
             raise HTTPException(status_code=500, detail="Database unavailable")
             
