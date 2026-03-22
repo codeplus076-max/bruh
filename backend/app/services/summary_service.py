@@ -17,6 +17,7 @@ async def extract_patient_info(messages: List[Dict[str, str]]) -> Dict[str, Any]
     """
     Extracts structured patient information from the conversation history using an LLM.
     """
+    client = get_openai_client()
     if not client:
         return _fallback_extraction()
         
@@ -44,6 +45,10 @@ Respond ONLY with a JSON object exactly following this structure:
 }
 """
 
+    client = get_openai_client()
+    if not client:
+        return "Summary generation unavailable (Missing API Key)"
+        
     try:
         response = await client.chat.completions.create(
             model=model_name,
