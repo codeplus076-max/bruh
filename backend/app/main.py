@@ -74,7 +74,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     traceback.print_exc()
     
     # Return a structured error response that the frontend can parse smoothly
-    return JSONResponse(
+    response = JSONResponse(
         status_code=500,
         content={
             "error": "Internal Server Error",
@@ -82,6 +82,11 @@ async def global_exception_handler(request: Request, exc: Exception):
             "path": request.url.path
         },
     )
+    # Manual CORS headers for errors
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
 
 @app.get("/health")
 def health_check():
