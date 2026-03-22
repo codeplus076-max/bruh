@@ -15,6 +15,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Global Request Logger
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    print(f"DEBUG: Incoming Request: {request.method} {request.url.path}")
+    response = await call_next(request)
+    print(f"DEBUG: Response Status: {response.status_code}")
+    return response
+
 # Configure CORS — Must come before middleware registration
 origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
