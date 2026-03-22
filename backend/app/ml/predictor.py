@@ -36,11 +36,12 @@ class DiseasePredictor:
         print(f"Loading ML Model from disk: {self.model_path}")
         try:
             if os.path.exists(self.model_path) and os.path.exists(self.meta_path):
-                # Removed mmap_mode because model is compressed
-                self.__class__._model = joblib.load(self.model_path)
-                self.__class__._meta = joblib.load(self.meta_path)
-                print("Successfully loaded ML model and metadata.")
-                gc.collect() # Immediate cleanup after load
+                # mmap_mode='r' now works because model is uncompressed!
+                # This saves ~100MB+ of active RAM.
+                self.__class__._model = joblib.load(self.model_path, mmap_mode='r')
+                self.__class__._meta = joblib.load(self.meta_path, mmap_mode='r')
+                print("Successfully Memory-Mapped ML model and metadata.")
+                gc.collect() 
             else:
                 print(f"Warning: Model or meta not found in {self.model_path}. Using mock.")
                 self.__class__._model = None
