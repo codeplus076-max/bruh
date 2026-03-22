@@ -165,7 +165,7 @@ export function HospitalMap({ t }: { t: Translations }) {
         setLocationStatus("fetching_hospitals");
         setLoading(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bruh-z604.onrender.com";
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://bruh-1-u248.onrender.com";
             const res = await fetch(`${apiUrl}/hospitals/nearby?lat=${latitude}&lng=${longitude}`);
             if (!res.ok) throw new Error("api_error");
             const data = await res.json();

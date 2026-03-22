@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Language, translations, Translations } from "@/lib/translations";
+import { useAuth } from "@/context/AuthContext";
 
 interface LanguageContextType {
     lang: Language;
@@ -13,14 +14,21 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [lang, setLangState] = useState<Language>("en");
+    const { userProfile } = useAuth();
 
-    // Load from local storage if available
     useEffect(() => {
+        // Priority 1: Firebase user profile (cross-device sync)
+        const profileLang = userProfile?.language as Language;
+        if (profileLang && ["en", "hi", "mr"].includes(profileLang)) {
+            setLangState(profileLang);
+            return;
+        }
+        // Priority 2: localStorage (single-device persistence)
         const saved = localStorage.getItem("upchaar-lang") as Language;
-        if (saved && (saved === "en" || saved === "hi" || saved === "mr")) {
+        if (saved && ["en", "hi", "mr"].includes(saved)) {
             setLangState(saved);
         }
-    }, []);
+    }, [userProfile]);
 
     const setLang = (newLang: Language) => {
         setLangState(newLang);

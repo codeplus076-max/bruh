@@ -38,7 +38,7 @@ interface Diagnosis {
 
 type Message = { role: "assistant" | "user"; content: string; diagnosis?: Diagnosis };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://bruh-z604.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://bruh-1-u248.onrender.com";
 
 export function ChatInterface({ input, setInput }: { input: string, setInput: (v: string) => void }) {
     const { lang, t } = useLanguage();

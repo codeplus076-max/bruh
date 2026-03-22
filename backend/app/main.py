@@ -15,16 +15,29 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS
+# Configure CORS — Must come before middleware registration
 origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if "*" in origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False, # Browsers reject allow_credentials=True when origin is "*"
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to UPCHAAR AI Backend!", "health_check": "/health"}
 
 # Add GZip compression only for large JSON payloads (hospital lists etc)
 # minimum_size raised to 2000 bytes - avoids compressing small chat/summary responses
