@@ -147,8 +147,11 @@ RULES:
 3. TRIGGER: Call `analyze_symptoms` immediately once symptoms are known.
 Reply concisely in {request.language}. Map severity to 1(mild), 2(mod), 3(severe)."""
 
+    # Latency Optimization: Truncate history to last 8 messages to reduce token count
+    chat_history = request.messages[-8:] if len(request.messages) > 8 else request.messages
+    
     messages = [{"role": "system", "content": system_prompt}]
-    for msg in request.messages:
+    for msg in chat_history:
         messages.append({"role": msg.role, "content": msg.content})
         
     client = get_openai_client()
