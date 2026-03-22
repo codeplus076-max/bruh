@@ -146,7 +146,7 @@ def _fetch_hospitals_from_google(rounded_lat: float, rounded_lng: float) -> List
         "Content-Type": "application/json"
     }
     body = {
-        "includedTypes": ["hospital", "doctor", "health"],
+        "includedTypes": ["hospital", "doctor"],
         "maxResultCount": 10,
         "locationRestriction": {
             "circle": {
