@@ -9,10 +9,26 @@ import gc
 import os
 from app.api.predict import predictor
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load ML Model once on startup
+    print("STARTUP: Warming up ML model...")
+    try:
+        predictor.load_model()
+        print(f"STARTUP: ML Model loaded. Status: {predictor.is_loaded}")
+    except Exception as e:
+        print(f"STARTUP ERROR: Failed to pre-load model: {e}")
+    yield
+    # Clean up on shutdown
+    print("SHUTDOWN: Cleaning up...")
+
 app = FastAPI(
     title="UPCHAAR - AI Rural Health Triage Assistant API",
     description="Backend for the AI Triage Assistant",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Global Request Logger

@@ -32,14 +32,23 @@ class DiseasePredictor:
         if self._model is not None and self._meta is not None:
             return
 
-        print(f"Loading ML Model from disk into memory (Memory Mapped): {self.model_path}")
-        if os.path.exists(self.model_path) and os.path.exists(self.meta_path):
-            # Use mmap_mode='r' to prevent loading the entire payload into active RAM
-            self.__class__._model = joblib.load(self.model_path, mmap_mode='r')
-            self.__class__._meta = joblib.load(self.meta_path, mmap_mode='r')
-            print("Successfully lazy-loaded custom XGBoost model and metadata.")
-        else:
-            print(f"Warning: Model or meta not found in {self.model_path}. Using mock predictions.")
+        import gc
+        print(f"Loading ML Model from disk: {self.model_path}")
+        try:
+            if os.path.exists(self.model_path) and os.path.exists(self.meta_path):
+                # Removed mmap_mode because model is compressed
+                self.__class__._model = joblib.load(self.model_path)
+                self.__class__._meta = joblib.load(self.meta_path)
+                print("Successfully loaded ML model and metadata.")
+                gc.collect() # Immediate cleanup after load
+            else:
+                print(f"Warning: Model or meta not found in {self.model_path}. Using mock.")
+                self.__class__._model = None
+                self.__class__._meta = None
+        except Exception as e:
+            print(f"CRITICAL ERROR loading model: {e}")
+            import traceback
+            traceback.print_exc()
             self.__class__._model = None
             self.__class__._meta = None
 
