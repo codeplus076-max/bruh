@@ -4,155 +4,116 @@ import os
 import re
 
 def clean_name(name):
-    """Standardize column names: lowercase, underscores replacing special chars."""
+    """Standardize names: lowercase, underscores replacing special chars."""
     return re.sub(r'[^a-zA-Z0-9]', '_', str(name).lower().strip()).strip('_')
 
 def main():
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    # --- File paths ---
-    dataset_path   = os.path.join(base_dir, 'dataset.csv')
-    augmented_path = os.path.join(base_dir, 'Final_Augmented_dataset_Diseases_and_Symptoms.csv')
-    severity_path  = os.path.join(base_dir, 'Symptom-severity.csv')
-    output_path    = os.path.join(base_dir, 'data', 'new_training_dataset.csv')
+    dataset_path  = os.path.join(base_dir, 'dataset.csv')
+    severity_path = os.path.join(base_dir, 'Symptom-severity.csv')
+    output_path   = os.path.join(base_dir, 'data', 'new_training_dataset.csv')
+
+    for path in [dataset_path, severity_path]:
+        if not os.path.exists(path):
+            print(f"ERROR: Required file not found: {path}")
+            return
 
     print("=== Loading Symptom-severity.csv ===")
     sev_df = pd.read_csv(severity_path)
     sev_df['Symptom'] = sev_df['Symptom'].apply(clean_name)
     severity_map = dict(zip(sev_df['Symptom'], sev_df['weight']))
-    print(f"Loaded {len(severity_map)} symptom weights.")
+    print(f"  Loaded {len(severity_map)} symptom weights.")
 
-    # ===========================================================
-    # PART A: Process dataset.csv (long-format Symptom_1..._17)
-    # ===========================================================
-    print("\n=== Loading dataset.csv (long-format) ===")
-    df_long = pd.read_csv(dataset_path)
-    print(f"  Shape: {df_long.shape}")
+    print("\n=== Loading dataset.csv ===")
+    df = pd.read_csv(dataset_path)
+    df.columns = df.columns.str.strip()
+    df['Disease'] = df['Disease'].str.strip()
+    print(f"  Shape: {df.shape}")
 
-    # The first column is 'Disease', the rest are Symptom_1 ... Symptom_17
-    disease_col = df_long.columns[0]
-    symptom_cols = df_long.columns[1:]
+    symptom_cols = [c for c in df.columns if c.lower().startswith('symptom_')]
+    print(f"  Symptom columns: {len(symptom_cols)}")
 
-    # Melt all symptom columns into a single column, drop NaN/empty
-    df_melted = df_long.melt(id_vars=[disease_col], value_vars=symptom_cols,
-                              var_name='_col', value_name='symptom')
-    df_melted = df_melted.dropna(subset=['symptom'])
-    df_melted['symptom'] = df_melted['symptom'].apply(clean_name)
-    df_melted = df_melted[df_melted['symptom'].str.len() > 0]
-    df_melted = df_melted[[disease_col, 'symptom']]
-    df_melted[disease_col] = df_melted[disease_col].str.strip()
+    # -------------------------------------------------------
+    # Vectorised melt → deduplicate symptoms per case
+    # -------------------------------------------------------
+    print("\n=== Building binary symptom matrix (vectorised) ===")
 
-    # Pivot to binary: each row = one original patient record, columns = symptoms
-    print("  Pivoting to binary one-hot matrix...")
-    df_pivot = df_melted.groupby([df_long.index.repeat(
-        len(symptom_cols)).values[:len(df_melted)],
-        disease_col, 'symptom']).size().unstack(fill_value=0)
+    # Add a row index so we can pivot back
+    df = df.reset_index().rename(columns={'index': 'case_id'})
 
-    # Alternative safer pivot approach:
-    # Build binary matrix directly from the original df_long
-    all_symptoms = sorted(df_melted['symptom'].unique().tolist())
-    print(f"  Total unique symptoms found: {len(all_symptoms)}")
+    # Melt all symptom columns
+    melted = df.melt(
+        id_vars=['case_id', 'Disease'],
+        value_vars=symptom_cols,
+        var_name='_col',
+        value_name='symptom'
+    )
+    melted = melted.dropna(subset=['symptom'])
+    melted['symptom'] = melted['symptom'].str.strip().apply(clean_name)
+    melted = melted[melted['symptom'].str.len() > 0]
+    melted = melted.drop_duplicates(subset=['case_id', 'symptom'])
 
-    rows = []
-    for _, row in df_long.iterrows():
-        disease = str(row[disease_col]).strip()
-        present = set()
-        for sc in symptom_cols:
-            val = row[sc]
-            if pd.notna(val) and str(val).strip():
-                present.add(clean_name(str(val).strip()))
-        binary_row = {s: int(s in present) for s in all_symptoms}
-        binary_row['diseases'] = disease
-        rows.append(binary_row)
+    all_symptoms = sorted(melted['symptom'].unique().tolist())
+    print(f"  Total unique symptoms: {len(all_symptoms)}")
 
-    df_bin = pd.DataFrame(rows)
+    # Pivot to binary matrix (rows = case_id, cols = symptoms)
+    print("  Pivoting to binary matrix...")
+    melted['val'] = 1
+    pivot = melted.pivot_table(
+        index='case_id',
+        columns='symptom',
+        values='val',
+        aggfunc='max',
+        fill_value=0
+    ).astype(int)
+
+    # Re-attach disease column
+    disease_series = df.set_index('case_id')['Disease']
+    pivot['diseases'] = disease_series
+
+    # Reset index cleanly
+    df_bin = pivot.reset_index(drop=True)
+
+    # Ensure all symptom columns come after 'diseases'
+    sym_cols   = [c for c in df_bin.columns if c != 'diseases']
+    df_bin     = df_bin[['diseases'] + sym_cols]
     print(f"  Binary matrix shape: {df_bin.shape}")
 
-    # ===========================================================
-    # PART B: Process Final_Augmented_dataset (already binary)
-    # ===========================================================
-    print("\n=== Loading Final_Augmented_dataset (binary format) ===")
-    df_aug = pd.read_csv(augmented_path)
-    print(f"  Shape: {df_aug.shape}")
-
-    # Find the disease column (should be first column)
-    aug_disease_col = df_aug.columns[0]
-    df_aug = df_aug.rename(columns={aug_disease_col: 'diseases'})
-    df_aug['diseases'] = df_aug['diseases'].astype(str).str.strip()
-
-    # Clean all symptom column names
-    aug_symptom_cols = [c for c in df_aug.columns if c != 'diseases']
-    rename_map = {c: clean_name(c) for c in aug_symptom_cols}
-    df_aug = df_aug.rename(columns=rename_map)
-
-    # Sample down to avoid memory issues (100k max from augmented)
-    if len(df_aug) > 100_000:
-        print(f"  Sampling augmented dataset to 100,000 rows...")
-        df_aug = df_aug.sample(n=100_000, random_state=42)
-
-    # ===========================================================
-    # PART C: Align and merge both datasets
-    # ===========================================================
-    print("\n=== Merging datasets ===")
-
-    # Get union of all symptom columns (excluding 'diseases')
-    cols_a = set(df_bin.columns) - {'diseases'}
-    cols_b = set(df_aug.columns) - {'diseases'}
-    all_cols = sorted(cols_a | cols_b)
-
-    # Add missing columns with 0 to each DF
-    for col in all_cols:
-        if col not in df_bin.columns:
-            df_bin[col] = 0
-        if col not in df_aug.columns:
-            df_aug[col] = 0
-
-    # Ensure int type
-    for col in all_cols:
-        df_bin[col] = df_bin[col].fillna(0).astype(int)
-        df_aug[col] = df_aug[col].fillna(0).astype(int)
-
-    # Combine
-    df_merged = pd.concat([df_bin[['diseases'] + all_cols],
-                            df_aug[['diseases'] + all_cols]],
-                           ignore_index=True)
-    print(f"  Merged shape: {df_merged.shape}")
-
-    # ===========================================================
-    # PART D: Compute severity & add demographics
-    # ===========================================================
+    # -------------------------------------------------------
+    # Compute severity scores
+    # -------------------------------------------------------
     print("\n=== Computing severity scores ===")
-    symptom_features = [c for c in df_merged.columns if c != 'diseases']
-    weights = np.array([severity_map.get(s, 1) for s in symptom_features])
-    S = df_merged[symptom_features].values.astype(float)
+    weights      = np.array([severity_map.get(s, 1) for s in sym_cols])
+    S            = df_bin[sym_cols].values.astype(float)
+    total_sev    = S.dot(weights)
+    count        = S.sum(axis=1)
+    avg_sev      = np.zeros(len(df_bin), dtype=float)
+    mask         = count > 0
+    avg_sev[mask]= total_sev[mask] / count[mask]
 
-    total_severity = S.dot(weights)
-    count = S.sum(axis=1)
-    avg_severity = np.zeros(len(df_merged), dtype=float)
-    mask = count > 0
-    avg_severity[mask] = total_severity[mask] / count[mask]
+    final_sev    = np.ones(len(df_bin), dtype=int)
+    final_sev[(avg_sev >= 3) & (avg_sev < 5)] = 2
+    final_sev[avg_sev >= 5] = 3
 
-    # Map to 3-tier scale
-    final_severity = np.ones(len(df_merged), dtype=int)
-    final_severity[(avg_severity >= 3) & (avg_severity < 5)] = 2
-    final_severity[avg_severity >= 5] = 3
-
-    print("Adding synthetic demographics...")
+    # -------------------------------------------------------
+    # Add synthetic demographics
+    # -------------------------------------------------------
     np.random.seed(42)
-    df_merged['Age']             = np.random.randint(5, 90, size=len(df_merged))
-    df_merged['Gender']          = np.random.randint(0, 2, size=len(df_merged))
-    df_merged['Duration_Min_Days'] = np.random.randint(1, 15, size=len(df_merged))
-    df_merged['Severity']        = final_severity
+    df_bin['Age']               = np.random.randint(5, 90, size=len(df_bin))
+    df_bin['Gender']            = np.random.randint(0, 2, size=len(df_bin))
+    df_bin['Duration_Min_Days'] = np.random.randint(1, 15, size=len(df_bin))
+    df_bin['Severity']          = final_sev
 
-    # ===========================================================
-    # PART E: Reorder columns and save
-    # ===========================================================
-    front_cols = ['diseases', 'Age', 'Gender', 'Severity', 'Duration_Min_Days']
-    other_cols = [c for c in df_merged.columns if c not in front_cols]
-    df_final = df_merged[front_cols + other_cols]
+    # -------------------------------------------------------
+    # Reorder and save
+    # -------------------------------------------------------
+    front   = ['diseases', 'Age', 'Gender', 'Severity', 'Duration_Min_Days']
+    others  = [c for c in df_bin.columns if c not in front]
+    df_final = df_bin[front + others]
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    print(f"\nSaving final dataset to {output_path}...")
+    print(f"\nSaving to {output_path}...")
     df_final.to_csv(output_path, index=False)
     print(f"Done! Final shape: {df_final.shape}")
     print(f"Classes ({df_final['diseases'].nunique()}): {sorted(df_final['diseases'].unique())[:10]}...")
