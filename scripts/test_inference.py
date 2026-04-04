@@ -1,86 +1,58 @@
-import os
-import sys
+import sys, os
+sys.path.insert(0, r'c:\Users\krishna\.gemini\antigravity\scratch\bruh\backend')
 
-# Ensure backend package is importable
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend')))
+from app.ml.hybrid_orchestrator import HybridOrchestrator
 
-from app.ml.predictor import DiseasePredictor
+orc = HybridOrchestrator()
 
-def test_inference():
-    print("=" * 50)
-    print("Testing ML Inference Engine Integration...")
-    print("=" * 50)
+print('=== TEST 1: Common Cold (fever + sore throat, 2 days) ===')
+r = orc.predict(age=25, gender=1, severity=1, duration_days=2,
+    clinical_symptoms='I have a sore throat, runny nose and mild fever',
+    fever=True, sore_throat=True)
+names = [c['name'] for c in r['likely_conditions']]
+print('Conditions:', names)
+print('Blacklist applied:', r['blacklist_applied'])
+print('Rules:', r['rules_applied'])
+print('Risk:', r['risk_level'], '| Urgency:', r['urgency'])
+print()
 
-    predictor = DiseasePredictor()
+print('=== TEST 2: Blacklist — high-severity blocked at 3 days ===')
+r2 = orc.predict(age=30, gender=0, severity=1, duration_days=3,
+    clinical_symptoms='I have fatigue and feel very tired all the time',
+    fever=False)
+names2 = [c['raw_name'].lower() if c.get('raw_name') else c['name'].lower() for c in r2['likely_conditions']]
+blocked = [n for n in names2 if any(b in n for b in ['cancer','aids','hiv','diabetes','tuberculosis'])]
+print('Conditions:', [c['name'] for c in r2['likely_conditions']])
+print('Blocked high-severity:', blocked)
+assert len(blocked) == 0, f'FAIL - blacklist did not block: {blocked}'
+print('PASS - blacklist correctly suppressed high-severity diseases')
+print()
 
-    # Always call load_model() explicitly before checking is_loaded
-    predictor.load_model()
+print('=== TEST 3: Emergency — chest pain + breathlessness ===')
+r3 = orc.predict(age=55, gender=1, severity=3, duration_days=1,
+    clinical_symptoms='severe chest pain and i cannot breathe properly',
+    chest_pain=True, breathlessness=True, fever=False)
+print('Conditions:', [c['name'] for c in r3['likely_conditions']])
+print('Emergency:', r3['emergency'])
+print('Risk level:', r3['risk_level'])
+assert r3['emergency'] == True or r3['risk_level'] in ['Emergency','High'], 'FAIL - emergency not flagged'
+print('PASS - emergency correctly flagged')
+print()
 
-    if not predictor.is_loaded:
-        print("\n[FAIL] Model failed to load.")
-        print("  Ensure triage_model_v2.json and model_meta_v2.joblib exist in backend/app/ml/")
-        return
+print('=== TEST 4: Low confidence fallback (vague input) ===')
+r4 = orc.predict(age=30, gender=0, severity=1, duration_days=1,
+    clinical_symptoms='i feel a bit off today')
+print('Conditions count:', len(r4['likely_conditions']))
+print('Confidence:', r4['confidence'])
+print('Disease:', r4['disease'])
+print()
 
-    print("\n[OK] Model loaded successfully.")
-    meta = predictor._meta
-    print(f"  Algorithm : {meta.get('algorithm')}")
-    print(f"  Version   : {meta.get('version')}")
-    print(f"  Features  : {meta.get('n_features')}")
-    print(f"  Classes   : {meta.get('n_classes')}")
+print('=== TEST 5: Rural boost — viral fever surfaces ===')
+r5 = orc.predict(age=22, gender=1, severity=1, duration_days=3,
+    clinical_symptoms='I have fever headache and body ache for 3 days',
+    fever=True, headache=True)
+print('Conditions:', [c['name'] for c in r5['likely_conditions']])
+print('Rules:', r5['rules_applied'])
+print()
 
-    # -------------------------------------------------------
-    # TEST CASE 1: Severe symptoms
-    # -------------------------------------------------------
-    print("\n--- TEST CASE 1: Severe Symptoms ---")
-    result = predictor.predict(
-        age=45,
-        gender=1,
-        severity=3,
-        duration=5.0,
-        clinical_symptoms="severe chest pain, breathlessness, sweating"
-    )
-    print(f"  Condition         : {result.get('condition')}")
-    print(f"  Confidence        : {result.get('confidence')}")
-    print(f"  Risk Level        : {result.get('risk_level')}")
-    print(f"  Risk Score        : {result.get('risk_score')}")
-    print(f"  Important Features: {result.get('important_features')}")
-
-    # Schema assertions
-    for key in ["condition", "confidence", "risk_level", "risk_score", "important_features"]:
-        assert key in result, f"[FAIL] Missing key in result: {key}"
-
-    # -------------------------------------------------------
-    # TEST CASE 2: Mild symptoms
-    # -------------------------------------------------------
-    print("\n--- TEST CASE 2: Mild Symptoms ---")
-    result_mild = predictor.predict(
-        age=20,
-        gender=0,
-        severity=1,
-        duration=2.0,
-        clinical_symptoms="slight headache"
-    )
-    print(f"  Condition : {result_mild.get('condition')}")
-    print(f"  Risk Level: {result_mild.get('risk_level')}")
-    print(f"  Risk Score: {result_mild.get('risk_score')}")
-
-    # -------------------------------------------------------
-    # TEST CASE 3: Fever + vomiting
-    # -------------------------------------------------------
-    print("\n--- TEST CASE 3: GI Symptoms ---")
-    result_gi = predictor.predict(
-        age=30,
-        gender=1,
-        severity=2,
-        duration=3.0,
-        clinical_symptoms="fever, vomiting, diarrhea, abdominal pain"
-    )
-    print(f"  Condition : {result_gi.get('condition')}")
-    print(f"  Risk Level: {result_gi.get('risk_level')}")
-
-    print("\n" + "=" * 50)
-    print("[PASS] All integration tests passed. Schema matches constraints.")
-    print("=" * 50)
-
-if __name__ == "__main__":
-    test_inference()
+print('ALL TESTS COMPLETE')

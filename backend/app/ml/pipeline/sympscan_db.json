@@ -1,0 +1,3693 @@
+{
+  "panic disorder": {
+    "description": "Panic disorder is a mental health condition marked by sudden, unexpected panic attacks—intense periods of fear or discomfort—often accompanied by physical symptoms like chest pain, rapid heartbeat, shortness of breath, or dizziness.",
+    "precautions": [
+      "Practice deep breathing",
+      "Avoid caffeine",
+      "Follow therapy plan",
+      "Seek support from loved ones"
+    ],
+    "medications": [
+      "SSRIs (e.g.",
+      "Sertraline",
+      "Fluoxetine)",
+      "Benzodiazepines (e.g.",
+      "Clonazepam",
+      "Alprazolam)"
+    ],
+    "diet": [
+      "Magnesium-rich foods (spinach",
+      "pumpkin seeds",
+      "almonds)",
+      "Omega-3 fatty acids (salmon",
+      "flaxseeds"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Panic disorder"
+  },
+  "vaginitis": {
+    "description": "Vaginitis is inflammation of the vaginal tissue, typically caused by infections (bacterial, fungal, or parasitic), hormonal imbalances, or irritants, resulting in discharge, itching, pain, or burning during urination.",
+    "precautions": [
+      "Wear breathable cotton underwear",
+      "Avoid douching",
+      "Maintain genital hygiene",
+      "Avoid scented hygiene products"
+    ],
+    "medications": [
+      "Metronidazole",
+      "Clindamycin",
+      "Fluconazole",
+      "Hydrocortisone cream",
+      "Probiotic supplements"
+    ],
+    "diet": [
+      "Probiotics (yogurt",
+      "kefir",
+      "sauerkraut)",
+      "Low-sugar diet (avoid sweets",
+      "processed sugar)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Vaginitis"
+  },
+  "problem during pregnancy": {
+    "description": "Problems during pregnancy refer to medical complications such as gestational diabetes, preeclampsia, or fetal growth restriction that can affect the health of the mother or baby during gestation.",
+    "precautions": [
+      "Attend regular prenatal visits",
+      "Avoid alcohol and smoking",
+      "Eat a balanced diet",
+      "Get adequate rest"
+    ],
+    "medications": [
+      "Prenatal vitamins",
+      "Iron supplements",
+      "Antihypertensives (e.g.",
+      "Labetalol)",
+      "Insulin (for gestational diabetes)",
+      "Folic acid"
+    ],
+    "diet": [
+      "Prenatal vitamins (consult doctor)",
+      "Iron-rich foods (red meat",
+      "lentils",
+      "spinach)",
+      "Folate-rich foods (leafy greens"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Problem during pregnancy"
+  },
+  "acute pancreatitis": {
+    "description": "Acute pancreatitis is a sudden inflammation of the pancreas that causes severe abdominal pain, nausea, vomiting, and elevated pancreatic enzymes, often due to gallstones or alcohol use.",
+    "precautions": [
+      "Avoid alcohol",
+      "Eat a low-fat diet",
+      "Stay hydrated",
+      "Follow doctor's advice strictly"
+    ],
+    "medications": [
+      "IV fluids",
+      "Pain relievers (e.g.",
+      "Morphine)",
+      "Antibiotics (if infection)",
+      "Enzyme replacement therapy",
+      "Fasting/NPO"
+    ],
+    "diet": [
+      "Low-fat foods (boiled vegetables",
+      "lean chicken breast)",
+      "Small frequent meals",
+      "Broths and clear liquids (chicken broth",
+      "vegetable broth)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Acute pancreatitis"
+  },
+  "asthma": {
+    "description": "Asthma is a chronic inflammatory disease of the airways causing recurrent wheezing, breathlessness, chest tightness, and coughing, often triggered by allergens, exercise, or cold air.",
+    "precautions": [
+      "Avoid known triggers",
+      "Use inhaler as prescribed",
+      "Monitor peak flow",
+      "Keep emergency inhaler handy"
+    ],
+    "medications": [
+      "Inhaled corticosteroids (e.g.",
+      "Fluticasone)",
+      "Beta-agonists (e.g.",
+      "Albuterol)",
+      "Leukotriene modifiers (e.g.",
+      "Montelukast)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (blueberries",
+      "kale",
+      "turmeric)",
+      "Magnesium-rich foods (pumpkin seeds",
+      "spinach)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Asthma"
+  },
+  "infectious gastroenteritis": {
+    "description": "Infectious gastroenteritis is an intestinal infection caused by viruses, bacteria, or parasites, leading to symptoms like diarrhea, vomiting, abdominal cramps, and fever.",
+    "precautions": [
+      "Wash hands frequently",
+      "Avoid sharing utensils",
+      "Drink clean water",
+      "Avoid street food"
+    ],
+    "medications": [
+      "Oral rehydration salts (ORS)",
+      "Antibiotics (e.g.",
+      "Ciprofloxacin",
+      "if bacterial)",
+      "Antiemetics (e.g.",
+      "Ondansetron)"
+    ],
+    "diet": [
+      "Oral rehydration solution (ORS)",
+      "BRAT diet (bananas",
+      "rice",
+      "applesauce",
+      "toast)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Infectious gastroenteritis"
+  },
+  "acute sinusitis": {
+    "description": "Acute sinusitis is a temporary inflammation or infection of the sinuses, usually following a cold, causing nasal congestion, facial pain, pressure, and headache.",
+    "precautions": [
+      "Use nasal saline spray",
+      "Stay hydrated",
+      "Avoid allergens",
+      "Use warm compresses"
+    ],
+    "medications": [
+      "Saline nasal spray",
+      "Decongestants (e.g.",
+      "Pseudoephedrine)",
+      "Nasal corticosteroids",
+      "Antibiotics (if bacterial)",
+      "Acetaminophen for pain"
+    ],
+    "diet": [
+      "Spicy foods (hot peppers",
+      "horseradish)",
+      "Hydration (water",
+      "herbal teas)",
+      "Vitamin C-rich foods (oranges"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Acute sinusitis"
+  },
+  "cornea infection": {
+    "description": "Cornea infection (keratitis) is an infection of the transparent front part of the eye, usually caused by bacteria, fungi, or viruses, leading to eye pain, redness, blurred vision, and light sensitivity.",
+    "precautions": [
+      "Avoid touching eyes",
+      "Use prescribed eye drops",
+      "Wear sunglasses",
+      "Don’t share towels or cosmetics"
+    ],
+    "medications": [
+      "Antibiotic eye drops (e.g.",
+      "Ciprofloxacin)",
+      "Antiviral eye drops (e.g.",
+      "Ganciclovir)",
+      "Antifungal drops (e.g.",
+      "Natamycin)"
+    ],
+    "diet": [
+      "Vitamin A-rich foods (carrots",
+      "sweet potatoes",
+      "spinach)",
+      "Zinc-rich foods (pumpkin seeds",
+      "beef)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Cornea infection"
+  },
+  "marijuana abuse": {
+    "description": "Marijuana abuse refers to the excessive or harmful use of cannabis, which can lead to cognitive impairment, altered judgment, addiction, and long-term mental health issues.",
+    "precautions": [
+      "Avoid peer pressure",
+      "Seek counseling",
+      "Build healthy habits",
+      "Avoid triggering environments"
+    ],
+    "medications": [
+      "Behavioral therapy",
+      "CBT",
+      "Motivational enhancement therapy",
+      "No FDA-approved medications",
+      "Support groups (e.g.",
+      "NA)"
+    ],
+    "diet": [
+      "Hydration (water",
+      "herbal teas)",
+      "Omega-3s for brain health (walnuts",
+      "flaxseeds)",
+      "Foods rich in B vitamins (eggs"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Marijuana abuse"
+  },
+  "bursitis": {
+    "description": "Bursitis is inflammation of the bursae—small fluid-filled sacs that cushion bones and joints—causing joint pain, swelling, and limited movement, often from repetitive motion or pressure.",
+    "precautions": [
+      "Rest the affected joint",
+      "Apply ice packs",
+      "Use joint support",
+      "Avoid repetitive strain"
+    ],
+    "medications": [
+      "NSAIDs (e.g.",
+      "Ibuprofen)",
+      "Corticosteroid injections",
+      "Ice packs",
+      "Physical therapy",
+      "Antibiotics (if septic bursitis)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (turmeric",
+      "ginger",
+      "berries)",
+      "Omega-3 fatty acids (salmon",
+      "chia seeds)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Bursitis"
+  },
+  "actinic keratosis": {
+    "description": "Actinic keratosis is a rough, scaly patch on the skin caused by prolonged sun exposure, and is considered a precancerous condition that can develop into squamous cell carcinoma.",
+    "precautions": [
+      "Avoid sun exposure",
+      "Use broad-spectrum sunscreen",
+      "Wear protective clothing",
+      "See dermatologist regularly"
+    ],
+    "medications": [
+      "Topical 5-fluorouracil",
+      "Imiquimod cream",
+      "Diclofenac gel",
+      "Cryotherapy",
+      "Photodynamic therapy"
+    ],
+    "diet": [
+      "Antioxidant-rich foods (berries",
+      "spinach",
+      "nuts)",
+      "Vitamin E-rich foods (almonds",
+      "sunflower seeds)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Actinic keratosis"
+  },
+  "copd": {
+    "description": "",
+    "precautions": [
+      "Avoid smoking",
+      "Use inhalers as prescribed",
+      "Stay away from air pollution",
+      "Get vaccinated against flu"
+    ],
+    "medications": [],
+    "diet": [],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "COPD"
+  },
+  "spondylosis": {
+    "description": "Spondylosis is a degenerative condition affecting the spine due to aging, resulting in stiffness, pain, and reduced mobility due to wear and tear on spinal discs and joints.",
+    "precautions": [
+      "Maintain good posture",
+      "Exercise regularly",
+      "Use ergonomic chairs",
+      "Avoid lifting heavy weights"
+    ],
+    "medications": [
+      "NSAIDs (e.g.",
+      "Naproxen)",
+      "Muscle relaxants",
+      "Physical therapy",
+      "Epidural steroid injections",
+      "Surgery in severe cases"
+    ],
+    "diet": [
+      "Calcium-rich foods (milk",
+      "cheese",
+      "fortified plant milk)",
+      "Vitamin D-rich foods (egg yolk",
+      "fortified cereals)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Spondylosis"
+  },
+  "injury to the arm": {
+    "description": "Injury to the arm refers to damage to muscles, bones, ligaments, or skin in the arm area from trauma, leading to pain, swelling, bruising, or limited movement.",
+    "precautions": [
+      "Immobilize the arm",
+      "Apply cold compress",
+      "Elevate the arm",
+      "Seek medical care if swelling"
+    ],
+    "medications": [
+      "Pain relievers (e.g.",
+      "Acetaminophen)",
+      "Cold compress",
+      "Immobilization/splinting",
+      "Antibiotics (if open wound)",
+      "Physical therapy"
+    ],
+    "diet": [
+      "Protein-rich foods (chicken",
+      "eggs",
+      "legumes)",
+      "Vitamin C-rich foods (citrus fruits",
+      "strawberries)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Injury to the arm"
+  },
+  "complex regional pain syndrome": {
+    "description": "Complex regional pain syndrome (CRPS) is a chronic pain condition usually affecting a limb after injury, with symptoms including burning pain, swelling, and sensitivity to touch.",
+    "precautions": [
+      "Follow physical therapy",
+      "Manage stress",
+      "Take prescribed medication",
+      "Avoid injury to the affected limb"
+    ],
+    "medications": [
+      "Gabapentin",
+      "Amitriptyline",
+      "Physical therapy",
+      "Corticosteroids",
+      "Nerve blocks"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (turmeric",
+      "berries",
+      "leafy greens)",
+      "Omega-3 fatty acids (salmon",
+      "walnuts)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Complex regional pain syndrome"
+  },
+  "injury to the trunk": {
+    "description": "Injury to the trunk includes trauma to the chest, abdomen, or back areas, possibly involving internal organs, muscles, or bones, and can range from minor bruises to serious internal damage.",
+    "precautions": [
+      "Apply ice or heat",
+      "Rest adequately",
+      "Use support belts if advised",
+      "Avoid strenuous activity"
+    ],
+    "medications": [
+      "Pain relievers (e.g.",
+      "Ibuprofen)",
+      "Ice/heat therapy",
+      "Muscle relaxants",
+      "Wound care (if external)",
+      "Physiotherapy"
+    ],
+    "diet": [
+      "High-protein foods (tofu",
+      "lean meats)",
+      "Vitamin C-rich foods (bell peppers",
+      "kiwi)",
+      "Zinc sources (shellfish"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Injury to the trunk"
+  },
+  "vulvodynia": {
+    "description": "Vulvodynia is chronic pain or discomfort around the opening of the vagina (vulva) with no identifiable cause, often described as burning, stinging, or irritation.",
+    "precautions": [
+      "Wear loose cotton clothing",
+      "Avoid scented products",
+      "Use prescribed creams",
+      "Manage stress levels"
+    ],
+    "medications": [
+      "Topical Lidocaine",
+      "Tricyclic antidepressants (e.g.",
+      "Amitriptyline)",
+      "Gabapentin",
+      "Physical therapy",
+      "Cognitive behavioral therapy"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (blueberries",
+      "leafy greens)",
+      "Probiotics (yogurt",
+      "kimchi)",
+      "Omega-3 fatty acids (flaxseeds"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Vulvodynia"
+  },
+  "concussion": {
+    "description": "A concussion is a mild traumatic brain injury caused by a blow to the head or body, resulting in temporary loss of brain function, such as confusion, memory loss, or dizziness.",
+    "precautions": [
+      "Rest and avoid screens",
+      "Avoid physical activity",
+      "Monitor symptoms",
+      "Follow up with neurologist"
+    ],
+    "medications": [
+      "Rest",
+      "Acetaminophen (avoid NSAIDs early)",
+      "Cognitive rest",
+      "Hydration",
+      "Gradual return to activities"
+    ],
+    "diet": [
+      "Omega-3 fatty acids (chia seeds",
+      "salmon)",
+      "Antioxidant-rich foods (blueberries",
+      "dark chocolate)",
+      "Protein-rich foods (eggs"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Concussion"
+  },
+  "hypoglycemia": {
+    "description": "Hypoglycemia is a condition characterized by abnormally low blood sugar levels, often causing shakiness, sweating, confusion, irritability, or fainting, common in diabetics on insulin.",
+    "precautions": [
+      "Eat small frequent meals",
+      "Carry glucose tablets",
+      "Avoid skipping meals",
+      "Monitor blood sugar levels"
+    ],
+    "medications": [
+      "Glucose tablets",
+      "Juice or sugary snacks",
+      "Glucagon injection (emergency)",
+      "Adjust insulin or diabetes medication",
+      "Frequent meals"
+    ],
+    "diet": [
+      "Complex carbohydrates (whole grains",
+      "legumes)",
+      "Protein with every meal (eggs",
+      "nuts)",
+      "Avoid sugary snacks"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Hypoglycemia"
+  },
+  "hiatal hernia": {
+    "description": "A hiatal hernia occurs when the upper part of the stomach pushes through the diaphragm into the chest cavity, often causing symptoms like heartburn, reflux, and chest pain.",
+    "precautions": [
+      "Eat small frequent meals",
+      "Avoid lying down after eating",
+      "Avoid spicy food",
+      "Maintain healthy weight"
+    ],
+    "medications": [
+      "Antacids",
+      "Proton Pump Inhibitors (e.g.",
+      "Omeprazole)",
+      "H2 Blockers (e.g.",
+      "Ranitidine)",
+      "Prokinetic agents"
+    ],
+    "diet": [
+      "Small",
+      "frequent meals",
+      "Avoid spicy foods and caffeine",
+      "High-fiber foods (oats",
+      "vegetables)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Hiatal hernia"
+  },
+  "allergy": {
+    "description": "An allergy is an overreaction of the immune system to substances like pollen, food, or medications, causing symptoms like sneezing, itching, rash, or anaphylaxis.",
+    "precautions": [
+      "Apply calamine",
+      "Cover area with bandage",
+      "Use ice to compress itching",
+      "Avoid known allergens"
+    ],
+    "medications": [
+      "Antihistamines (e.g.",
+      "Loratadine)",
+      "Decongestants (e.g.",
+      "Pseudoephedrine)",
+      "Epinephrine auto-injectors",
+      "Corticosteroids"
+    ],
+    "diet": [
+      "Elimination diet (avoid allergen foods)",
+      "Omega-3 fatty acids (salmon",
+      "flaxseeds)",
+      "Vitamin C-rich foods (oranges",
+      "bell peppers)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Allergy"
+  },
+  "acute bronchospasm": {
+    "description": "Acute bronchospasm is a sudden constriction of the muscles in the walls of the bronchioles, often triggered by asthma or allergens, causing wheezing and difficulty breathing.",
+    "precautions": [
+      "Avoid cold air",
+      "Use bronchodilator inhaler",
+      "Avoid allergens",
+      "Monitor breathing patterns"
+    ],
+    "medications": [
+      "Short-acting beta-agonists (e.g.",
+      "Albuterol)",
+      "Anticholinergics",
+      "Systemic corticosteroids",
+      "Oxygen therapy",
+      "Magnesium sulfate (in severe cases)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (ginger",
+      "turmeric)",
+      "Omega-3 fatty acids (wild salmon",
+      "chia seeds)",
+      "Vitamin C-rich foods (citrus fruits)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Acute bronchospasm"
+  },
+  "degenerative disc disease": {
+    "description": "Degenerative disc disease is a condition where spinal discs break down over time, leading to back pain, reduced flexibility, and sometimes nerve compression.",
+    "precautions": [
+      "Maintain healthy weight",
+      "Avoid lifting heavy items",
+      "Engage in back exercises",
+      "Use lumbar support"
+    ],
+    "medications": [
+      "NSAIDs",
+      "Physical therapy",
+      "Muscle relaxants",
+      "Steroid injections",
+      "Surgery (e.g.",
+      "spinal fusion in advanced cases)"
+    ],
+    "diet": [
+      "Calcium-rich foods (milk",
+      "cheese)",
+      "Vitamin D-rich foods (fatty fish",
+      "egg yolk)",
+      "Anti-inflammatory foods (berries"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Degenerative disc disease"
+  },
+  "pain after an operation": {
+    "description": "Pain after an operation (postoperative pain) is discomfort or soreness at the surgical site, which may be due to tissue injury, inflammation, or healing processes.",
+    "precautions": [
+      "Take pain meds as prescribed",
+      "Avoid physical strain",
+      "Keep surgical area clean",
+      "Attend follow-up appointments"
+    ],
+    "medications": [
+      "Acetaminophen",
+      "Opioids (e.g.",
+      "Morphine",
+      "Tramadol)",
+      "NSAIDs",
+      "Local anesthetics"
+    ],
+    "diet": [
+      "High-protein foods (eggs",
+      "fish)",
+      "Vitamin C-rich foods (kiwi",
+      "strawberries)",
+      "Zinc-rich foods (beef"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Pain after an operation"
+  },
+  "injury to the leg": {
+    "description": "Injury to the leg includes trauma to any part of the leg such as the thigh, knee, shin, or ankle, potentially involving muscles, bones, or ligaments.",
+    "precautions": [
+      "Elevate the leg",
+      "Apply ice packs",
+      "Avoid putting weight",
+      "Use crutches if advised"
+    ],
+    "medications": [
+      "Pain relievers",
+      "Compression bandages",
+      "Crutches or brace",
+      "Physical therapy",
+      "Antibiotics (if open wound)"
+    ],
+    "diet": [
+      "Protein-rich foods (lean meats",
+      "beans)",
+      "Vitamin C-rich foods (oranges",
+      "strawberries)",
+      "Zinc-rich foods (shellfish"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Injury to the leg"
+  },
+  "gout": {
+    "description": "Gout is a form of inflammatory arthritis caused by buildup of uric acid crystals in joints, leading to sudden, severe pain, redness, and swelling, often in the big toe.",
+    "precautions": [
+      "Avoid purine-rich food",
+      "Stay hydrated",
+      "Limit alcohol intake",
+      "Take medication as prescribed"
+    ],
+    "medications": [
+      "Colchicine",
+      "NSAIDs (e.g.",
+      "Indomethacin)",
+      "Allopurinol",
+      "Febuxostat",
+      "Corticosteroids"
+    ],
+    "diet": [
+      "Low-purine foods (vegetables",
+      "whole grains)",
+      "Cherries and berries",
+      "Hydration",
+      "Limit red meat and seafood"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Gout"
+  },
+  "otitis media": {
+    "description": "Otitis media is a middle ear infection that commonly affects children, causing ear pain, fever, irritability, and sometimes fluid discharge from the ear.",
+    "precautions": [
+      "Avoid water entering ears",
+      "Take antibiotics as prescribed",
+      "Use warm compress",
+      "Follow up with ENT specialist"
+    ],
+    "medications": [
+      "Amoxicillin",
+      "Cefdinir",
+      "Acetaminophen for pain",
+      "Decongestants",
+      "Tympanostomy (if recurrent)"
+    ],
+    "diet": [
+      "Hydrating fluids (water",
+      "herbal teas)",
+      "Vitamin C-rich foods (citrus fruits)",
+      "Probiotics (yogurt",
+      "kefir)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Otitis media"
+  },
+  "acute kidney injury": {
+    "description": "Acute kidney injury (AKI) is a sudden loss of kidney function due to illness, injury, or toxins, leading to buildup of waste products in the blood.",
+    "precautions": [
+      "Avoid NSAIDs",
+      "Stay hydrated",
+      "Monitor fluid intake",
+      "Follow renal diet plan"
+    ],
+    "medications": [
+      "IV fluids",
+      "Diuretics (e.g.",
+      "Furosemide)",
+      "Electrolyte management",
+      "Discontinue nephrotoxic drugs",
+      "Dialysis (if severe)"
+    ],
+    "diet": [
+      "Low-protein diet (consult doctor)",
+      "Limit sodium (avoid processed foods)",
+      "Potassium regulation (bananas",
+      "potatoes – based on medical advice)",
+      "Hydration monitoring"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Acute kidney injury"
+  },
+  "threatened pregnancy": {
+    "description": "A threatened pregnancy refers to early pregnancy complications, such as vaginal bleeding or cramping, that may suggest a risk of miscarriage but with a still viable fetus.",
+    "precautions": [
+      "Take prescribed medications",
+      "Avoid stress and lifting heavy items",
+      "Get regular checkups",
+      "Rest as recommended"
+    ],
+    "medications": [
+      "Progesterone supplements",
+      "Folic acid",
+      "Bed rest (limited use)",
+      "IV fluids (if dehydrated)",
+      "Close monitoring with ultrasound"
+    ],
+    "diet": [
+      "Folic acid-rich foods (leafy greens",
+      "beans)",
+      "Iron-rich foods (red meat",
+      "lentils)",
+      "Hydration"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Threatened pregnancy"
+  },
+  "gum disease": {
+    "description": "Gum disease (periodontal disease) is an infection and inflammation of the gums and surrounding tissues, often caused by poor oral hygiene, leading to bleeding, receding gums, and tooth loss.",
+    "precautions": [
+      "Maintain oral hygiene",
+      "Floss daily",
+      "Avoid smoking",
+      "Visit dentist regularly"
+    ],
+    "medications": [
+      "Antibacterial mouthwash (e.g.",
+      "Chlorhexidine)",
+      "Scaling and root planing",
+      "Doxycycline",
+      "Fluoride toothpaste",
+      "Surgical interventions (if severe)"
+    ],
+    "diet": [
+      "Vitamin C-rich foods (citrus fruits",
+      "strawberries)",
+      "Calcium-rich foods (milk",
+      "yogurt)",
+      "Green tea"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Gum disease"
+  },
+  "gastrointestinal hemorrhage": {
+    "description": "Gastrointestinal hemorrhage is bleeding that occurs anywhere along the digestive tract, often presenting as vomiting blood or black, tarry stools, and can be caused by ulcers, varices, or cancer.",
+    "precautions": [
+      "Avoid NSAIDs",
+      "Eat a soft bland diet",
+      "Limit alcohol",
+      "Follow up with GI specialist"
+    ],
+    "medications": [
+      "IV proton pump inhibitors (e.g.",
+      "Pantoprazole)",
+      "Endoscopic hemostasis",
+      "Blood transfusion",
+      "Octreotide (for variceal bleeding)",
+      "Antibiotics (e.g."
+    ],
+    "diet": [
+      "Avoid spicy and acidic foods",
+      "Bland diet (bananas",
+      "rice",
+      "applesauce)",
+      "Hydration"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Gastrointestinal hemorrhage"
+  },
+  "anxiety": {
+    "description": "Anxiety is a mental health condition characterized by excessive worry, nervousness, or fear that interferes with daily activities, often accompanied by physical symptoms like restlessness, sweating, or rapid heartbeat.",
+    "precautions": [
+      "Practice relaxation techniques",
+      "Avoid stimulants like caffeine",
+      "Maintain regular sleep",
+      "Seek counseling if needed"
+    ],
+    "medications": [
+      "SSRIs (e.g.",
+      "Escitalopram)",
+      "SNRIs (e.g.",
+      "Duloxetine)",
+      "Benzodiazepines (short-term use)",
+      "Buspirone"
+    ],
+    "diet": [
+      "Magnesium-rich foods (nuts",
+      "seeds)",
+      "Omega-3 fatty acids (salmon",
+      "chia seeds)",
+      "Vitamin B-complex foods (whole grains"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Anxiety"
+  },
+  "conjunctivitis due to allergy": {
+    "description": "Allergic conjunctivitis is inflammation of the conjunctiva (eye lining) caused by allergens like pollen or dust, leading to red, itchy, watery eyes without infectious discharge.",
+    "precautions": [
+      "Avoid rubbing eyes",
+      "Use antihistamine drops",
+      "Keep environment clean",
+      "Avoid known allergens"
+    ],
+    "medications": [
+      "Antihistamine eye drops (e.g.",
+      "Olopatadine)",
+      "Mast cell stabilizers (e.g.",
+      "Ketotifen)",
+      "Artificial tears",
+      "Oral antihistamines"
+    ],
+    "diet": [
+      "Antihistamine-rich foods (quercetin in apples",
+      "onions)",
+      "Omega-3 fatty acids (salmon",
+      "flaxseeds)",
+      "Vitamin C-rich foods (citrus)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Conjunctivitis due to allergy"
+  },
+  "drug reaction": {
+    "description": "A drug reaction is an adverse response to a medication, ranging from mild rashes or stomach upset to severe allergic responses like Stevens-Johnson syndrome or anaphylaxis.",
+    "precautions": [
+      "Stop the drug immediately",
+      "Consult a doctor",
+      "Use antihistamines if prescribed",
+      "Monitor for worsening symptoms"
+    ],
+    "medications": [
+      "Discontinuation of offending drug",
+      "Antihistamines (e.g.",
+      "Diphenhydramine)",
+      "Corticosteroids",
+      "Epinephrine (for anaphylaxis)",
+      "IV fluids and supportive care"
+    ],
+    "diet": [
+      "Balanced diet with antioxidants (berries",
+      "leafy greens)",
+      "Hydration",
+      "Avoid processed and allergenic foods",
+      "Vitamin C and E-rich foods (nuts"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Drug reaction"
+  },
+  "macular degeneration": {
+    "description": "Macular degeneration is an eye disorder that damages the macula, the part of the retina responsible for central vision, leading to blurred or loss of central vision, typically in older adults.",
+    "precautions": [
+      "Wear sunglasses",
+      "Eat leafy greens",
+      "Avoid smoking",
+      "Regular eye checkups"
+    ],
+    "medications": [
+      "Anti-VEGF injections (e.g.",
+      "Ranibizumab",
+      "Aflibercept)",
+      "AREDS2 vitamin supplements",
+      "Photodynamic therapy",
+      "Laser therapy (rarely)"
+    ],
+    "diet": [
+      "Vitamin A-rich foods (carrots",
+      "sweet potatoes)",
+      "Lutein and zeaxanthin foods (spinach",
+      "kale)",
+      "Omega-3 fatty acids (fish"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Macular degeneration"
+  },
+  "pneumonia": {
+    "description": "Pneumonia is an infection of the lungs caused by bacteria, viruses, or fungi, resulting in cough, fever, chest pain, and difficulty breathing due to inflammation and fluid in the lungs.",
+    "precautions": [
+      "Take full course of antibiotics",
+      "Avoid smoking",
+      "Rest adequately",
+      "Stay hydrated"
+    ],
+    "medications": [
+      "Antibiotics (e.g.",
+      "Azithromycin",
+      "Ceftriaxone)",
+      "Antivirals (e.g.",
+      "Oseltamivir if viral)",
+      "Expectorants"
+    ],
+    "diet": [
+      "Hydrating fluids (water",
+      "herbal teas)",
+      "Protein-rich foods (chicken",
+      "beans)",
+      "Vitamin C-rich foods (oranges"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Pneumonia"
+  },
+  "vaginal cyst": {
+    "description": "A vaginal cyst is a fluid-filled sac that forms along the vaginal wall, often benign and asymptomatic, but can sometimes cause discomfort or pain if enlarged or infected.",
+    "precautions": [
+      "Maintain genital hygiene",
+      "Avoid tight clothing",
+      "Do warm sitz baths",
+      "Follow doctor’s advice"
+    ],
+    "medications": [
+      "Warm compress",
+      "Sitz bath",
+      "Antibiotics (if infected)",
+      "Surgical drainage (if large or recurrent)",
+      "Analgesics for pain"
+    ],
+    "diet": [
+      "Probiotics (yogurt",
+      "kefir)",
+      "Anti-inflammatory foods (berries",
+      "leafy greens)",
+      "Hydration"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Vaginal cyst"
+  },
+  "carpal tunnel syndrome": {
+    "description": "Carpal tunnel syndrome is a condition caused by compression of the median nerve in the wrist, leading to numbness, tingling, and weakness in the hand and fingers.",
+    "precautions": [
+      "Take frequent hand breaks",
+      "Use wrist splints",
+      "Avoid repetitive motions",
+      "Do stretching exercises"
+    ],
+    "medications": [
+      "Wrist splint",
+      "NSAIDs",
+      "Corticosteroid injections",
+      "Gabapentin (if nerve pain)",
+      "Surgical decompression (if severe)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (turmeric",
+      "ginger)",
+      "Omega-3 fatty acids (chia seeds",
+      "salmon)",
+      "Magnesium-rich foods (spinach"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Carpal tunnel syndrome"
+  },
+  "nose disorder": {
+    "description": "Nose disorders include structural or inflammatory issues such as deviated septum, nasal polyps, or rhinitis, causing congestion, breathing difficulty, or nosebleeds.",
+    "precautions": [
+      "Avoid nose picking",
+      "Keep nasal passages moist",
+      "Use saline sprays",
+      "Avoid irritants and allergens"
+    ],
+    "medications": [
+      "Nasal decongestants (e.g.",
+      "Oxymetazoline)",
+      "Antihistamines",
+      "Saline nasal spray",
+      "Intranasal corticosteroids",
+      "Antibiotics (if bacterial infection)"
+    ],
+    "diet": [
+      "Hydration",
+      "Vitamin C-rich foods (citrus",
+      "strawberries)",
+      "Zinc-rich foods (meat",
+      "seeds)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Nose disorder"
+  },
+  "dental caries": {
+    "description": "Dental caries (tooth decay) is the destruction of tooth enamel due to acids produced by bacteria feeding on sugars, leading to cavities, tooth pain, and infection if untreated.",
+    "precautions": [
+      "Brush twice daily",
+      "Limit sugar intake",
+      "Visit dentist regularly",
+      "Floss daily"
+    ],
+    "medications": [
+      "Fluoride toothpaste or gel",
+      "Dental fillings",
+      "Chlorhexidine mouth rinse",
+      "Analgesics for pain",
+      "Root canal therapy (if advanced)"
+    ],
+    "diet": [
+      "Calcium-rich foods (milk",
+      "cheese)",
+      "Vitamin D-rich foods (fatty fish",
+      "fortified cereals)",
+      "Limit sugary and sticky foods"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Dental caries"
+  },
+  "hypertensive heart disease": {
+    "description": "Hypertensive heart disease includes conditions caused by chronic high blood pressure, such as heart failure, thickened heart muscle, or coronary artery disease.",
+    "precautions": [
+      "Reduce salt intake",
+      "Monitor blood pressure",
+      "Exercise regularly",
+      "Take antihypertensive medication"
+    ],
+    "medications": [
+      "ACE inhibitors (e.g.",
+      "Lisinopril)",
+      "Beta-blockers (e.g.",
+      "Metoprolol)",
+      "Diuretics (e.g.",
+      "Furosemide)"
+    ],
+    "diet": [
+      "Low-sodium diet (avoid processed foods)",
+      "Potassium-rich foods (bananas",
+      "sweet potatoes)",
+      "Omega-3 fatty acids (salmon",
+      "walnuts)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Hypertensive heart disease"
+  },
+  "seasonal allergies (hay fever)": {
+    "description": "Seasonal allergies, or hay fever, are allergic reactions to airborne allergens like pollen, causing sneezing, nasal congestion, itchy eyes, and throat irritation, often during specific seasons.",
+    "precautions": [
+      "Keep windows closed during high pollen",
+      "Shower after being outdoors",
+      "Use air purifier",
+      "Take antihistamines"
+    ],
+    "medications": [
+      "Oral antihistamines (e.g.",
+      "Cetirizine)",
+      "Intranasal corticosteroids (e.g.",
+      "Fluticasone)",
+      "Leukotriene receptor antagonists (e.g.",
+      "Montelukast)"
+    ],
+    "diet": [
+      "Quercetin-rich foods (onions",
+      "apples)",
+      "Vitamin C-rich foods (citrus fruits)",
+      "Omega-3 fatty acids (flaxseeds",
+      "fish)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Seasonal allergies (hay fever)"
+  },
+  "fungal infection of the hair": {
+    "description": "Fungal infection of the hair, or tinea capitis, is a scalp infection caused by dermatophyte fungi, resulting in scaly patches, hair loss, and sometimes black dots or swelling.",
+    "precautions": [
+      "Keep scalp dry and clean",
+      "Avoid sharing personal items",
+      "Use antifungal shampoo",
+      "Maintain proper hygiene"
+    ],
+    "medications": [
+      "Griseofulvin (oral)",
+      "Terbinafine (oral)",
+      "Ketoconazole shampoo",
+      "Selenium sulfide shampoo",
+      "Itraconazole"
+    ],
+    "diet": [
+      "Antifungal foods (garlic",
+      "coconut oil)",
+      "Probiotics (yogurt",
+      "kefir)",
+      "Vitamin E-rich foods (nuts"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Fungal infection of the hair"
+  },
+  "rectal disorder": {
+    "description": "Rectal disorders include conditions affecting the rectum such as hemorrhoids, fissures, or prolapse, often causing pain, bleeding, or difficulty during bowel movements.",
+    "precautions": [
+      "Eat a high-fiber diet",
+      "Drink plenty of water",
+      "Avoid straining during bowel movements",
+      "Use sitz baths"
+    ],
+    "medications": [
+      "Hydrocortisone suppositories",
+      "Laxatives (e.g.",
+      "Lactulose)",
+      "Fiber supplements",
+      "Sitz baths",
+      "Surgical intervention (e.g."
+    ],
+    "diet": [
+      "High-fiber foods (whole grains",
+      "fruits",
+      "vegetables)",
+      "Hydration",
+      "Avoid spicy and processed foods"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Rectal disorder"
+  },
+  "stye": {
+    "description": "A stye is a red, painful lump near the edge of the eyelid caused by a bacterial infection of an oil gland, often resolving on its own or with warm compresses.",
+    "precautions": [
+      "Apply warm compress",
+      "Avoid touching or squeezing",
+      "Maintain eyelid hygiene",
+      "Discontinue eye makeup temporarily"
+    ],
+    "medications": [
+      "Warm compresses",
+      "Topical antibiotic ointment (e.g.",
+      "Erythromycin)",
+      "Oral antibiotics (if spreading)",
+      "Pain relievers",
+      "Incision and drainage (if abscess forms)"
+    ],
+    "diet": [
+      "Vitamin A-rich foods (carrots",
+      "sweet potatoes)",
+      "Vitamin C-rich foods (citrus)",
+      "Hydration",
+      "Omega-3 fatty acids (salmon"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Stye"
+  },
+  "heart attack": {
+    "description": "A heart attack (myocardial infarction) occurs when blood flow to part of the heart is blocked, leading to chest pain, shortness of breath, nausea, and potentially life-threatening damage to heart muscle.",
+    "precautions": [
+      "Take prescribed medication",
+      "Avoid stress",
+      "Eat heart-healthy diet",
+      "Monitor cholesterol and BP"
+    ],
+    "medications": [
+      "Aspirin",
+      "Nitroglycerin",
+      "Beta-blockers (e.g.",
+      "Metoprolol)",
+      "ACE inhibitors",
+      "Thrombolytics or PCI (percutaneous coronary intervention)"
+    ],
+    "diet": [
+      "Low-sodium diet (vegetables",
+      "fresh fruits)",
+      "Omega-3 fatty acids (salmon",
+      "flaxseeds)",
+      "Whole grains (brown rice"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Heart attack"
+  },
+  "obstructive sleep apnea (osa)": {
+    "description": "OSA is a sleep disorder where the throat muscles intermittently relax and block the airway, causing repeated pauses in breathing during sleep and leading to poor rest and fatigue.",
+    "precautions": [
+      "Maintain healthy weight",
+      "Use CPAP machine if prescribed",
+      "Avoid alcohol before bedtime",
+      "Sleep on your side"
+    ],
+    "medications": [
+      "CPAP (Continuous Positive Airway Pressure)",
+      "Weight loss",
+      "Mandibular advancement device",
+      "Modafinil (for residual sleepiness)",
+      "Surgery (e.g.",
+      "UPPP"
+    ],
+    "diet": [
+      "Weight management diet (calorie control)",
+      "Avoid alcohol and sedatives",
+      "High-fiber foods (whole grains",
+      "fruits)",
+      "Avoid heavy meals before bedtime"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Obstructive sleep apnea (OSA)"
+  },
+  "psoriasis": {
+    "description": "Psoriasis is a chronic autoimmune skin condition causing rapid skin cell growth that results in thick, scaly, red patches, often on the elbows, knees, or scalp.",
+    "precautions": [
+      "Keep skin moisturized",
+      "Avoid triggers like stress",
+      "Use prescribed creams",
+      "Avoid scratching"
+    ],
+    "medications": [
+      "Topical corticosteroids",
+      "Vitamin D analogs (e.g.",
+      "Calcipotriol)",
+      "Methotrexate",
+      "Biologics (e.g.",
+      "Adalimumab)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (turmeric",
+      "ginger",
+      "berries)",
+      "Omega-3 fatty acids (salmon",
+      "walnuts)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Psoriasis"
+  },
+  "arthritis of the hip": {
+    "description": "Arthritis of the hip involves inflammation and degeneration of the hip joint cartilage, leading to pain, stiffness, and reduced mobility, commonly due to osteoarthritis.",
+    "precautions": [
+      "Do low-impact exercises",
+      "Use walking aids if needed",
+      "Maintain healthy weight",
+      "Take anti-inflammatory medication"
+    ],
+    "medications": [
+      "NSAIDs",
+      "Corticosteroid injections",
+      "Physical therapy",
+      "Glucosamine supplements",
+      "Hip replacement surgery (in advanced cases)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (olive oil",
+      "turmeric",
+      "berries)",
+      "Omega-3 fatty acids (fish",
+      "flaxseeds)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Arthritis of the hip"
+  },
+  "sickle cell crisis": {
+    "description": "Sickle cell crisis is a painful episode in people with sickle cell disease, where misshapen red blood cells block blood flow, causing severe pain, fatigue, and potential organ damage.",
+    "precautions": [
+      "Stay hydrated",
+      "Avoid extreme temperatures",
+      "Prevent infections",
+      "Take prescribed medication regularly"
+    ],
+    "medications": [
+      "Hydroxyurea",
+      "Folic acid",
+      "Pain management (e.g.",
+      "Morphine)",
+      "IV fluids",
+      "Blood transfusions (if needed)"
+    ],
+    "diet": [
+      "Folate-rich foods (leafy greens",
+      "legumes)",
+      "Hydrating fluids (water",
+      "herbal teas)",
+      "Iron-rich foods (lean meats"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Sickle cell crisis"
+  },
+  "otitis externa (swimmer's ear)": {
+    "description": "Otitis externa is an infection of the outer ear canal, often due to trapped water and bacteria, leading to ear pain, itching, swelling, and discharge.",
+    "precautions": [
+      "Dry ears after swimming",
+      "Avoid inserting objects into ears",
+      "Use prescribed ear drops",
+      "Avoid dirty water bodies"
+    ],
+    "medications": [
+      "Topical antibiotic ear drops (e.g.",
+      "Ciprofloxacin + Hydrocortisone)",
+      "Acidifying drops (e.g.",
+      "Acetic acid)",
+      "Analgesics",
+      "Ear wick for deep infections"
+    ],
+    "diet": [
+      "Hydration",
+      "Avoid irritants and allergens",
+      "Vitamin C-rich foods (citrus fruits",
+      "bell peppers)",
+      "Anti-inflammatory foods (turmeric"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Otitis externa (swimmer's ear)"
+  },
+  "acute bronchiolitis": {
+    "description": "Acute bronchiolitis is a common lower respiratory tract infection in infants, usually caused by RSV, leading to wheezing, coughing, and difficulty breathing.",
+    "precautions": [
+      "Keep child hydrated",
+      "Use humidifier",
+      "Avoid exposure to smoke",
+      "Monitor breathing"
+    ],
+    "medications": [
+      "Supportive care",
+      "Nasal suctioning",
+      "Saline nebulization",
+      "Oxygen therapy (if hypoxic)",
+      "Antipyretics (e.g.",
+      "Paracetamol)"
+    ],
+    "diet": [
+      "Hydration (water",
+      "herbal teas)",
+      "Vitamin C-rich foods (oranges",
+      "strawberries)",
+      "Protein-rich foods (chicken"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Acute bronchiolitis"
+  },
+  "pyogenic skin infection": {
+    "description": "A pyogenic skin infection is a bacterial infection of the skin that produces pus, such as abscesses, boils, or cellulitis, often caused by Staphylococcus aureus.",
+    "precautions": [
+      "Keep wound clean and dry",
+      "Avoid scratching",
+      "Take prescribed antibiotics",
+      "Cover infected area"
+    ],
+    "medications": [
+      "Oral antibiotics (e.g.",
+      "Cephalexin",
+      "Clindamycin)",
+      "Topical antibiotics (e.g.",
+      "Mupirocin)",
+      "Incision and drainage"
+    ],
+    "diet": [
+      "Protein-rich foods (lean meat",
+      "eggs)",
+      "Vitamin C-rich foods (citrus fruits",
+      "kiwi)",
+      "Zinc-rich foods (pumpkin seeds"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Pyogenic skin infection"
+  },
+  "noninfectious gastroenteritis": {
+    "description": "Noninfectious gastroenteritis refers to inflammation of the stomach and intestines not caused by infection, but by irritants like medications, alcohol, or food intolerances.",
+    "precautions": [
+      "Avoid irritant foods",
+      "Stay hydrated",
+      "Eat bland diet",
+      "Rest well"
+    ],
+    "medications": [
+      "Antiemetics (e.g.",
+      "Ondansetron)",
+      "Antispasmodics (e.g.",
+      "Dicyclomine)",
+      "Probiotics",
+      "Hydration therapy"
+    ],
+    "diet": [
+      "Bland diet (bananas",
+      "rice",
+      "applesauce)",
+      "Hydration",
+      "Avoid spicy"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Noninfectious gastroenteritis"
+  },
+  "benign prostatic hyperplasia (bph)": {
+    "description": "BPH is a non-cancerous enlargement of the prostate gland in older men, causing difficulty urinating, weak stream, or frequent urination, especially at night.",
+    "precautions": [
+      "Limit evening fluid intake",
+      "Avoid alcohol and caffeine",
+      "Empty bladder completely",
+      "Follow up with urologist"
+    ],
+    "medications": [
+      "Alpha blockers (e.g.",
+      "Tamsulosin)",
+      "5-alpha reductase inhibitors (e.g.",
+      "Finasteride)",
+      "Tadalafil (for symptoms)",
+      "Surgical options (e.g."
+    ],
+    "diet": [
+      "Hydration",
+      "Limit caffeine and alcohol",
+      "Zinc-rich foods (pumpkin seeds",
+      "beef)",
+      "Tomatoes (lycopene)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Benign prostatic hyperplasia (BPH)"
+  },
+  "spinal stenosis": {
+    "description": "Spinal stenosis is the narrowing of the spinal canal, often due to arthritis or disc problems, leading to back pain, numbness, and weakness in the legs.",
+    "precautions": [
+      "Avoid high-impact activities",
+      "Use walking support",
+      "Physical therapy",
+      "Take anti-inflammatory meds"
+    ],
+    "medications": [
+      "NSAIDs",
+      "Physical therapy",
+      "Epidural steroid injections",
+      "Gabapentin or Pregabalin",
+      "Surgical decompression (e.g.",
+      "laminectomy)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (berries",
+      "leafy greens)",
+      "Omega-3 fatty acids (salmon",
+      "flaxseeds)",
+      "Calcium-rich foods (milk"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Spinal stenosis"
+  },
+  "acute bronchitis": {
+    "description": "Acute bronchitis is inflammation of the bronchial tubes in the lungs, typically caused by a viral infection, resulting in cough, mucus production, chest discomfort, and low-grade fever.",
+    "precautions": [
+      "Avoid smoking",
+      "Drink warm fluids",
+      "Use cough suppressants if needed",
+      "Rest and recover"
+    ],
+    "medications": [
+      "Cough suppressants (e.g.",
+      "Dextromethorphan)",
+      "Expectorants (e.g.",
+      "Guaifenesin)",
+      "Bronchodilators (if wheezing)",
+      "NSAIDs"
+    ],
+    "diet": [
+      "Hydration",
+      "Vitamin C-rich foods (citrus fruits",
+      "bell peppers)",
+      "Avoid dairy if mucus increases",
+      "Anti-inflammatory foods (ginger"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Acute bronchitis"
+  },
+  "croup": {
+    "description": "Croup is a viral infection that causes swelling of the airway in young children, leading to a barking cough, hoarseness, and difficulty breathing, often worse at night.",
+    "precautions": [
+      "Use humidified air",
+      "Keep child calm",
+      "Encourage fluid intake",
+      "Seek medical help for breathing difficulty"
+    ],
+    "medications": [
+      "Dexamethasone (oral or IM)",
+      "Nebulized epinephrine",
+      "Humidified air",
+      "Antipyretics",
+      "Hydration"
+    ],
+    "diet": [
+      "Hydration",
+      "Humidified air",
+      "Vitamin C-rich foods (oranges",
+      "strawberries)",
+      "Avoid dairy if mucus worsens"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Croup"
+  },
+  "idiopathic excessive menstruation": {
+    "description": "Idiopathic excessive menstruation refers to abnormally heavy or prolonged menstrual bleeding without an identifiable underlying medical cause.",
+    "precautions": [
+      "Use sanitary protection",
+      "Monitor blood loss",
+      "Iron-rich diet",
+      "Consult gynecologist"
+    ],
+    "medications": [
+      "Tranexamic acid",
+      "NSAIDs (e.g.",
+      "Mefenamic acid)",
+      "Oral contraceptives",
+      "Levonorgestrel-releasing IUD",
+      "Iron supplements"
+    ],
+    "diet": [
+      "Iron-rich foods (spinach",
+      "red meat)",
+      "Vitamin C-rich foods (oranges",
+      "bell peppers)",
+      "Hydration"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Idiopathic excessive menstruation"
+  },
+  "ear drum damage": {
+    "description": "Ear drum damage (tympanic membrane perforation) is a tear or hole in the eardrum due to infection, injury, or loud noise, which may cause pain, hearing loss, or drainage.",
+    "precautions": [
+      "Avoid water entry into ear",
+      "Don’t insert objects into ear",
+      "Use ear drops as prescribed",
+      "Follow up with ENT"
+    ],
+    "medications": [
+      "Antibiotic ear drops (if infection)",
+      "Oral antibiotics (if needed)",
+      "Avoid water entry",
+      "Pain relief (e.g.",
+      "Acetaminophen)",
+      "Tympanoplasty (if persistent perforation)"
+    ],
+    "diet": [
+      "Protein-rich foods (lean meats",
+      "eggs)",
+      "Vitamin C-rich foods (citrus",
+      "broccoli)",
+      "Zinc-rich foods (shellfish"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Ear drum damage"
+  },
+  "temporary or benign blood in urine": {
+    "description": "Temporary or benign hematuria is the presence of blood in the urine without a serious underlying cause, sometimes triggered by exercise, medications, or mild infections.",
+    "precautions": [
+      "Stay hydrated",
+      "Avoid strenuous activity",
+      "Avoid certain medications (as advised)",
+      "Follow up with doctor"
+    ],
+    "medications": [
+      "Hydration therapy",
+      "Avoid strenuous exercise",
+      "Adjust anticoagulants (if relevant)",
+      "Monitor kidney function",
+      "Reassurance and follow-up"
+    ],
+    "diet": [
+      "Hydration",
+      "Avoid irritants (spicy foods",
+      "caffeine)",
+      "Balanced diet with fruits and vegetables",
+      "Limit sodium and processed foods"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Temporary or benign blood in urine"
+  },
+  "common cold": {
+    "description": "The common cold is a viral infection of the upper respiratory tract, typically causing sneezing, sore throat, nasal congestion, cough, and mild fever.",
+    "precautions": [
+      "Drink plenty of fluids",
+      "Rest well",
+      "Use nasal decongestants",
+      "Practice good hygiene"
+    ],
+    "medications": [
+      "Paracetamol",
+      "Ibuprofen",
+      "Decongestants (e.g.",
+      "Pseudoephedrine)",
+      "Antihistamines",
+      "Cough syrups (e.g."
+    ],
+    "diet": [
+      "Hydration (water",
+      "herbal teas)",
+      "Vitamin C-rich foods (citrus",
+      "kiwi)",
+      "Zinc-rich foods (nuts"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Common cold"
+  },
+  "depression": {
+    "description": "Depression is a mental health disorder characterized by persistent sadness, loss of interest or pleasure, fatigue, and changes in sleep or appetite, significantly impacting daily life.",
+    "precautions": [
+      "Maintain social connection",
+      "Follow treatment plan",
+      "Get regular exercise",
+      "Avoid alcohol and drugs"
+    ],
+    "medications": [
+      "SSRIs (e.g.",
+      "Sertraline",
+      "Escitalopram)",
+      "SNRIs (e.g.",
+      "Venlafaxine)",
+      "Atypical antidepressants (e.g."
+    ],
+    "diet": [
+      "Omega-3 fatty acids (salmon",
+      "walnuts)",
+      "Vitamin D-rich foods (egg yolk",
+      "fortified cereals)",
+      "Complex carbs (whole grains"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Depression"
+  },
+  "idiopathic irregular menstrual cycle": {
+    "description": "Idiopathic irregular menstrual cycle refers to inconsistent or unpredictable menstrual periods without a clear medical cause, often linked to hormonal imbalance.",
+    "precautions": [
+      "Keep menstrual diary",
+      "Maintain healthy weight",
+      "Reduce stress",
+      "Consult a gynecologist"
+    ],
+    "medications": [
+      "Combined oral contraceptives",
+      "Progestins",
+      "Metformin (if PCOS-related)",
+      "Lifestyle modification",
+      "Clomiphene (for ovulation induction)"
+    ],
+    "diet": [
+      "Balanced diet with protein (chicken",
+      "beans)",
+      "Iron-rich foods (spinach",
+      "lentils)",
+      "Vitamin B6-rich foods (bananas"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Idiopathic irregular menstrual cycle"
+  },
+  "schizophrenia": {
+    "description": "Schizophrenia is a severe psychiatric disorder involving distortions in thinking, perception, emotions, language, and behavior, often with hallucinations or delusions.",
+    "precautions": [
+      "Adhere to medication",
+      "Avoid substance abuse",
+      "Attend therapy sessions",
+      "Build a support network"
+    ],
+    "medications": [
+      "Antipsychotics (e.g.",
+      "Risperidone",
+      "Olanzapine)",
+      "Clozapine (treatment-resistant cases)",
+      "Cognitive behavioral therapy",
+      "Long-acting injectables"
+    ],
+    "diet": [
+      "Omega-3 fatty acids (fish",
+      "flaxseeds)",
+      "Complex carbs (whole grains",
+      "vegetables)",
+      "Vitamin B-complex foods (eggs"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Schizophrenia"
+  },
+  "sepsis": {
+    "description": "Sepsis is a life-threatening response to infection where the body’s immune system causes widespread inflammation, leading to tissue damage, organ failure, and possibly death.",
+    "precautions": [
+      "Seek urgent medical care",
+      "Follow antibiotic regimen",
+      "Monitor temperature & vitals",
+      "Maintain good hygiene"
+    ],
+    "medications": [
+      "IV broad-spectrum antibiotics (e.g.",
+      "Piperacillin-tazobactam)",
+      "IV fluids",
+      "Vasopressors (e.g.",
+      "Norepinephrine)",
+      "Oxygen therapy"
+    ],
+    "diet": [
+      "High-protein foods (eggs",
+      "lean meat)",
+      "Hydration",
+      "Vitamin C and zinc-rich foods (citrus fruits",
+      "pumpkin seeds)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Sepsis"
+  },
+  "cholecystitis": {
+    "description": "Cholecystitis is inflammation of the gallbladder, often due to gallstones, causing severe upper abdominal pain, fever, nausea, and tenderness.",
+    "precautions": [
+      "Avoid fatty foods",
+      "Stay hydrated",
+      "Follow up for imaging/tests",
+      "Take antibiotics as prescribed"
+    ],
+    "medications": [
+      "IV antibiotics (e.g.",
+      "Ceftriaxone + Metronidazole)",
+      "Pain relievers (e.g.",
+      "Morphine)",
+      "IV fluids",
+      "NPO (nothing by mouth)"
+    ],
+    "diet": [
+      "Low-fat diet (lean proteins",
+      "vegetables)",
+      "Avoid fried and fatty foods",
+      "High-fiber foods (whole grains",
+      "fruits)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Cholecystitis"
+  },
+  "cystitis": {
+    "description": "Cystitis is inflammation of the bladder, usually from a bacterial infection, leading to frequent, painful urination and lower abdominal discomfort.",
+    "precautions": [
+      "Drink cranberry juice or water",
+      "Urinate frequently",
+      "Avoid irritants like caffeine",
+      "Wipe front to back"
+    ],
+    "medications": [
+      "Nitrofurantoin",
+      "Trimethoprim-sulfamethoxazole",
+      "Fosfomycin",
+      "Phenazopyridine (for pain relief)",
+      "Hydration"
+    ],
+    "diet": [
+      "Hydration (water",
+      "cranberry juice)",
+      "Avoid caffeine and alcohol",
+      "Vitamin C-rich foods (oranges",
+      "strawberries)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Cystitis"
+  },
+  "hemorrhoids": {
+    "description": "Hemorrhoids are swollen veins in the anus or rectum that cause pain, itching, bleeding, or discomfort during bowel movements.",
+    "precautions": [
+      "Eat fiber-rich foods",
+      "Avoid prolonged sitting",
+      "Stay hydrated",
+      "Use sitz baths"
+    ],
+    "medications": [
+      "Topical hydrocortisone cream",
+      "Witch hazel pads",
+      "Stool softeners (e.g.",
+      "Docusate)",
+      "Sitz baths",
+      "Surgical procedures (e.g."
+    ],
+    "diet": [
+      "High-fiber foods (whole grains",
+      "fruits",
+      "vegetables)",
+      "Hydration",
+      "Avoid straining and constipation"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Hemorrhoids"
+  },
+  "contact dermatitis": {
+    "description": "Contact dermatitis is a skin inflammation caused by exposure to an irritant or allergen, resulting in redness, itching, blisters, or dryness.",
+    "precautions": [
+      "Identify and avoid allergen",
+      "Use fragrance-free products",
+      "Apply soothing lotion",
+      "Wear gloves when needed"
+    ],
+    "medications": [
+      "Topical corticosteroids (e.g.",
+      "Hydrocortisone)",
+      "Oral antihistamines",
+      "Moisturizers",
+      "Avoidance of allergen/irritant",
+      "Oral corticosteroids (if severe)"
+    ],
+    "diet": [
+      "Avoid allergenic foods",
+      "Anti-inflammatory foods (turmeric",
+      "ginger)",
+      "Hydrating fluids",
+      "Vitamin E-rich foods (nuts"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Contact dermatitis"
+  },
+  "sinus bradycardia": {
+    "description": "Sinus bradycardia is a slower than normal heart rate originating from the sinus node, which may be normal in athletes or caused by medications or medical conditions.",
+    "precautions": [
+      "Avoid excessive physical strain",
+      "Regular cardiac monitoring",
+      "Follow-up with cardiologist",
+      "Manage electrolyte balance"
+    ],
+    "medications": [
+      "Atropine (acute cases)",
+      "Temporary or permanent pacemaker (if symptomatic)",
+      "Adjust medications (if drug-induced)",
+      "Isoproterenol infusion (if needed)",
+      "Monitor ECG"
+    ],
+    "diet": [
+      "Balanced diet with adequate electrolytes (potassium from bananas",
+      "magnesium from nuts)",
+      "Hydration",
+      "Limit caffeine and alcohol",
+      "Whole grains and lean proteins"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Sinus bradycardia"
+  },
+  "pelvic inflammatory disease": {
+    "description": "Pelvic inflammatory disease (PID) is an infection of the female reproductive organs, often caused by sexually transmitted bacteria, leading to abdominal pain, fever, and abnormal discharge.",
+    "precautions": [
+      "Complete full course of antibiotics",
+      "Avoid sexual activity during treatment",
+      "Practice safe sex",
+      "Attend follow-up appointments"
+    ],
+    "medications": [
+      "Ceftriaxone + Doxycycline + Metronidazole",
+      "Pain relievers",
+      "Hospitalization (for severe cases)",
+      "Partner treatment",
+      "Abstain from intercourse during treatment"
+    ],
+    "diet": [
+      "Hydration",
+      "Protein-rich foods (chicken",
+      "beans)",
+      "Vitamin C-rich foods (citrus fruits)",
+      "Avoid irritants and processed foods"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Pelvic inflammatory disease"
+  },
+  "liver disease": {
+    "description": "Liver disease refers to a range of disorders affecting the liver, such as hepatitis, fatty liver, or cirrhosis, potentially causing jaundice, fatigue, and liver dysfunction.",
+    "precautions": [
+      "Avoid alcohol",
+      "Follow a liver-friendly diet",
+      "Get vaccinated for hepatitis",
+      "Monitor liver function tests"
+    ],
+    "medications": [
+      "Lactulose (for hepatic encephalopathy)",
+      "Diuretics (e.g.",
+      "Spironolactone)",
+      "Vitamin K (if coagulopathy)",
+      "Ursodeoxycholic acid",
+      "Antivirals (e.g."
+    ],
+    "diet": [
+      "Low sodium diet (avoid processed foods)",
+      "High-protein foods (eggs",
+      "lean meats)",
+      "Vitamin-rich foods (leafy greens",
+      "fruits)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Liver disease"
+  },
+  "chronic constipation": {
+    "description": "Chronic constipation is a long-term condition characterized by infrequent or difficult bowel movements, often accompanied by abdominal discomfort or bloating.",
+    "precautions": [
+      "Increase fiber intake",
+      "Exercise regularly",
+      "Stay hydrated",
+      "Avoid delaying bowel movements"
+    ],
+    "medications": [
+      "Laxatives (e.g.",
+      "Polyethylene glycol)",
+      "Stool softeners (e.g.",
+      "Docusate)",
+      "Fiber supplements (e.g.",
+      "Psyllium)"
+    ],
+    "diet": [
+      "High-fiber foods (whole grains",
+      "fruits",
+      "vegetables)",
+      "Hydration",
+      "Probiotics (yogurt"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Chronic constipation"
+  },
+  "skin polyp": {
+    "description": "A skin polyp (skin tag) is a small, benign growth of skin that typically appears in areas where skin rubs together, like the neck, armpits, or groin.",
+    "precautions": [
+      "Avoid irritation or injury to area",
+      "Monitor size and appearance",
+      "Don’t self-remove",
+      "Seek medical evaluation"
+    ],
+    "medications": [
+      "Cryotherapy",
+      "Electrosurgical removal",
+      "Snare excision",
+      "Topical anesthesia",
+      "Histopathology (to rule out malignancy)"
+    ],
+    "diet": [
+      "Balanced diet with antioxidants (berries",
+      "leafy greens)",
+      "Vitamin A-rich foods (carrots",
+      "sweet potatoes)",
+      "Hydration"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Skin polyp"
+  },
+  "brachial neuritis": {
+    "description": "Brachial neuritis is inflammation of the brachial plexus nerves, causing sudden shoulder and arm pain followed by weakness or numbness.",
+    "precautions": [
+      "Avoid heavy lifting",
+      "Physical therapy",
+      "Manage pain with meds",
+      "Get adequate rest"
+    ],
+    "medications": [
+      "NSAIDs",
+      "Oral corticosteroids",
+      "Gabapentin or Pregabalin",
+      "Physical therapy",
+      "Pain management"
+    ],
+    "diet": [
+      "Protein-rich foods (chicken",
+      "beans)",
+      "Anti-inflammatory foods (turmeric",
+      "ginger)",
+      "Omega-3 fatty acids (salmon"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Brachial neuritis"
+  },
+  "esophagitis": {
+    "description": "Esophagitis is inflammation of the esophagus, commonly due to acid reflux, infections, or medications, causing pain when swallowing and chest discomfort.",
+    "precautions": [
+      "Avoid spicy & acidic food",
+      "Eat smaller meals",
+      "Sit upright after eating",
+      "Follow prescribed medication"
+    ],
+    "medications": [
+      "Proton Pump Inhibitors (e.g.",
+      "Omeprazole)",
+      "H2 Blockers (e.g.",
+      "Ranitidine)",
+      "Sucralfate",
+      "Antifungal or antiviral agents (if infectious)"
+    ],
+    "diet": [
+      "Soft",
+      "bland diet (bananas",
+      "applesauce",
+      "oatmeal)",
+      "Avoid spicy"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Esophagitis"
+  },
+  "diverticulitis": {
+    "description": "Diverticulitis is inflammation or infection of small pouches (diverticula) in the colon wall, leading to abdominal pain, fever, and changes in bowel habits.",
+    "precautions": [
+      "Eat low-fiber during flare-ups",
+      "Stay hydrated",
+      "Take antibiotics if prescribed",
+      "Avoid seeds/nuts if advised"
+    ],
+    "medications": [
+      "Antibiotics (e.g.",
+      "Ciprofloxacin + Metronidazole)",
+      "Clear liquid diet (during flare)",
+      "Pain relievers",
+      "High-fiber diet (after recovery)",
+      "Surgery (if complications)"
+    ],
+    "diet": [
+      "Low-fiber diet during flare-up (white bread",
+      "white rice)",
+      "Hydration",
+      "Gradual increase to high-fiber diet (fruits",
+      "vegetables"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Diverticulitis"
+  },
+  "sprain or strain": {
+    "description": "A sprain is a stretched or torn ligament, while a strain is a stretched or torn muscle or tendon; both cause pain, swelling, and limited movement.",
+    "precautions": [
+      "Rest the area",
+      "Apply ice packs",
+      "Compression with bandage",
+      "Elevate the limb"
+    ],
+    "medications": [
+      "RICE (Rest",
+      "Ice",
+      "Compression",
+      "Elevation)",
+      "NSAIDs (e.g.",
+      "Ibuprofen)"
+    ],
+    "diet": [
+      "Protein-rich foods (lean meat",
+      "eggs)",
+      "Anti-inflammatory foods (ginger",
+      "turmeric)",
+      "Vitamin C-rich foods (citrus fruits)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Sprain or strain"
+  },
+  "idiopathic painful menstruation": {
+    "description": "Idiopathic painful menstruation (primary dysmenorrhea) is severe menstrual cramping without an identifiable medical condition, often starting in adolescence.",
+    "precautions": [
+      "Use heat pads",
+      "Take antispasmodics/NSAIDs",
+      "Regular exercise",
+      "Avoid stress"
+    ],
+    "medications": [
+      "NSAIDs (e.g.",
+      "Ibuprofen)",
+      "Oral contraceptives",
+      "Heat therapy",
+      "Vitamin B1 and magnesium supplements",
+      "Physical activity"
+    ],
+    "diet": [
+      "Magnesium-rich foods (spinach",
+      "dark chocolate)",
+      "Omega-3 fatty acids (salmon",
+      "walnuts)",
+      "Hydration"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Idiopathic painful menstruation"
+  },
+  "eustachian tube dysfunction (ear disorder)": {
+    "description": "Eustachian tube dysfunction occurs when the tube connecting the middle ear to the throat becomes blocked or fails to open, causing pressure, pain, or hearing issues.",
+    "precautions": [
+      "Avoid flying with a cold",
+      "Use decongestants",
+      "Perform Valsalva maneuver",
+      "Stay hydrated"
+    ],
+    "medications": [
+      "Nasal decongestants",
+      "Nasal corticosteroids",
+      "Auto-inflation (e.g.",
+      "Valsalva maneuver)",
+      "Antihistamines",
+      "Surgical placement of ear tubes (in severe cases)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (berries",
+      "leafy greens)",
+      "Vitamin C-rich foods (oranges",
+      "peppers)",
+      "Hydration"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Eustachian tube dysfunction (ear disorder)"
+  },
+  "appendicitis": {
+    "description": "Appendicitis is inflammation of the appendix, usually requiring surgery, and causes sudden lower right abdominal pain, nausea, and fever.",
+    "precautions": [
+      "Avoid taking laxatives",
+      "Seek emergency care",
+      "Don’t eat or drink before surgery",
+      "Follow post-op instructions"
+    ],
+    "medications": [
+      "Surgical removal (Appendectomy)",
+      "Pre-operative antibiotics (e.g.",
+      "Ceftriaxone + Metronidazole)",
+      "Pain management",
+      "IV fluids",
+      "NPO status before surgery"
+    ],
+    "diet": [
+      "Post-surgery: soft foods (broths",
+      "rice",
+      "applesauce)",
+      "Hydration",
+      "Avoid high-fat and spicy foods"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Appendicitis"
+  },
+  "hyperemesis gravidarum": {
+    "description": "Hyperemesis gravidarum is a severe form of morning sickness in pregnancy, leading to persistent nausea, vomiting, dehydration, and weight loss.",
+    "precautions": [
+      "Eat small, frequent meals",
+      "Stay hydrated",
+      "Avoid strong odors",
+      "Take prescribed anti-nausea meds"
+    ],
+    "medications": [
+      "IV fluids and electrolytes",
+      "Vitamin B6 (Pyridoxine)",
+      "Antiemetics (e.g.",
+      "Ondansetron",
+      "Promethazine)",
+      "Thiamine supplementation"
+    ],
+    "diet": [
+      "Small frequent meals",
+      "Bland foods (crackers",
+      "rice)",
+      "Ginger tea",
+      "Vitamin B6-rich foods (bananas"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Hyperemesis gravidarum"
+  },
+  "urinary tract infection": {
+    "description": "A urinary tract infection (UTI) is an infection in any part of the urinary system, commonly the bladder, causing pain during urination, urgency, and cloudy or strong-smelling urine.",
+    "precautions": [
+      "Drink plenty of fluids",
+      "Urinate after sex",
+      "Wipe front to back",
+      "Complete antibiotic course"
+    ],
+    "medications": [
+      "Nitrofurantoin",
+      "Ciprofloxacin",
+      "Trimethoprim-sulfamethoxazole",
+      "Cranberry supplements",
+      "Hydration therapy"
+    ],
+    "diet": [
+      "Hydration (water",
+      "cranberry juice)",
+      "Avoid caffeine",
+      "alcohol",
+      "and spicy foods"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Urinary tract infection"
+  },
+  "peripheral nerve disorder": {
+    "description": "Peripheral nerve disorders affect the nerves outside the brain and spinal cord, leading to numbness, weakness, pain, or coordination problems.",
+    "precautions": [
+      "Avoid repetitive injury",
+      "Use ergonomic tools",
+      "Take B vitamins if deficient",
+      "Follow neurologist’s advice"
+    ],
+    "medications": [
+      "Gabapentin",
+      "Pregabalin",
+      "Amitriptyline",
+      "Physical therapy",
+      "Alpha-lipoic acid (as supplement)"
+    ],
+    "diet": [
+      "Vitamin B-rich foods (whole grains",
+      "eggs",
+      "leafy greens)",
+      "Omega-3 fatty acids (salmon",
+      "chia seeds)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Peripheral nerve disorder"
+  },
+  "sebaceous cyst": {
+    "description": "A sebaceous cyst is a noncancerous bump beneath the skin, filled with oily material, often caused by blocked sebaceous glands.",
+    "precautions": [
+      "Keep area clean",
+      "Avoid squeezing",
+      "Apply warm compress",
+      "Get it drained by a doctor if needed"
+    ],
+    "medications": [
+      "Warm compress",
+      "Incision and drainage (if infected)",
+      "Antibiotics (if signs of infection)",
+      "Surgical excision",
+      "Steroid injection (if inflamed)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (ginger",
+      "turmeric",
+      "leafy greens)",
+      "Zinc-rich foods (pumpkin seeds",
+      "nuts)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Sebaceous cyst"
+  },
+  "spontaneous abortion": {
+    "description": "Spontaneous abortion (miscarriage) is the loss of a pregnancy before 20 weeks, often due to genetic issues or unknown causes, and may involve bleeding and cramping.",
+    "precautions": [
+      "Take emotional support",
+      "Rest adequately",
+      "Avoid strenuous activity",
+      "Follow up for check-up"
+    ],
+    "medications": [
+      "Misoprostol (to complete expulsion)",
+      "Mifepristone + Misoprostol (in selected cases)",
+      "Dilation and curettage (if needed)",
+      "Rh immunoglobulin (if Rh-negative)",
+      "Emotional support and counseling"
+    ],
+    "diet": [
+      "Iron-rich foods (red meat",
+      "spinach)",
+      "Vitamin C (citrus",
+      "strawberries)",
+      "Folate-rich foods (legumes"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Spontaneous abortion"
+  },
+  "gallstone": {
+    "description": "Gallstones are hardened deposits of digestive fluid in the gallbladder that can block bile flow, causing abdominal pain, nausea, and sometimes infection.",
+    "precautions": [
+      "Avoid high-fat foods",
+      "Maintain a healthy weight",
+      "Eat regular meals",
+      "Follow up for surgical evaluation if needed"
+    ],
+    "medications": [
+      "Ursodeoxycholic acid (in some cases)",
+      "Pain relievers (e.g.",
+      "NSAIDs)",
+      "Cholecystectomy (surgical removal)",
+      "Antibiotics (if cholecystitis)",
+      "Dietary modifications"
+    ],
+    "diet": [
+      "Low-fat diet (steamed vegetables",
+      "lean meats)",
+      "High-fiber foods (whole grains",
+      "apples)",
+      "Avoid fried foods and refined carbs"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Gallstone"
+  },
+  "multiple sclerosis": {
+    "description": "Multiple sclerosis (MS) is an autoimmune disease where the immune system attacks the protective sheath of nerves, leading to weakness, vision problems, and coordination issues.",
+    "precautions": [
+      "Avoid overheating",
+      "Follow medication schedule",
+      "Stay physically active",
+      "Rest when needed"
+    ],
+    "medications": [
+      "Interferon beta",
+      "Glatiramer acetate",
+      "Natalizumab",
+      "Corticosteroids (for flare-ups)",
+      "Disease-modifying therapies (e.g.",
+      "Fingolimod)"
+    ],
+    "diet": [
+      "Omega-3 fatty acids (flaxseeds",
+      "salmon)",
+      "Vitamin D-rich foods (eggs",
+      "fortified milk)",
+      "Antioxidant-rich foods (berries"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Multiple sclerosis"
+  },
+  "angina": {
+    "description": "Angina is chest pain or discomfort due to reduced blood flow to the heart muscle, often triggered by exertion or stress, and relieved by rest or medication.",
+    "precautions": [
+      "Avoid overexertion",
+      "Take nitroglycerin as prescribed",
+      "Manage stress",
+      "Avoid cold exposure"
+    ],
+    "medications": [
+      "Nitroglycerin (sublingual)",
+      "Beta-blockers",
+      "Calcium channel blockers",
+      "Aspirin",
+      "Statins"
+    ],
+    "diet": [
+      "Heart-healthy diet (oats",
+      "olive oil",
+      "fish)",
+      "Omega-3 fatty acids (salmon",
+      "flaxseed)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Angina"
+  },
+  "skin pigmentation disorder": {
+    "description": "Skin pigmentation disorders involve changes in skin color due to excess or lack of melanin, such as vitiligo, melasma, or hyperpigmentation.",
+    "precautions": [
+      "Use sunscreen daily",
+      "Avoid skin irritants",
+      "Follow dermatological treatments",
+      "Stay hydrated"
+    ],
+    "medications": [
+      "Hydroquinone cream",
+      "Topical retinoids",
+      "Azelaic acid",
+      "Chemical peels",
+      "Laser therapy (for resistant cases)"
+    ],
+    "diet": [
+      "Vitamin C-rich foods (oranges",
+      "bell peppers)",
+      "Vitamin E-rich foods (almonds",
+      "sunflower seeds)",
+      "Beta-carotene (carrots"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Skin pigmentation disorder"
+  },
+  "personality disorder": {
+    "description": "Personality disorders are mental health conditions involving rigid and unhealthy patterns of thinking, functioning, and behaving that impair social or occupational life.",
+    "precautions": [
+      "Follow psychotherapy plan",
+      "Avoid substance use",
+      "Build healthy relationships",
+      "Maintain regular routines"
+    ],
+    "medications": [
+      "Psychotherapy (e.g.",
+      "DBT for BPD)",
+      "SSRIs (for mood symptoms)",
+      "Mood stabilizers (e.g.",
+      "Lithium)",
+      "Antipsychotics (in some cases)"
+    ],
+    "diet": [
+      "Balanced diet",
+      "Omega-3 fatty acids (walnuts",
+      "flaxseed)",
+      "Vitamin B-complex (eggs",
+      "legumes)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Personality disorder"
+  },
+  "strep throat": {
+    "description": "Strep throat is a bacterial throat infection caused by Streptococcus pyogenes, leading to sore throat, fever, swollen glands, and red tonsils with white patches.",
+    "precautions": [
+      "Complete full antibiotic course",
+      "Avoid sharing utensils",
+      "Get adequate rest",
+      "Drink warm fluids"
+    ],
+    "medications": [
+      "Penicillin",
+      "Amoxicillin",
+      "Azithromycin (if allergic to penicillin)",
+      "Analgesics (e.g.",
+      "Acetaminophen)",
+      "Salt water gargles"
+    ],
+    "diet": [
+      "Soft foods (soups",
+      "mashed potatoes)",
+      "Warm teas (ginger",
+      "chamomile)",
+      "Hydration"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Strep throat"
+  },
+  "developmental disability": {
+    "description": "Developmental disabilities are chronic conditions that begin in childhood and affect physical, learning, language, or behavioral areas, such as autism or intellectual disability.",
+    "precautions": [
+      "Follow individualized education plans",
+      "Encourage structured routine",
+      "Regular therapy",
+      "Provide positive reinforcement"
+    ],
+    "medications": [
+      "Speech therapy",
+      "Occupational therapy",
+      "Behavioral therapy",
+      "Medications (e.g.",
+      "Risperidone for irritability in autism)",
+      "Special education programs"
+    ],
+    "diet": [
+      "Balanced",
+      "nutrient-dense diet",
+      "Omega-3 fatty acids (fish",
+      "flaxseeds)",
+      "B vitamins (whole grains"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Developmental disability"
+  },
+  "chronic back pain": {
+    "description": "Chronic back pain is persistent or recurring pain in the back lasting more than three months, often due to structural issues, nerve damage, or degenerative conditions.",
+    "precautions": [
+      "Maintain proper posture",
+      "Regular stretching",
+      "Use ergonomic furniture",
+      "Avoid lifting heavy objects"
+    ],
+    "medications": [
+      "NSAIDs",
+      "Muscle relaxants",
+      "Physical therapy",
+      "Epidural steroid injections",
+      "Chronic pain management (e.g.",
+      "TENS"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (berries",
+      "turmeric)",
+      "Calcium and Vitamin D (milk",
+      "cheese",
+      "eggs)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Chronic back pain"
+  },
+  "heart failure": {
+    "description": "Heart failure is a condition where the heart can't pump blood effectively, leading to fatigue, shortness of breath, fluid retention, and reduced exercise capacity.",
+    "precautions": [
+      "Monitor fluid intake",
+      "Follow low-sodium diet",
+      "Take prescribed meds",
+      "Track weight daily"
+    ],
+    "medications": [
+      "ACE inhibitors",
+      "Beta-blockers",
+      "Loop diuretics (e.g.",
+      "Furosemide)",
+      "Aldosterone antagonists (e.g.",
+      "Spironolactone)"
+    ],
+    "diet": [
+      "Low-sodium diet",
+      "Fluid monitoring",
+      "Potassium-rich foods (bananas",
+      "sweet potatoes)",
+      "Omega-3 fatty acids (fish)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Heart failure"
+  },
+  "conjunctivitis": {
+    "description": "Conjunctivitis (pink eye) is inflammation of the conjunctiva of the eye due to infection or allergy, resulting in redness, discharge, and eye irritation.",
+    "precautions": [
+      "Use prescribed eye drops",
+      "Avoid touching/rubbing eyes",
+      "Wash hands frequently",
+      "Don’t share towels"
+    ],
+    "medications": [
+      "Antibiotic eye drops (e.g.",
+      "Erythromycin",
+      "Moxifloxacin)",
+      "Antiviral drops (e.g.",
+      "Ganciclovir for herpes)",
+      "Lubricant drops"
+    ],
+    "diet": [
+      "Vitamin A-rich foods (carrots",
+      "spinach)",
+      "Zinc-rich foods (pumpkin seeds)",
+      "Hydration",
+      "Probiotics (yogurt)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Conjunctivitis"
+  },
+  "herniated disk": {
+    "description": "A herniated disk occurs when the inner gel-like core of a spinal disc bulges out through a tear, pressing on nearby nerves and causing back pain, numbness, or weakness.",
+    "precautions": [
+      "Avoid lifting heavy items",
+      "Follow physical therapy",
+      "Use proper posture",
+      "Take prescribed meds"
+    ],
+    "medications": [
+      "NSAIDs",
+      "Physical therapy",
+      "Muscle relaxants",
+      "Steroid injections",
+      "Surgical discectomy (if severe)"
+    ],
+    "diet": [
+      "Anti-inflammatory diet (ginger",
+      "leafy greens)",
+      "Omega-3 fatty acids (fish",
+      "flaxseed)",
+      "Vitamin D and calcium (fortified foods"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Herniated disk"
+  },
+  "diaper rash": {
+    "description": "Diaper rash is skin irritation in the diaper area of infants or adults using diapers, often caused by moisture, friction, or infection.",
+    "precautions": [
+      "Keep area dry",
+      "Change diapers frequently",
+      "Apply protective creams",
+      "Avoid scented products"
+    ],
+    "medications": [
+      "Zinc oxide cream",
+      "Petroleum jelly",
+      "Topical antifungals (e.g.",
+      "Clotrimazole)",
+      "Hydrocortisone cream (short-term)",
+      "Frequent diaper changes"
+    ],
+    "diet": [
+      "Breastfeeding (for infants)",
+      "For older babies: Avoid acidic foods (tomatoes",
+      "citrus)",
+      "Probiotics (yogurt)",
+      "Zinc-rich foods (eggs"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Diaper rash"
+  },
+  "eczema": {
+    "description": "Eczema (atopic dermatitis) is a chronic skin condition that causes itchy, inflamed, red, and dry skin, often triggered by allergens, stress, or irritants.",
+    "precautions": [
+      "Moisturize regularly",
+      "Avoid irritants like soaps & wool",
+      "Use corticosteroid creams",
+      "Reduce stress"
+    ],
+    "medications": [
+      "Topical corticosteroids",
+      "Emollients/Moisturizers",
+      "Antihistamines (for itching)",
+      "Calcineurin inhibitors (e.g.",
+      "Tacrolimus)",
+      "Phototherapy (in severe cases)"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (turmeric",
+      "blueberries)",
+      "Omega-3 fatty acids (salmon",
+      "chia seeds)",
+      "Avoid allergenic foods (dairy"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Eczema"
+  },
+  "chronic obstructive pulmonary disease (copd)": {
+    "description": "COPD is a group of progressive lung diseases, including emphysema and chronic bronchitis, characterized by airflow limitation, coughing, wheezing, and shortness of breath.",
+    "precautions": [],
+    "medications": [
+      "Bronchodilators (e.g.",
+      "Salbutamol)",
+      "Inhaled corticosteroids",
+      "Phosphodiesterase-4 inhibitors (e.g.",
+      "Roflumilast)",
+      "Oxygen therapy"
+    ],
+    "diet": [
+      "Anti-inflammatory foods (turmeric",
+      "ginger",
+      "berries)",
+      "Omega-3 fatty acids (wild salmon",
+      "walnuts)"
+    ],
+    "home_care": [
+      "Rest adequately",
+      "Stay well-hydrated",
+      "Eat light, easily digestible meals",
+      "Monitor temperature regularly"
+    ],
+    "when_to_seek_help": [
+      "Symptoms worsen after 48h of home care",
+      "Difficulty breathing or chest pain",
+      "High fever above 103F persists 2+ days",
+      "Confusion, fainting, or cannot keep fluids down"
+    ],
+    "_canonical": "Chronic obstructive pulmonary disease (COPD)"
+  }
+}

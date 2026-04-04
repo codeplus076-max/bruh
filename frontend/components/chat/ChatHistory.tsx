@@ -32,8 +32,7 @@ export function ChatHistory() {
         const fetchHistory = async () => {
             try {
                 const q = query(
-                    collection(db, "sessions"),
-                    where("userId", "==", user.uid),
+                    collection(db, "users", user.uid, "sessions"),
                     orderBy("createdAt", "desc"),
                     limit(10)
                 );
