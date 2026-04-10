@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
-import { collection, query, where, orderBy, getDocs, limit } from "firebase/firestore";
+import { collection, query, orderBy, getDocs, limit } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 import { useChat } from "@/context/ChatStateContext";
 import { useLanguage } from "@/context/LanguageContext";
