@@ -387,7 +387,7 @@ export function ChatInterface({ input, setInput }: { input: string, setInput: (v
                     <button
                         onClick={() => {
                             const greetingText = userProfile?.fullName ? t.chatGreeting.replace("Hi there!", `Hi ${userProfile.fullName.split(' ')[0]}!`) : t.chatGreeting;
-                            resetChat(greetingText, user?.uid);
+                            resetChat(greetingText);
                             setReportSummary(null); // Clear report on new chat
                         }}
                         className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-wider bg-surface border border-borderDark text-textMuted hover:text-primary hover:border-primary/50 transition-all shadow-sm group"
