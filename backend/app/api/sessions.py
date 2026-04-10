@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
+import time
 from app.firebase_config import get_db
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
@@ -59,6 +60,7 @@ async def save_session(request: SessionSaveRequest, authorization: Optional[str]
 @router.get("/history")
 async def get_history(authorization: Optional[str] = Header(None)):
     uid = await get_uid(authorization)
+    db = get_db()
     if not db:
         return []
     
@@ -79,6 +81,7 @@ async def get_history(authorization: Optional[str] = Header(None)):
 @router.get("/{sessionId}")
 async def get_session(sessionId: str, authorization: Optional[str] = Header(None)):
     uid = await get_uid(authorization)
+    db = get_db()
     if not db:
         raise HTTPException(status_code=500, detail="Database not ready")
     
