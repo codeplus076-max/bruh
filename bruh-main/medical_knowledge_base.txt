@@ -1,0 +1,208 @@
+=== MED-AI CLINICAL KNOWLEDGE BASE ===
+This is the trusted source of truth for disease diagnostics. Use ONLY this information when making medical assessments.
+
+DISEASE: (vertigo) Paroymsal  Positional Vertigo
+DESCRIPTION: Benign paroxysmal positional vertigo (BPPV) is one of the most common causes of vertigo — the sudden sensation that you're spinning or that the inside of your head is spinning. Benign paroxysmal positional vertigo causes brief episodes of mild to intense dizziness.
+COMMON SYMPTOMS: Headache, Loss of balance, Nausea, Spinning movements, Unsteadiness, Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Lie down, Avoid sudden change in body, Avoid abrupt head movment, Relax
+----------------------------------------
+DISEASE: AIDS
+DESCRIPTION: Acquired immunodeficiency syndrome (AIDS) is a chronic, potentially life-threatening condition caused by the human immunodeficiency virus (HIV). By damaging your immune system, HIV interferes with your body's ability to fight infection and disease.
+COMMON SYMPTOMS: Extra marital contacts, High fever, Muscle wasting, Patches in throat
+RECOMMENDED PRECAUTIONS/TREATMENTS: Avoid open cuts, Wear ppe if possible, Consult doctor, Follow up
+----------------------------------------
+DISEASE: Acne
+DESCRIPTION: Acne vulgaris is the formation of comedones, papules, pustules, nodules, and/or cysts as a result of obstruction and inflammation of pilosebaceous units (hair follicles and their accompanying sebaceous gland). Acne develops on the face and upper trunk. It most often affects adolescents.
+COMMON SYMPTOMS: Blackheads, Pus filled pimples, Scurring, Skin rash
+RECOMMENDED PRECAUTIONS/TREATMENTS: Bath twice, Avoid fatty spicy food, Drink plenty of water, Avoid too many products
+----------------------------------------
+DISEASE: Alcoholic hepatitis
+DESCRIPTION: Alcoholic hepatitis is a diseased, inflammatory condition of the liver caused by heavy alcohol consumption over an extended period of time. It's also aggravated by binge drinking and ongoing alcohol use. If you develop this condition, you must stop drinking alcohol
+COMMON SYMPTOMS: Abdominal pain, Distention of abdomen, Fluid overload, History of alcohol consumption, Swelling of stomach, Vomiting, Yellowish skin
+RECOMMENDED PRECAUTIONS/TREATMENTS: Stop alcohol consumption, Consult doctor, Medication, Follow up
+----------------------------------------
+DISEASE: Allergy
+DESCRIPTION: An allergy is an immune system response to a foreign substance that's not typically harmful to your body.They can include certain foods, pollen, or pet dander. Your immune system's job is to keep you healthy by fighting harmful pathogens.
+COMMON SYMPTOMS: Chills, Continuous sneezing, Shivering, Watering from eyes
+RECOMMENDED PRECAUTIONS/TREATMENTS: Apply calamine, Cover area with bandage, Use ice to compress itching
+----------------------------------------
+DISEASE: Arthritis
+DESCRIPTION: Arthritis is the swelling and tenderness of one or more of your joints. The main symptoms of arthritis are joint pain and stiffness, which typically worsen with age. The most common types of arthritis are osteoarthritis and rheumatoid arthritis.
+COMMON SYMPTOMS: Movement stiffness, Muscle weakness, Painful walking, Stiff neck, Swelling joints
+RECOMMENDED PRECAUTIONS/TREATMENTS: Exercise, Use hot and cold therapy, Try acupuncture, Massage
+----------------------------------------
+DISEASE: Bronchial Asthma
+DESCRIPTION: Bronchial asthma is a medical condition which causes the airway path of the lungs to swell and narrow. Due to this swelling, the air path produces excess mucus making it hard to breathe, which results in coughing, short breath, and wheezing. The disease is chronic and interferes with daily working.
+COMMON SYMPTOMS: Breathlessness, Cough, Family history, Fatigue, High fever, Mucoid sputum
+RECOMMENDED PRECAUTIONS/TREATMENTS: Switch to loose cloothing, Take deep breaths, Get away from trigger, Seek help
+----------------------------------------
+DISEASE: Cervical spondylosis
+DESCRIPTION: Cervical spondylosis is a general term for age-related wear and tear affecting the spinal disks in your neck. As the disks dehydrate and shrink, signs of osteoarthritis develop, including bony projections along the edges of bones (bone spurs).
+COMMON SYMPTOMS: Back pain, Dizziness, Loss of balance, Neck pain, Weakness in limbs
+RECOMMENDED PRECAUTIONS/TREATMENTS: Use heating pad or cold pack, Exercise, Take otc pain reliver, Consult doctor
+----------------------------------------
+DISEASE: Chicken pox
+DESCRIPTION: Chickenpox is a highly contagious disease caused by the varicella-zoster virus (VZV). It can cause an itchy, blister-like rash. The rash first appears on the chest, back, and face, and then spreads over the entire body, causing between 250 and 500 itchy blisters.
+COMMON SYMPTOMS: Fatigue, Headache, High fever, Itching, Lethargy, Loss of appetite, Malaise, Mild fever, Red spots over body, Skin rash, Swelled lymph nodes
+RECOMMENDED PRECAUTIONS/TREATMENTS: Use neem in bathing, Consume neem leaves, Take vaccine, Avoid public places
+----------------------------------------
+DISEASE: Chronic cholestasis
+DESCRIPTION: Chronic cholestatic diseases, whether occurring in infancy, childhood or adulthood, are characterized by defective bile acid transport from the liver to the intestine, which is caused by primary damage to the biliary epithelium in most cases
+COMMON SYMPTOMS: Abdominal pain, Itching, Loss of appetite, Nausea, Vomiting, Yellowing of eyes, Yellowish skin
+RECOMMENDED PRECAUTIONS/TREATMENTS: Cold baths, Anti itch medicine, Consult doctor, Eat healthy
+----------------------------------------
+DISEASE: Common Cold
+DESCRIPTION: The common cold is a viral infection of your nose and throat (upper respiratory tract). It's usually harmless, although it might not feel that way. Many types of viruses can cause a common cold.
+COMMON SYMPTOMS: Chest pain, Chills, Congestion, Continuous sneezing, Cough, Fatigue, Headache, High fever, Loss of smell, Malaise, Muscle pain, Phlegm, Redness of eyes, Runny nose, Sinus pressure, Swelled lymph nodes, Throat irritation
+RECOMMENDED PRECAUTIONS/TREATMENTS: Drink vitamin c rich drinks, Take vapour, Avoid cold food, Keep fever in check
+----------------------------------------
+DISEASE: Dengue
+DESCRIPTION: an acute infectious disease caused by a flavivirus (species Dengue virus of the genus Flavivirus), transmitted by aedes mosquitoes, and characterized by headache, severe joint pain, and a rash. — called also breakbone fever, dengue fever.
+COMMON SYMPTOMS: Back pain, Chills, Fatigue, Headache, High fever, Joint pain, Loss of appetite, Malaise, Muscle pain, Nausea, Pain behind the eyes, Red spots over body, Skin rash, Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Drink papaya leaf juice, Avoid fatty spicy food, Keep mosquitos away, Keep hydrated
+----------------------------------------
+DISEASE: Diabetes
+DESCRIPTION: Diabetes is a disease that occurs when your blood glucose, also called blood sugar, is too high. Blood glucose is your main source of energy and comes from the food you eat. Insulin, a hormone made by the pancreas, helps glucose from food get into your cells to be used for energy.
+COMMON SYMPTOMS: Blurred and distorted vision, Excessive hunger, Fatigue, Increased appetite, Irregular sugar level, Lethargy, Obesity, Polyuria, Restlessness, Weight loss
+RECOMMENDED PRECAUTIONS/TREATMENTS: Have balanced diet, Exercise, Consult doctor, Follow up
+----------------------------------------
+DISEASE: Dimorphic hemmorhoids(piles)
+DESCRIPTION: No description available.
+COMMON SYMPTOMS: Bloody stool, Constipation, Irritation in anus, Pain during bowel movements, Pain in anal region
+RECOMMENDED PRECAUTIONS/TREATMENTS: Avoid fatty spicy food, Consume witch hazel, Warm bath with epsom salt, Consume alovera juice
+----------------------------------------
+DISEASE: Drug Reaction
+DESCRIPTION: An adverse drug reaction (ADR) is an injury caused by taking medication. ADRs may occur following a single dose or prolonged administration of a drug or result from the combination of two or more drugs.
+COMMON SYMPTOMS: Burning micturition, Itching, Skin rash, Spotting  urination, Stomach pain
+RECOMMENDED PRECAUTIONS/TREATMENTS: Stop irritation, Consult nearest hospital, Stop taking drug, Follow up
+----------------------------------------
+DISEASE: Fungal infection
+DESCRIPTION: In humans, fungal infections occur when an invading fungus takes over an area of the body and is too much for the immune system to handle. Fungi can live in the air, soil, water, and plants. There are also some fungi that live naturally in the human body. Like many microbes, there are helpful fungi and harmful fungi.
+COMMON SYMPTOMS: Dischromic  patches, Itching, Nodal skin eruptions, Skin rash
+RECOMMENDED PRECAUTIONS/TREATMENTS: Bath twice, Use detol or neem in bathing water, Keep infected area dry, Use clean cloths
+----------------------------------------
+DISEASE: GERD
+DESCRIPTION: Gastroesophageal reflux disease, or GERD, is a digestive disorder that affects the lower esophageal sphincter (LES), the ring of muscle between the esophagus and stomach. Many people, including pregnant women, suffer from heartburn or acid indigestion caused by GERD.
+COMMON SYMPTOMS: Acidity, Chest pain, Cough, Stomach pain, Ulcers on tongue, Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Avoid fatty spicy food, Avoid lying down after eating, Maintain healthy weight, Exercise
+----------------------------------------
+DISEASE: Gastroenteritis
+DESCRIPTION: Gastroenteritis is an inflammation of the digestive tract, particularly the stomach, and large and small intestines. Viral and bacterial gastroenteritis are intestinal infections associated with symptoms of diarrhea , abdominal cramps, nausea , and vomiting .
+COMMON SYMPTOMS: Dehydration, Diarrhoea, Sunken eyes, Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Stop eating solid food for while, Try taking small sips of water, Rest, Ease back into eating
+----------------------------------------
+DISEASE: Heart attack
+DESCRIPTION: The death of heart muscle due to the loss of blood supply. The loss of blood supply is usually caused by a complete blockage of a coronary artery, one of the arteries that supplies blood to the heart muscle.
+COMMON SYMPTOMS: Breathlessness, Chest pain, Sweating, Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Call ambulance, Chew or swallow asprin, Keep calm
+----------------------------------------
+DISEASE: Hepatitis B
+DESCRIPTION: Hepatitis B is an infection of your liver. It can cause scarring of the organ, liver failure, and cancer. It can be fatal if it isn't treated. It's spread when people come in contact with the blood, open sores, or body fluids of someone who has the hepatitis B virus.
+COMMON SYMPTOMS: Abdominal pain, Dark urine, Fatigue, Itching, Lethargy, Loss of appetite, Malaise, Receiving blood transfusion, Receiving unsterile injections, Yellow urine, Yellowing of eyes, Yellowish skin
+RECOMMENDED PRECAUTIONS/TREATMENTS: Consult nearest hospital, Vaccination, Eat healthy, Medication
+----------------------------------------
+DISEASE: Hepatitis C
+DESCRIPTION: Inflammation of the liver due to the hepatitis C virus (HCV), which is usually spread via blood transfusion (rare), hemodialysis, and needle sticks. The damage hepatitis C does to the liver can lead to cirrhosis and its complications as well as cancer.
+COMMON SYMPTOMS: Family history, Fatigue, Loss of appetite, Nausea, Yellowing of eyes, Yellowish skin
+RECOMMENDED PRECAUTIONS/TREATMENTS: Consult nearest hospital, Vaccination, Eat healthy, Medication
+----------------------------------------
+DISEASE: Hepatitis D
+DESCRIPTION: Hepatitis D, also known as the hepatitis delta virus, is an infection that causes the liver to become inflamed. This swelling can impair liver function and cause long-term liver problems, including liver scarring and cancer. The condition is caused by the hepatitis D virus (HDV).
+COMMON SYMPTOMS: Abdominal pain, Dark urine, Fatigue, Joint pain, Loss of appetite, Nausea, Vomiting, Yellowing of eyes, Yellowish skin
+RECOMMENDED PRECAUTIONS/TREATMENTS: Consult doctor, Medication, Eat healthy, Follow up
+----------------------------------------
+DISEASE: Hepatitis E
+DESCRIPTION: A rare form of liver inflammation caused by infection with the hepatitis E virus (HEV). It is transmitted via food or drink handled by an infected person or through infected water supplies in areas where fecal matter may get into the water. Hepatitis E does not cause chronic liver disease.
+COMMON SYMPTOMS: Abdominal pain, Acute liver failure, Coma, Dark urine, Fatigue, High fever, Joint pain, Loss of appetite, Nausea, Stomach bleeding, Vomiting, Yellowing of eyes, Yellowish skin
+RECOMMENDED PRECAUTIONS/TREATMENTS: Stop alcohol consumption, Rest, Consult doctor, Medication
+----------------------------------------
+DISEASE: Hypertension
+DESCRIPTION: Hypertension (HTN or HT), also known as high blood pressure (HBP), is a long-term medical condition in which the blood pressure in the arteries is persistently elevated. High blood pressure typically does not cause symptoms.
+COMMON SYMPTOMS: Chest pain, Dizziness, Headache, Lack of concentration, Loss of balance
+RECOMMENDED PRECAUTIONS/TREATMENTS: Meditation, Salt baths, Reduce stress, Get proper sleep
+----------------------------------------
+DISEASE: Hyperthyroidism
+DESCRIPTION: Hyperthyroidism (overactive thyroid) occurs when your thyroid gland produces too much of the hormone thyroxine. Hyperthyroidism can accelerate your body's metabolism, causing unintentional weight loss and a rapid or irregular heartbeat.
+COMMON SYMPTOMS: Abnormal menstruation, Diarrhoea, Excessive hunger, Fast heart rate, Fatigue, Irritability, Mood swings, Muscle weakness, Restlessness, Sweating, Weight loss
+RECOMMENDED PRECAUTIONS/TREATMENTS: Eat healthy, Massage, Use lemon balm, Take radioactive iodine treatment
+----------------------------------------
+DISEASE: Hypoglycemia
+DESCRIPTION: Hypoglycemia is a condition in which your blood sugar (glucose) level is lower than normal. Glucose is your body's main energy source. Hypoglycemia is often related to diabetes treatment. But other drugs and a variety of conditions — many rare — can cause low blood sugar in people who don't have diabetes.
+COMMON SYMPTOMS: Anxiety, Blurred and distorted vision, Drying and tingling lips, Excessive hunger, Fatigue, Headache, Irritability, Nausea, Palpitations, Slurred speech, Sweating, Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Lie down on side, Check in pulse, Drink sugary drinks, Consult doctor
+----------------------------------------
+DISEASE: Hypothyroidism
+DESCRIPTION: Hypothyroidism, also called underactive thyroid or low thyroid, is a disorder of the endocrine system in which the thyroid gland does not produce enough thyroid hormone.
+COMMON SYMPTOMS: Abnormal menstruation, Brittle nails, Cold hands and feets, Depression, Dizziness, Enlarged thyroid, Fatigue, Irritability, Lethargy, Mood swings, Puffy face and eyes, Swollen extremeties, Weight gain
+RECOMMENDED PRECAUTIONS/TREATMENTS: Reduce stress, Exercise, Eat healthy, Get proper sleep
+----------------------------------------
+DISEASE: Impetigo
+DESCRIPTION: Impetigo (im-puh-TIE-go) is a common and highly contagious skin infection that mainly affects infants and children. Impetigo usually appears as red sores on the face, especially around a child's nose and mouth, and on hands and feet. The sores burst and develop honey-colored crusts.
+COMMON SYMPTOMS: Blister, High fever, Red sore around nose, Skin rash, Yellow crust ooze
+RECOMMENDED PRECAUTIONS/TREATMENTS: Soak affected area in warm water, Use antibiotics, Remove scabs with wet compressed cloth, Consult doctor
+----------------------------------------
+DISEASE: Jaundice
+DESCRIPTION: Yellow staining of the skin and sclerae (the whites of the eyes) by abnormally high blood levels of the bile pigment bilirubin. The yellowing extends to other tissues and body fluids. Jaundice was once called the "morbus regius" (the regal disease) in the belief that only the touch of a king could cure it
+COMMON SYMPTOMS: Abdominal pain, Dark urine, Fatigue, High fever, Itching, Vomiting, Weight loss, Yellowish skin
+RECOMMENDED PRECAUTIONS/TREATMENTS: Drink plenty of water, Consume milk thistle, Eat fruits and high fiberous food, Medication
+----------------------------------------
+DISEASE: Malaria
+DESCRIPTION: An infectious disease caused by protozoan parasites from the Plasmodium family that can be transmitted by the bite of the Anopheles mosquito or by a contaminated needle or transfusion. Falciparum malaria is the most deadly type.
+COMMON SYMPTOMS: Chills, Diarrhoea, Headache, High fever, Muscle pain, Nausea, Sweating, Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Consult nearest hospital, Avoid oily food, Avoid non veg food, Keep mosquitos out
+----------------------------------------
+DISEASE: Migraine
+DESCRIPTION: A migraine can cause severe throbbing pain or a pulsing sensation, usually on one side of the head. It's often accompanied by nausea, vomiting, and extreme sensitivity to light and sound. Migraine attacks can last for hours to days, and the pain can be so severe that it interferes with your daily activities.
+COMMON SYMPTOMS: Acidity, Blurred and distorted vision, Depression, Excessive hunger, Headache, Indigestion, Irritability, Stiff neck, Visual disturbances
+RECOMMENDED PRECAUTIONS/TREATMENTS: Meditation, Reduce stress, Use poloroid glasses in sun, Consult doctor
+----------------------------------------
+DISEASE: Osteoarthristis
+DESCRIPTION: Osteoarthritis is the most common form of arthritis, affecting millions of people worldwide. It occurs when the protective cartilage that cushions the ends of your bones wears down over time.
+COMMON SYMPTOMS: Hip joint pain, Joint pain, Knee pain, Neck pain, Painful walking, Swelling joints
+RECOMMENDED PRECAUTIONS/TREATMENTS: Acetaminophen, Consult nearest hospital, Follow up, Salt baths
+----------------------------------------
+DISEASE: Paralysis (brain hemorrhage)
+DESCRIPTION: Intracerebral hemorrhage (ICH) is when blood suddenly bursts into brain tissue, causing damage to your brain. Symptoms usually appear suddenly during ICH. They include headache, weakness, confusion, and paralysis, particularly on one side of your body.
+COMMON SYMPTOMS: Altered sensorium, Headache, Vomiting, Weakness of one body side
+RECOMMENDED PRECAUTIONS/TREATMENTS: Massage, Eat healthy, Exercise, Consult doctor
+----------------------------------------
+DISEASE: Peptic ulcer diseae
+DESCRIPTION: Peptic ulcer disease (PUD) is a break in the inner lining of the stomach, the first part of the small intestine, or sometimes the lower esophagus. An ulcer in the stomach is called a gastric ulcer, while one in the first part of the intestines is a duodenal ulcer.
+COMMON SYMPTOMS: Abdominal pain, Indigestion, Internal itching, Loss of appetite, Passage of gases, Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Avoid fatty spicy food, Consume probiotic food, Eliminate milk, Limit alcohol
+----------------------------------------
+DISEASE: Pneumonia
+DESCRIPTION: Pneumonia is an infection in one or both lungs. Bacteria, viruses, and fungi cause it. The infection causes inflammation in the air sacs in your lungs, which are called alveoli. The alveoli fill with fluid or pus, making it difficult to breathe.
+COMMON SYMPTOMS: Breathlessness, Chest pain, Chills, Cough, Fast heart rate, Fatigue, High fever, Malaise, Phlegm, Rusty sputum, Sweating
+RECOMMENDED PRECAUTIONS/TREATMENTS: Consult doctor, Medication, Rest, Follow up
+----------------------------------------
+DISEASE: Psoriasis
+DESCRIPTION: Psoriasis is a common skin disorder that forms thick, red, bumpy patches covered with silvery scales. They can pop up anywhere, but most appear on the scalp, elbows, knees, and lower back. Psoriasis can't be passed from person to person. It does sometimes happen in members of the same family.
+COMMON SYMPTOMS: Inflammatory nails, Joint pain, Silver like dusting, Skin peeling, Skin rash, Small dents in nails
+RECOMMENDED PRECAUTIONS/TREATMENTS: Wash hands with warm soapy water, Stop bleeding using pressure, Consult doctor, Salt baths
+----------------------------------------
+DISEASE: Tuberculosis
+DESCRIPTION: Tuberculosis (TB) is an infectious disease usually caused by Mycobacterium tuberculosis (MTB) bacteria. Tuberculosis generally affects the lungs, but can also affect other parts of the body. Most infections show no symptoms, in which case it is known as latent tuberculosis.
+COMMON SYMPTOMS: Blood in sputum, Breathlessness, Chest pain, Chills, Cough, Fatigue, High fever, Loss of appetite, Malaise, Mild fever, Phlegm, Sweating, Swelled lymph nodes, Vomiting, Weight loss, Yellowing of eyes
+RECOMMENDED PRECAUTIONS/TREATMENTS: Cover mouth, Consult doctor, Medication, Rest
+----------------------------------------
+DISEASE: Typhoid
+DESCRIPTION: An acute illness characterized by fever caused by infection with the bacterium Salmonella typhi. Typhoid fever has an insidious onset, with fever, headache, constipation, malaise, chills, and muscle pain. Diarrhea is uncommon, and vomiting is not usually severe.
+COMMON SYMPTOMS: Abdominal pain, Belly pain, Chills, Constipation, Diarrhoea, Fatigue, Headache, High fever, Nausea, Toxic look (typhos), Vomiting
+RECOMMENDED PRECAUTIONS/TREATMENTS: Eat high calorie vegitables, Antiboitic therapy, Consult doctor, Medication
+----------------------------------------
+DISEASE: Urinary tract infection
+DESCRIPTION: Urinary tract infection: An infection of the kidney, ureter, bladder, or urethra. Abbreviated UTI. Not everyone with a UTI has symptoms, but common symptoms include a frequent urge to urinate and pain or burning when urinating.
+COMMON SYMPTOMS: Bladder discomfort, Burning micturition, Continuous feel of urine, Foul smell of urine
+RECOMMENDED PRECAUTIONS/TREATMENTS: Drink plenty of water, Increase vitamin c intake, Drink cranberry juice, Take probiotics
+----------------------------------------
+DISEASE: Varicose veins
+DESCRIPTION: A vein that has enlarged and twisted, often appearing as a bulging, blue blood vessel that is clearly visible through the skin. Varicose veins are most common in older adults, particularly women, and occur especially on the legs.
+COMMON SYMPTOMS: Bruising, Cramps, Fatigue, Obesity, Prominent veins on calf, Swollen blood vessels, Swollen legs
+RECOMMENDED PRECAUTIONS/TREATMENTS: Lie down flat and raise the leg high, Use oinments, Use vein compression, Dont stand still for long
+----------------------------------------
+DISEASE: hepatitis A
+DESCRIPTION: Hepatitis A is a highly contagious liver infection caused by the hepatitis A virus. The virus is one of several types of hepatitis viruses that cause inflammation and affect your liver's ability to function.
+COMMON SYMPTOMS: Abdominal pain, Dark urine, Diarrhoea, Joint pain, Loss of appetite, Mild fever, Muscle pain, Nausea, Vomiting, Yellowing of eyes, Yellowish skin
+RECOMMENDED PRECAUTIONS/TREATMENTS: Consult nearest hospital, Wash hands through, Avoid fatty spicy food, Medication
+----------------------------------------

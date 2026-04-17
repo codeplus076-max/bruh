@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 244 247 249;
+    --surface: 255 255 255;
+    --surface-highlight: 240 244 248;
+    --primary: 2 132 199;
+    --primary-vibrant: 3 105 161;
+    --primary-muted: 2 132 199;
+    --secondary: 16 185 129;
+    --danger: 225 29 72;
+    --warning: 245 158 11;
+    --text-main: 15 23 42;
+    --text-muted: 100 116 139;
+    --border-dark: 15 23 42;
+    --border-opacity: 0.1;
+
+    --bg-mesh-1: 2 132 199;
+    --bg-mesh-2: 16 185 129;
+    --grid-line: 15 23 42;
+    --scrollbar-thumb: 203 213 225;
+    --scrollbar-hover: 148 163 184;
+  }
+
+  .dark {
+    --background: 10 12 16;
+    --surface: 17 21 28;
+    --surface-highlight: 24 29 38;
+    --primary: 0 240 255;
+    --primary-vibrant: 0 213 255;
+    --primary-muted: 0 240 255;
+    --secondary: 0 255 157;
+    --danger: 255 51 102;
+    --warning: 255 209 102;
+    --text-main: 226 232 240;
+    --text-muted: 148 163 184;
+    --border-dark: 255 255 255;
+    --border-opacity: 0.08;
+
+    --bg-mesh-1: 0 240 255;
+    --bg-mesh-2: 0 255 157;
+    --grid-line: 255 255 255;
+    --scrollbar-thumb: 30 41 59;
+    --scrollbar-hover: 51 65 85;
+  }
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--text-main));
+  font-family: var(--font-outfit), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgb(var(--bg-mesh-1) / 0.05), transparent 35%),
+    radial-gradient(circle at 85% 30%, rgb(var(--bg-mesh-2) / 0.03), transparent 35%),
+    linear-gradient(rgb(var(--grid-line) / 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--grid-line) / 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  background-attachment: fixed;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-syne), sans-serif;
+}
+
+/* Glassmorphism primitives */
+.glass-panel {
+  @apply bg-surface/80 backdrop-blur-xl border border-borderDark shadow-glass rounded-2xl;
+}
+
+.glass-pill {
+  @apply bg-surface/50 backdrop-blur-md border border-borderDark px-4 py-2 rounded-full;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-hover);
+}
+
+/* Markdown prose overrides (if any) */
+.prose {
+  color: var(--text-main);
+}
+
+.prose strong {
+  color: var(--text-main);
+  font-weight: 600;
+}
