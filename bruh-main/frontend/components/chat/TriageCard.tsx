@@ -46,9 +46,7 @@ export function TriageCard({ diagnosis }: { diagnosis: Diagnosis | null | undefi
     // Styling logic for header background
     const isWarning  = (alerts.length > 0) || (actions.length > 0);
 
-    const riskBadgeColor = isWarning 
-        ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
-        : "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+
 
     return (
         <motion.div 
